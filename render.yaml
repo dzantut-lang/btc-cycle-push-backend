@@ -1,0 +1,32 @@
+services:
+  - type: web
+    name: btc-cycle-desk-push
+    runtime: node
+    plan: starter
+    region: oregon
+    buildCommand: npm install
+    startCommand: npm start
+    healthCheckPath: /health
+    disk:
+      name: btc-cycle-push-data
+      mountPath: /opt/render/project/src/data
+      sizeGB: 1
+    envVars:
+      - key: NODE_VERSION
+        value: 20
+      - key: DATA_DIR
+        value: /opt/render/project/src/data
+      - key: PORT
+        value: 8080
+      - key: POLL_MINUTES
+        value: 15
+      - key: ALLOWED_ORIGIN
+        value: https://headless-tlsmzediahg-8jsw69yvfg-140a.wix-site-host.com
+      - key: VAPID_SUBJECT
+        value: mailto:admin@example.com
+      - key: ADMIN_SECRET
+        generateValue: true
+      - key: VAPID_PUBLIC_KEY
+        sync: false
+      - key: VAPID_PRIVATE_KEY
+        sync: false
