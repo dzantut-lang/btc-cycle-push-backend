@@ -58,7 +58,7 @@ function rsi(values, period = 14) {
   return 100 - 100 / (1 + rs);
 }
 async function computeSignal() {
-  const url = 'https://api.binance.com/api/v3/klines?symbol=BTCUSDT&interval=1d&limit=220';
+  const url = 'https://api.binance.us/api/v3/klines?symbol=BTCUSDT&interval=1d&limit=220';
   const response = await fetch(url, { headers: { 'accept': 'application/json' } });
   if (!response.ok) throw new Error(`Binance HTTP ${response.status}`);
   const rows = await response.json();
