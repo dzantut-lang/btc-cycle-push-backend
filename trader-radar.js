@@ -71,7 +71,7 @@ class TraderRadar {
       const pnl=cycle.realizedPnl;m.closedTrades+=1;m.realizedPnl+=pnl;
       if(pnl>0){m.wins+=1;m.grossProfit+=pnl;}else if(pnl<0){m.losses+=1;m.grossLoss+=Math.abs(pnl);}else m.breakeven+=1;
       m.avgPnl=m.realizedPnl/m.closedTrades;m.winRate=m.wins/Math.max(1,m.wins+m.losses);
-      m.profitFactor=m.grossLoss>0?m.grossProfit/m.grossLoss:(m.grossProfit>0?null:0);
+      m.profitFactor=m.grossLoss>0?m.grossProfit/m.grossLoss:(m.grossProfit>0?3:0);m.profitFactorCapped=m.grossLoss===0&&m.grossProfit>0;
       m.lastCloseAt=new Date(num(fill.time)).toISOString();this.performance[address]=m;delete this.closeCycles[address];
     }else this.closeCycles[address]=cycle;
   }
