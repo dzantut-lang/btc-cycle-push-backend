@@ -33,42 +33,28 @@
     async function renderTraderChart(el, events, eligible) {
       if (!el) return;
       try {
-        const res = await fetch('https://api.binance.us/api/v3/klines?symbol=BTCUSDT&interval=4h&limit=90', { cache: 'no-store' });
+        const res = await fetch('https://api.binance.us/api/v3/klines?symbol=BTCUSDT&interval=1m&limit=120', { cache: 'no-store' });
         if (!res.ok) throw new Error('Candles BTC indisponíveis');
         const rows = await res.json();
-        if (!Array.isArray(rows) || rows.length < 10) throw new Error('Histórico de candles insuficiente');
-        const candles = rows.map(r => ({ t: Number(r[0]), c: Number(r[4]) })).filter(r => r.t > 0 && r.c > 0);
-        const allowed = new Set(eligible.map(t => String(t.address).toLowerCase()));
-        const marks = events.filter(ev => allowed.has(String(ev.wallet || '').toLowerCase()) && Number(ev.timestamp) > 0 && Number(ev.price) > 0 && Number(ev.timestamp) >= candles[0].t && Number(ev.timestamp) <= Date.now() + 60000);
-        const W = 760, H = 320, L = 65, R = 16, T = 22, B = 32, innerW = W - L - R;
-        const tickerRes = await fetch('https://api.binance.us/api/v3/ticker/price?symbol=BTCUSDT', { cache: 'no-store' });
-        let livePrice = null;
-        if (tickerRes.ok) { const q = await tickerRes.json(); livePrice = Number(q.price); if (!(livePrice > 0)) livePrice = null; }
-        const lastTime = Math.max(Date.now(), candles[candles.length - 1].t + 1);
-        const plotCandles = candles.concat(livePrice ? [{ t: lastTime, c: livePrice, live: true }] : []);
-        const prices = plotCandles.map(c => c.c).concat(marks.map(e => Number(e.price)));
-        const min = Math.min(...prices) * 0.997, max = Math.max(...prices) * 1.003, range = max - min || 1;
-        const x = t => L + ((t - candles[0].t) / (lastTime - candles[0].t || 1)) * innerW;
-        const y = p => T + (max - p) / range * (H - T - B);
-        const path = plotCandles.map((c, i) => (i ? 'L' : 'M') + x(c.t).toFixed(1) + ',' + y(c.c).toFixed(1)).join(' ');
-        const grid = [0, 1, 2, 3].map(i => {
-          const p = max - range * i / 3, yy = y(p);
-          return '<line x1="' + L + '" y1="' + yy + '" x2="' + (W - R) + '" y2="' + yy + '" stroke="rgba(120,145,175,.16)"/><text x="' + (L - 7) + '" y="' + (yy + 4) + '" fill="#8fa4bf" font-size="10" text-anchor="end">' + Math.round(p).toLocaleString('en-US') + '</text>';
-        }).join('');
-        const dots = marks.map(ev => {
-          const entry = ev.type === 'NEW_BTC_ENTRY';
-          const buy = entry ? ev.direction === 'LONG' : ev.direction === 'CLOSE_SHORT';
-          const color = buy ? '#4ade80' : '#fb7185';
-          const cx = x(Number(ev.timestamp)), cy = y(Number(ev.price));
-          const kind = entry ? (buy ? 'COMPRA · LONG' : 'VENDA · SHORT') : ((ev.isFullClose ? 'SAÍDA ' : 'REDUÇÃO ') + ev.direction);
-          const label = (ev.trader || ev.wallet || 'Trader') + ' · ' + kind + ' · ' + new Date(Number(ev.timestamp)).toLocaleString('pt-BR') + ' · $' + Number(ev.price).toLocaleString('en-US');
-          return '<g style="color:' + color + '"><circle class="tr-radar-pulse" cx="' + cx.toFixed(1) + '" cy="' + cy.toFixed(1) + '" r="5" fill="' + color + '"/><circle class="tr-radar-core" cx="' + cx.toFixed(1) + '" cy="' + cy.toFixed(1) + '" r="5" fill="' + color + '"><title>' + esc(label) + '</title></circle></g>';
-        }).join('');
-        const note = eligible.length + ' trader(s) validados · ' + marks.length + ' evento(s) no período · candle 4h + preço spot atualizado' + (eligible.length < 5 ? ' · ranking ainda não possui cinco traders validados' : '');
-        el.innerHTML = '<div class="tr-metrics"><span>● BTC '+(livePrice?'AO VIVO':'COTAÇÃO INDISPONÍVEL')+'</span><span>'+(livePrice?'$'+livePrice.toLocaleString('en-US',{maximumFractionDigits:2}):'')+'</span><span>Atualizado '+new Date().toLocaleTimeString('pt-BR')+'</span></div><svg class="tr-chart-svg" viewBox="0 0 '+W+' '+H+'" role="img" aria-label="Gráfico BTC com pontos pulsantes das compras e vendas dos cinco traders validados">'+grid+'<path d="'+path+'" fill="none" stroke="#f7931a" stroke-width="2.4" stroke-linejoin="round" stroke-linecap="round"/>'+dots+'<text x="'+L+'" y="'+(H-8)+'" fill="#8fa4bf" font-size="10">'+new Date(candles[0].t).toLocaleString('pt-BR',{day:'2-digit',month:'2-digit',hour:'2-digit'})+'</text><text x="'+(W-R)+'" y="'+(H-8)+'" fill="#8fa4bf" font-size="10" text-anchor="end">AGORA</text></svg><div class="tr-chart-legend"><span><i class="tr-dot" style="background:#4ade80"></i>Compra / entrada LONG</span><span><i class="tr-dot" style="background:#fb7185"></i>Venda / SHORT / saída</span></div><div class="tr-meta">'+note+'</div>';
-      } catch (err) {
-        el.innerHTML = '<div class="tr-chart-empty">' + esc(err.message || 'Não foi possível carregar o gráfico BTC') + '</div>';
-      }
+        if (!Array.isArray(rows) || rows.length < 20) throw new Error('Histórico de candles insuficiente');
+        const candles = rows.map(r => ({ t:Number(r[0]), o:Number(r[1]), h:Number(r[2]), l:Number(r[3]), c:Number(r[4]) })).filter(c => c.t > 0 && c.o > 0 && c.h > 0 && c.l > 0 && c.c > 0);
+        const allowed = new Set(eligible.slice(0, 5).map(t => String(t.address).toLowerCase()));
+        const first = candles[0].t, last = candles[candles.length - 1].t, now = Date.now();
+        const marks = events.filter(ev => allowed.has(String(ev.wallet || '').toLowerCase()) && Number(ev.timestamp) >= first && Number(ev.timestamp) <= now + 60000 && Number(ev.price) > 0).sort((a,b) => Number(a.timestamp)-Number(b.timestamp));
+        const W=760,H=320,L=66,R=16,T=18,B=30,plotW=W-L-R,plotH=H-T-B;
+        const prices=candles.flatMap(c=>[c.h,c.l]).concat(marks.map(e=>Number(e.price)));
+        const lo=Math.min(...prices)*0.999,hi=Math.max(...prices)*1.001,span=hi-lo||1;
+        const x=i=>L+i/(candles.length-1)*plotW, y=p=>T+(hi-p)/span*plotH;
+        const idx=t=>Math.max(0,Math.min(candles.length-1,Math.round((t-first)/(last-first||1)*(candles.length-1))));
+        const grid=[0,1,2,3,4].map(i=>{const p=hi-span*i/4,yy=y(p);return '<line x1="'+L+'" y1="'+yy.toFixed(1)+'" x2="'+(W-R)+'" y2="'+yy.toFixed(1)+'" stroke="#243247"/><text x="'+(L-8)+'" y="'+(yy+4).toFixed(1)+'" fill="#9db0c7" font-size="10" text-anchor="end">'+Math.round(p).toLocaleString('en-US')+'</text>';}).join('');
+        const cw=Math.max(2,Math.min(5,plotW/candles.length*.62));
+        const candleSvg=candles.map((c,i)=>{const cx=x(i),up=c.c>=c.o,col=up?'#35d49a':'#fb6477',top=y(Math.max(c.o,c.c)),bottom=y(Math.min(c.o,c.c));return '<g><line x1="'+cx.toFixed(1)+'" y1="'+y(c.h).toFixed(1)+'" x2="'+cx.toFixed(1)+'" y2="'+y(c.l).toFixed(1)+'" stroke="'+col+'" stroke-width="1.2"/><rect x="'+(cx-cw/2).toFixed(1)+'" y="'+top.toFixed(1)+'" width="'+cw.toFixed(1)+'" height="'+Math.max(1.5,bottom-top).toFixed(1)+'" rx=".5" fill="'+col+'"/></g>';}).join('');
+        const dots=marks.map(ev=>{const entry=ev.type==='NEW_BTC_ENTRY',green=entry?ev.direction==='LONG':ev.direction==='CLOSE_SHORT',col=green?'#4ade80':'#fb7185',cx=x(idx(Number(ev.timestamp))),cy=y(Number(ev.price)),kind=entry?(green?'COMPRA · LONG':'VENDA · SHORT'):(ev.isFullClose?'SAÍDA ':'REDUÇÃO ')+(ev.direction==='CLOSE_LONG'?'LONG':'SHORT'),label=(ev.trader||ev.wallet||'Trader')+' · '+kind+' · '+new Date(Number(ev.timestamp)).toLocaleString('pt-BR')+' · '+money(ev.price);return '<g><circle class="tr-radar-pulse" cx="'+cx.toFixed(1)+'" cy="'+cy.toFixed(1)+'" r="5" fill="'+col+'"/><circle class="tr-radar-core" cx="'+cx.toFixed(1)+'" cy="'+cy.toFixed(1)+'" r="4.5" fill="'+col+'"><title>'+esc(label)+'</title></circle></g>';}).join('');
+        let livePrice=candles[candles.length-1].c;
+        try { const tr=await fetch('https://api.binance.us/api/v3/ticker/price?symbol=BTCUSDT',{cache:'no-store'}); if(tr.ok){const q=await tr.json();if(Number(q.price)>0)livePrice=Number(q.price);} } catch (_) {}
+        const note=eligible.length?'Mostrando '+Math.min(5,eligible.length)+' trader(s) validados · '+marks.length+' operação(ões) no período':'Candles BTC ao vivo · aguardando histórico suficiente para validar traders';
+        el.innerHTML='<div class="tr-metrics"><span><i class="tr-live-dot"></i> BTC · CANDLES 1 MIN</span><strong>'+money(livePrice)+'</strong><span>Atualizado '+new Date().toLocaleTimeString('pt-BR')+'</span></div><svg class="tr-chart-svg" viewBox="0 0 '+W+' '+H+'" role="img" aria-label="Candles de Bitcoin com operações dos cinco traders mais bem classificados">'+grid+candleSvg+dots+'<text x="'+L+'" y="'+(H-7)+'" fill="#9db0c7" font-size="10">'+new Date(first).toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'})+'</text><text x="'+(W-R)+'" y="'+(H-7)+'" fill="#9db0c7" font-size="10" text-anchor="end">AGORA</text></svg><div class="tr-chart-legend"><span><i class="tr-dot" style="background:#4ade80"></i>Compra / saída SHORT</span><span><i class="tr-dot" style="background:#fb7185"></i>Venda / saída LONG</span></div><div class="tr-meta">'+note+'. A marcação depende da chegada da execução pública da Hyperliquid.</div>';
+      } catch (err) { el.innerHTML='<div class="tr-chart-empty">'+esc(err.message || 'Não foi possível carregar candles BTC')+'</div>'; }
     }
     async function refresh() {
       if (stopped) return;
