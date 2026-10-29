@@ -12,4 +12,7 @@ jobs:
         with:
           node-version: 20
       - run: npm install
+      - run: node --check server.js
+      - run: node --check trader-radar.js
+      - run: node --check public/trader-radar-panel.js
       - run: npm test
