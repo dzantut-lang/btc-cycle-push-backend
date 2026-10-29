@@ -91,7 +91,10 @@ async function monitorOnce() {
   return { ...current, changed: Boolean(previous && previous.signal !== current.signal) };
 }
 
-app.get('/health', (_req,res) => res.json({ ok: true, service: 'BTC Cycle Desk Push', pushReady, subscribers: subscriptions().length, pollingMinutes: Math.max(5, Number(process.env.POLL_MINUTES || 15)) }));
+app.get('/health', (_req,res) => {
+  const radar = traderRadar.status();
+  res.json({ ok: true, service: 'BTC Cycle Desk Push', pushReady, subscribers: subscriptions().length, pollingMinutes: Math.max(5, Number(process.env.POLL_MINUTES || 15)), traderRadar: { running: radar.running, source: radar.source, watchedWallets: radar.watchedWallets, connectedWallets: radar.connectedWallets, eventCount: radar.eventCount, rankedEligible: radar.rankedEligible, lastDiscoveryAt: radar.lastDiscoveryAt, lastError: radar.lastError } });
+});
 app.get('/api/push/public-key', (_req,res) => { if (!publicKey || publicKey.startsWith('REPLACE_')) return res.status(503).json({ error: 'VAPID_PUBLIC_KEY_NOT_CONFIGURED' }); res.json({ publicKey }); });
 app.post('/api/push/subscribe', (req,res) => {
   const sub = req.body && req.body.subscription;
