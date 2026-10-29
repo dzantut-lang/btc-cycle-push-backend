@@ -1,6 +1,6 @@
 const test = require('node:test');
 const assert = require('node:assert/strict');
-const { validAddress, classifyNewBtcEntry, selectLeaderboardCandidates } = require('../trader-radar');
+const { validAddress, classifyNewBtcEntry, classifyBtcExit, selectLeaderboardCandidates } = require('../trader-radar');
 
 const wallet = '0x1234567890abcdef1234567890abcdef12345678';
 const fill = (overrides = {}) => ({ coin: 'BTC', dir: 'Open Long', startPosition: '0', px: '65000', sz: '0.1', time: 1793290000000, hash: '0xabc', oid: 12, tid: 34, side: 'B', ...overrides });
@@ -55,4 +55,23 @@ test('selects only valid, sufficiently funded candidates with positive weekly/mo
 
 test('rejects unexpected leaderboard response shapes', () => {
   assert.throws(() => selectLeaderboardCandidates({ nope: true }), /Schema inesperado/);
+});
+
+test('detects a full BTC long exit with actual execution price and realized PnL', () => {
+  const event = classifyBtcExit(fill({ dir: 'Close Long', startPosition: '0.1', px: '67000', sz: '0.1', side: 'A', closedPnl: '200' }), wallet);
+  assert.equal(event.type, 'BTC_POSITION_EXIT');
+  assert.equal(event.direction, 'CLOSE_LONG');
+  assert.equal(event.price, 67000);
+  assert.equal(event.closedPnl, 200);
+  assert.equal(event.isFullClose, true);
+});
+test('marks partial exits as reductions, not full closes', () => {
+  const event = classifyBtcExit(fill({ dir: 'Close Short', startPosition: '-0.2', px: '64000', sz: '0.1', side: 'B', closedPnl: '50' }), wallet);
+  assert.equal(event.direction, 'CLOSE_SHORT');
+  assert.equal(event.isFullClose, false);
+  assert.equal(event.remainingPosition, -0.1);
+});
+test('ignores invalid exit events and other assets', () => {
+  assert.equal(classifyBtcExit(fill({ dir: 'Close Long', startPosition: '0.1', sz: '0.1', side: 'A' }), wallet), null);
+  assert.equal(classifyBtcExit(fill({ dir: 'Close Long', startPosition: '0.1', sz: '0.1', side: 'A', closedPnl: '10', coin: 'ETH' }), wallet), null);
 });
