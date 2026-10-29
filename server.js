@@ -23,7 +23,7 @@ function saveSubscriptions(value) { writeJson(SUBS_FILE, value); }
 const publicKey = process.env.VAPID_PUBLIC_KEY || '';
 const privateKey = process.env.VAPID_PRIVATE_KEY || '';
 const subject = process.env.VAPID_SUBJECT || '';
-const subjectConfigured = (/^mailto:[^@\s]+@[^@\s]+\.[^@\s]+$/.test(subject) && !/example\.(com|org|net)$/i.test(subject)) || /^https:\/\/\S+$/.test(subject);
+const subjectConfigured = (subject.startsWith('mailto:') && subject.includes('@') && subject.includes('.') && !subject.toLowerCase().includes('example.com') && !subject.toLowerCase().includes('example.org') && !subject.toLowerCase().includes('example.net')) || (subject.startsWith('https://') && !subject.includes(' '));
 // Do not report push as ready unless the credentials, contact subject, and durable storage are all configured.
 const persistentStorageConfigured = process.env.DATA_PERSISTENT === 'true';
 const pushReady = Boolean(publicKey && privateKey && !publicKey.startsWith('REPLACE_') && !privateKey.startsWith('REPLACE_') && subjectConfigured && persistentStorageConfigured);
