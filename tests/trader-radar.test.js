@@ -38,7 +38,7 @@ test('rejects incomplete or invalid fills', () => {
   assert.equal(classifyNewBtcEntry(fill({ time: 0 }), wallet), null);
 });
 
-test('selects only valid, sufficiently funded candidates with positive weekly/monthly/all-time PnL', () => {
+test('keeps funded candidates with positive monthly/all-time PnL even during a negative weekly pullback', () => {
   const row = (address, accountValue, week, month, allTime) => ({
     ethAddress: address, accountValue,
     windowPerformances: [['week', { pnl: week }], ['month', { pnl: month }], ['allTime', { pnl: allTime }]]
@@ -49,8 +49,9 @@ test('selects only valid, sufficiently funded candidates with positive weekly/mo
     row('0xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa', 9000, 100, 500, 1000),
     row('0xbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb', 20000, -1, 500, 1000)
   ], 10000, 25);
-  assert.equal(candidates.length, 1);
+  assert.equal(candidates.length, 2);
   assert.equal(candidates[0].address, wallet);
+  assert.equal(candidates[1].weekPnl, -1);
 });
 
 test('rejects unexpected leaderboard response shapes', () => {
