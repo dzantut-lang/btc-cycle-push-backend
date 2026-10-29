@@ -136,24 +136,54 @@ app.post('/api/admin/notify', requireAdmin, async (req,res) => {
 app.get('/api/market/signal', (_req,res) => res.status(503).json({ error: 'official_engine_not_integrated', message: 'O motor público do backend não está sincronizado com o motor oficial do dashboard. O endpoint de sinal foi bloqueado para impedir que uma heurística diária seja confundida com o sinal oficial de 3 dias.', officialEngineIntegrated: false, officialTimeframe: '3d', legacyEngineTimeframe: '1d', marketSignalAlertsEnabled: false }));
 app.post('/api/admin/check-now', requireAdmin, async (_req,res) => { try { res.json(await monitorOnce()); } catch (e) { res.status(502).json({ error: 'monitor_failed', message: e.message }); } });
 app.get('/api/trader-radar/panel.js', (_req,res) => { res.type('application/javascript').set('Cache-Control','no-store').sendFile(path.join(__dirname,'public','trader-radar-panel.js')); });
+// Short server-side cache and request coalescing prevent mobile refreshes from
+// firing duplicate upstream candle requests. Keep stale data only as an explicitly
+// labelled fallback when Hyperliquid is temporarily unavailable.
+const traderRadarCandleCache = new Map();
+const traderRadarCandleRequests = new Map();
 app.get('/api/trader-radar/candles', async (req,res) => {
   const allowed = new Set(['1m','5m','15m','1h','4h','1d']);
   const interval = allowed.has(String(req.query.interval)) ? String(req.query.interval) : '1m';
   const limit = Math.min(500, Math.max(20, Number(req.query.limit) || 120));
   const duration = ({'1m':60000,'5m':300000,'15m':900000,'1h':3600000,'4h':14400000,'1d':86400000})[interval];
-  const endTime = Date.now();
+  const key = interval + ':' + limit;
+  const now = Date.now();
+  const cached = traderRadarCandleCache.get(key);
+  if (cached && now - cached.fetchedAt < 10000) {
+    return res.set('Cache-Control','no-store').json({...cached.payload, cache:{state:'fresh',ageMs:now-cached.fetchedAt}});
+  }
   try {
-    const response = await fetch('https://api.hyperliquid.xyz/info', {
-      method: 'POST',
-      headers: {'content-type':'application/json','accept':'application/json'},
-      body: JSON.stringify({type:'candleSnapshot',req:{coin:'BTC',interval,startTime:endTime-limit*duration,endTime}})
-    });
-    if (!response.ok) return res.status(502).json({error:'hyperliquid_candles_unavailable',status:response.status});
-    const candles = await response.json();
-    if (!Array.isArray(candles)) return res.status(502).json({error:'invalid_candle_response'});
-    res.set('Cache-Control','no-store').json({source:'Hyperliquid BTC candles',interval,candles});
+    let pending = traderRadarCandleRequests.get(key);
+    if (!pending) {
+      const endTime = now;
+      pending = (async () => {
+        const response = await fetch('https://api.hyperliquid.xyz/info', {
+          method: 'POST',
+          headers: {'content-type':'application/json','accept':'application/json'},
+          body: JSON.stringify({type:'candleSnapshot',req:{coin:'BTC',interval,startTime:endTime-limit*duration,endTime}}),
+          signal: AbortSignal.timeout(8000)
+        });
+        if (!response.ok) throw new Error('Hyperliquid HTTP ' + response.status);
+        const candles = await response.json();
+        if (!Array.isArray(candles) || candles.some(c => !c || !Number.isFinite(Number(c.t)) || !Number.isFinite(Number(c.c)))) {
+          throw new Error('Resposta de candles inválida');
+        }
+        const payload = {source:'Hyperliquid BTC candles',interval,candles};
+        traderRadarCandleCache.set(key,{fetchedAt:Date.now(),payload});
+        return payload;
+      })();
+      traderRadarCandleRequests.set(key,pending);
+    }
+    const payload = await pending;
+    res.set('Cache-Control','no-store').json({...payload,cache:{state:'refreshed',ageMs:0}});
   } catch (e) {
-    res.status(502).json({error:'hyperliquid_candles_unavailable',message:e.message});
+    const fallback = traderRadarCandleCache.get(key);
+    if (fallback) {
+      return res.set('Cache-Control','no-store').json({...fallback.payload,cache:{state:'stale-fallback',ageMs:Date.now()-fallback.fetchedAt,error:String(e.message||e)}});
+    }
+    res.status(502).json({error:'hyperliquid_candles_unavailable',message:String(e.message||e),retryable:true});
+  } finally {
+    traderRadarCandleRequests.delete(key);
   }
 });
 
