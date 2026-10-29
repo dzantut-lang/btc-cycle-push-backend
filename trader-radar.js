@@ -38,7 +38,7 @@ class TraderRadar {
     this.eventsFile = path.join(dataDir,'trader-radar-events.json'); this.walletsFile = path.join(dataDir,'trader-radar-wallets.json'); this.stateFile = path.join(dataDir,'trader-radar-state.json');
     this.events = this.read(this.eventsFile,[]); this.seen = new Set(this.read(path.join(dataDir,'trader-radar-seen.json'),[]));
     const state = this.read(this.stateFile,{}); this.lastDiscoveryAt = state.lastDiscoveryAt || null; this.lastError = state.lastError || null;
-    this.initialized = new Set(state.initialized || []); this.cursors = state.cursors || {}; this.wallets = new Map();
+    this.initialized = new Set(state.initialized || []); this.cursors = state.cursors || {}; this.closeCycles = state.closeCycles || {}; this.performance = state.performance || {}; this.wallets = new Map();
     for (const w of [...this.read(this.walletsFile,[]), ...wallets]) this.addWallet(w.address || w, w, false);
   }
   read(f,d){try{return JSON.parse(fs.readFileSync(f,'utf8'));}catch{return d;}}
@@ -46,7 +46,7 @@ class TraderRadar {
   addWallet(address,meta={},persist=true){if(!validAddress(address))throw new Error('Endereço Hyperliquid inválido');address=address.toLowerCase();const old=this.wallets.get(address)||{};const w={address,displayName:meta.displayName||old.displayName||null,accountValue:meta.accountValue??old.accountValue??null,source:meta.source||old.source||'lista manual',addedAt:old.addedAt||new Date().toISOString()};this.wallets.set(address,w);if(persist)this.save();if(this.running)this.connect(address);return w;}
   removeWallet(address){address=String(address).toLowerCase();this.wallets.delete(address);try{this.sockets.get(address)?.close();}catch{}this.sockets.delete(address);clearTimeout(this.timers.get(address));this.timers.delete(address);this.save();}
   async discoverCandidates(){const res=await this.fetch(LEADERBOARD,{headers:{accept:'application/json'},signal:AbortSignal.timeout(12000)});if(!res.ok)throw new Error('Leaderboard HTTP '+res.status);const candidates=selectCandidates(await res.json(),num(process.env.TRADER_RADAR_MIN_ACCOUNT_VALUE)||10000,Math.min(100,num(process.env.TRADER_RADAR_MAX_WALLETS)||25));for(const c of candidates)this.addWallet(c.address,c,false);this.lastDiscoveryAt=new Date().toISOString();this.lastError=null;this.save();return candidates;}
-  start(){if(this.running)return;this.running=true;for(const a of this.wallets.keys())this.connect(a);this.discoverCandidates().then(()=>{for(const a of this.wallets.keys())this.connect(a)}).catch(e=>{this.lastError=e.message;this.logger.error('Trader Radar discovery:',e.message);this.save()});this.discoveryTimer=setInterval(()=>this.discoverCandidates().then(()=>{for(const a of this.wallets.keys())if(!this.sockets.has(a))this.connect(a)}).catch(e=>{this.lastError=e.message;this.save()}),Math.max(15,num(process.env.TRADER_RADAR_DISCOVERY_MINUTES)||60)*60000);}
+  start(){if(this.running)return;this.running=true;for(const a of this.wallets.keys())this.connect(a);this.discoverCandidates().then(()=>{for(const a of this.wallets.keys())this.connect(a)}).catch(e=>{this.lastError=e.message;this.logger.error('Trader Radar discovery:',e.message);this.save()});this.discoveryTimer=setInterval(()=>this.discoverCandidates().then(()=>{for(const a of this.wallets.keys())if(!this.sockets.has(a))this.connect(a)}).catch(e=>{this.lastError=e.message;this.save()}),Math.max(60,num(process.env.TRADER_RADAR_DISCOVERY_MINUTES)||360)*60000);}
   stop(){this.running=false;clearInterval(this.discoveryTimer);for(const t of this.timers.values())clearTimeout(t);for(const s of this.sockets.values())try{s.close()}catch{}this.timers.clear();this.sockets.clear();}
   connect(address){if(!this.running||this.sockets.has(address)||!this.WS)return;let ws;try{ws=new this.WS(HL_WS)}catch(e){return this.reconnect(address)}this.sockets.set(address,ws);
     ws.addEventListener('open',()=>ws.send(JSON.stringify({method:'subscribe',subscription:{type:'userFills',user:address,aggregateByTime:true}})));
@@ -54,7 +54,32 @@ class TraderRadar {
     ws.addEventListener('close',()=>{if(this.sockets.get(address)===ws)this.sockets.delete(address);this.reconnect(address)});ws.addEventListener('error',()=>{try{ws.close()}catch{}});}
   reconnect(a){if(!this.running||this.timers.has(a))return;this.timers.set(a,setTimeout(()=>{this.timers.delete(a);this.connect(a)},5000));}
   fillId(a,f){return [a,f.hash||'',f.oid??'',f.tid??'',f.time,f.coin,f.side,f.sz].join(':');}
-  async processFill(address,fill){const id=this.fillId(address,fill);if(this.seen.has(id))return null;this.seen.add(id);this.cursors[address]=Math.max(num(this.cursors[address]),num(fill.time));const e=classifyFill(fill,address);if(!e){this.save();return null;}e.id=id;const w=this.wallets.get(address);e.trader=w?.displayName||address.slice(0,6)+'…'+address.slice(-4);e.walletSource=w?.source||'Hyperliquid';this.events.unshift(e);this.events=this.events.slice(0,500);this.save();const dir=e.direction==='LONG'?'COMPRA (LONG)':'VENDA (SHORT)';try{await this.sendPush({title:'BTC Trader Radar: '+e.direction,body:e.trader+' abriu '+dir+' em BTC a $'+e.price.toLocaleString('en-US')+' · '+e.size+' BTC. Evento público da Hyperliquid; não é recomendação.',tag:'trader-radar-'+id,url:'/?panel=trader-radar',eventType:'trader-radar-new-btc-entry',trade:e});}catch(err){this.logger.error('Trader Radar push:',err.message);}return e;}
-  status(){return {ok:true,running:this.running,source:'Hyperliquid public API/WebSocket',websocketUrl:HL_WS,watchedWallets:this.wallets.size,connectedWallets:this.sockets.size,lastDiscoveryAt:this.lastDiscoveryAt,lastError:this.lastError,eventCount:this.events.length,rules:{symbol:'BTC',events:'somente novas entradas',acceptedDirections:['Open Long','Open Short'],requiresFlatStartPosition:true,snapshotAlerts:false,deduplication:true}};}
+  recordClosedTrade(address,fill){
+    if(String(fill.coin).toUpperCase()!=='BTC')return;
+    const dir=String(fill.dir||'').toLowerCase();
+    if(dir!=='close long'&&dir!=='close short')return;
+    const start=Number(fill.startPosition),size=num(fill.sz),closedPnl=Number(fill.closedPnl);
+    if(!Number.isFinite(start)||!Number.isFinite(closedPnl)||size<=0)return;
+    const signedDelta=String(fill.side).toUpperCase()==='B'?size:-size;
+    const end=start+signedDelta;
+    const cycle=this.closeCycles[address]||{realizedPnl:0,direction:dir==='close long'?'LONG':'SHORT',fills:0};
+    cycle.realizedPnl+=closedPnl;cycle.fills+=1;cycle.direction=dir==='close long'?'LONG':'SHORT';
+    if(Math.abs(end)<1e-8){
+      const m=this.performance[address]||{closedTrades:0,wins:0,losses:0,breakeven:0,realizedPnl:0,grossProfit:0,grossLoss:0,avgPnl:0,lastCloseAt:null};
+      const pnl=cycle.realizedPnl;m.closedTrades+=1;m.realizedPnl+=pnl;
+      if(pnl>0){m.wins+=1;m.grossProfit+=pnl;}else if(pnl<0){m.losses+=1;m.grossLoss+=Math.abs(pnl);}else m.breakeven+=1;
+      m.avgPnl=m.realizedPnl/m.closedTrades;m.winRate=m.wins/m.closedTrades;
+      m.profitFactor=m.grossLoss>0?m.grossProfit/m.grossLoss:(m.grossProfit>0?null:0);
+      m.lastCloseAt=new Date(num(fill.time)).toISOString();this.performance[address]=m;delete this.closeCycles[address];
+    }else this.closeCycles[address]=cycle;
+  }
+  rankedTraders(){
+    return [...this.wallets.values()].map(w=>{const m=this.performance[w.address]||{closedTrades:0,wins:0,losses:0,realizedPnl:0,winRate:0,profitFactor:0};const eligible=m.closedTrades>=20&&m.realizedPnl>0&&m.profitFactor>=1.2;
+      const score=eligible?Math.round(Math.min(35,m.winRate*35)+Math.min(25,(m.profitFactor||0)/2*25)+Math.min(20,Math.max(0,m.realizedPnl)/(Math.max(1,w.accountValue||10000))*100)+Math.min(20,m.closedTrades/100*20)):null;
+      return {...w,performance:m,eligibleForRanking:eligible,score,rankingNote:eligible?'Amostra observada suficiente; ainda sem ajuste completo de drawdown/alavancagem':'Sem amostra suficiente ou critérios de rentabilidade/profit factor não atendidos'};
+    }).sort((a,b)=>(b.score??-1)-(a.score??-1));
+  }
+  async processFill(address,fill){const id=this.fillId(address,fill);if(this.seen.has(id))return null;this.seen.add(id);this.cursors[address]=Math.max(num(this.cursors[address]),num(fill.time));this.recordClosedTrade(address,fill);const e=classifyFill(fill,address);if(!e){this.save();return null;}e.id=id;const w=this.wallets.get(address);e.trader=w?.displayName||address.slice(0,6)+'…'+address.slice(-4);e.walletSource=w?.source||'Hyperliquid';this.events.unshift(e);this.events=this.events.slice(0,500);this.save();const dir=e.direction==='LONG'?'COMPRA (LONG)':'VENDA (SHORT)';try{await this.sendPush({title:'BTC Trader Radar: '+e.direction,body:e.trader+' abriu '+dir+' em BTC a $'+e.price.toLocaleString('en-US')+' · '+e.size+' BTC. Evento público da Hyperliquid; não é recomendação.',tag:'trader-radar-'+id,url:'/?panel=trader-radar',eventType:'trader-radar-new-btc-entry',trade:e});}catch(err){this.logger.error('Trader Radar push:',err.message);}return e;}
+  status(){return {ok:true,running:this.running,source:'Hyperliquid public API/WebSocket',websocketUrl:HL_WS,watchedWallets:this.wallets.size,connectedWallets:this.sockets.size,lastDiscoveryAt:this.lastDiscoveryAt,lastError:this.lastError,eventCount:this.events.length,rankedEligible:this.rankedTraders().filter(x=>x.eligibleForRanking).length,rankingMinimumClosedTrades:20,rules:{symbol:'BTC',events:'somente novas entradas',acceptedDirections:['Open Long','Open Short'],requiresFlatStartPosition:true,snapshotAlerts:false,deduplication:true}};}
 }
 module.exports={TraderRadar,validAddress,classifyNewBtcEntry:classifyFill,selectLeaderboardCandidates:selectCandidates};
