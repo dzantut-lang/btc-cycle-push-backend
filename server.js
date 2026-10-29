@@ -185,7 +185,9 @@ async function refreshHyperliquidOpenPositions(force = false) {
           const notional = Math.abs(Number(p.positionValue)) || Math.abs(signedSize) * entryPrice;
           if (!Number.isFinite(signedSize) || Math.abs(signedSize) < 1e-10 || !Number.isFinite(entryPrice) || entryPrice <= 0 || !Number.isFinite(notional) || notional <= 0) return null;
           const direction = signedSize > 0 ? 'LONG' : 'SHORT';
-          const event = traderRadar.events.find(ev => ev.type === 'NEW_BTC_ENTRY' && String(ev.wallet).toLowerCase() === String(wallet.address).toLowerCase() && ev.direction === direction && Number(ev.price) > 0);
+          const activeCycle = traderRadar.closeCycles && traderRadar.closeCycles[String(wallet.address).toLowerCase()];
+          const cycleDirection = activeCycle && String(activeCycle.direction || '').toUpperCase();
+          const entryTime = activeCycle && cycleDirection === direction && activeCycle.openedAt ? Date.parse(activeCycle.openedAt) : null;
           return {
             wallet: wallet.address,
             trader: wallet.displayName || wallet.address.slice(0,6) + '…' + wallet.address.slice(-4),
@@ -196,8 +198,8 @@ async function refreshHyperliquidOpenPositions(force = false) {
             notionalUsd: notional,
             unrealizedPnl: Number.isFinite(Number(p.unrealizedPnl)) ? Number(p.unrealizedPnl) : null,
             leverage: p.leverage && Number.isFinite(Number(p.leverage.value)) ? Number(p.leverage.value) : null,
-            entryTime: event ? Number(event.timestamp) : null,
-            entryTimeSource: event ? 'observed Hyperliquid fill' : 'not available in clearinghouse snapshot',
+            entryTime: Number.isFinite(entryTime) && entryTime > 0 ? entryTime : null,
+            entryTimeSource: Number.isFinite(entryTime) && entryTime > 0 ? 'active observed trade cycle' : 'not available with confidence; entry fill not linked to active cycle',
             source: 'Hyperliquid clearinghouseState',
             observedAt: now
           };
