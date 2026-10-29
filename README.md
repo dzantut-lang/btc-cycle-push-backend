@@ -1,58 +1,40 @@
 # BTC Cycle Desk — Push Backend
 
-Backend de notificações Web Push e monitoramento informativo de sinais BTC para o **BTC Cycle Desk — by Daniel Meneghelli**.
+Backend do BTC Cycle Desk / BTC Cycle Intelligence. O serviço oferece endpoints de saúde, inscrições Web Push e o Trader Radar informativo da Hyperliquid.
 
-## Incluído
-- API de inscrição e cancelamento de inscrição Web Push.
-- Monitoramento de mercado em intervalos configuráveis (padrão: 15 minutos).
-- Notificação quando o sinal heurístico do servidor muda entre `COMPRA POTENCIAL`, `AGUARDAR` e `VENDA POTENCIAL`.
-- Endpoint de saúde `/health` e endpoints administrativos protegidos por segredo.
-- Blueprint `render.yaml` para iniciar a implantação no Render e `Dockerfile` para outros hosts compatíveis.
+## Estado e segurança
+- O monitor de mercado do servidor usa uma heurística legada com candles diários (EMA20/EMA50, RSI e volume). **Ela não é o motor oficial do dashboard e não deve ser usada como fonte dos sinais exibidos no app.**
+- Alertas automáticos de compra/venda do monitor legado estão intencionalmente suprimidos para evitar divergência com o painel.
+- A inscrição Web Push é recusada com HTTP 503 quando o envio VAPID não está configurado; endpoint e chaves da inscrição são validados e inscrições repetidas do mesmo endpoint são substituídas.
+- O Trader Radar acompanha eventos observados na API pública da Hyperliquid. Isso não constitui recomendação de investimento nem representa o histórico completo de uma conta.
+- O backend não executa ordens e não utiliza chaves de trading.
 
-**Importante:** o monitor do servidor usa uma heurística própria (EMA20/EMA50, RSI e volume), que pode divergir do score detalhado do dashboard. Alertas são informativos, não são recomendações personalizadas nem garantem resultados. O serviço não executa ordens e não usa chaves de trading.
+## Requisitos para ativar Web Push
+1. Configure um par VAPID válido no Render (`VAPID_PUBLIC_KEY` e `VAPID_PRIVATE_KEY`) gerado localmente com `npx web-push generate-vapid-keys`.
+2. Defina `VAPID_SUBJECT` com um endereço de contato real, por exemplo `mailto:contato@seudominio.com`.
+3. Configure armazenamento persistente para `DATA_DIR`. O serviço atualmente usa arquivos locais; em ambiente sem disco persistente, inscrições e estado podem ser perdidos em reinicializações ou deploys.
+4. Teste `/health` e `/api/push/public-key`; em seguida configure a URL HTTPS do backend e a chave pública no dashboard e teste em um dispositivo real.
+5. Só reative notificações de sinais do mercado quando o dashboard e o backend consumirem o mesmo contrato de sinal oficial, com autenticação, deduplicação e testes de integração.
 
-## Implantar no Render
-1. Descompacte este projeto e envie a pasta `btc-cycle-push-backend` para um repositório privado no GitHub.
-2. No Render, crie um Blueprint a partir desse repositório e confirme o serviço `btc-cycle-desk-push`.
-3. Gere um par de chaves VAPID localmente com `npx web-push generate-vapid-keys` (requer Node.js e npm). Não envie a chave privada para o GitHub.
-4. No painel do Render, preencha `VAPID_PUBLIC_KEY` e `VAPID_PRIVATE_KEY` com o par gerado. Troque `VAPID_SUBJECT` por um `mailto:` real de contato.
-5. Aguarde a implantação e teste `https://SEU-SERVICO.onrender.com/health`. Verifique `ok: true` e `pushReady: true`.
-6. Copie a URL HTTPS pública do serviço para a configuração `PUSH_API_BASE` do dashboard e use a chave pública VAPID em `PUSH_VAPID_PUBLIC_KEY`.
-7. Teste primeiro em um dispositivo de teste: abra o dashboard, clique em **Ativar alertas**, conceda permissão e confirme o número de inscritos em `/health`.
-
-O blueprint usa plano pago com disco persistente porque as inscrições de dispositivos e o último sinal precisam sobreviver a reinicializações e novas implantações. Confira preços e disponibilidade no painel do Render antes de confirmar.
+**Não coloque `VAPID_PRIVATE_KEY`, `ADMIN_SECRET` ou arquivos `.env` no GitHub nem no HTML do dashboard.** Não altere o plano do Render nem crie recursos pagos sem verificar os custos no painel.
 
 ## Variáveis de ambiente
-- `VAPID_PUBLIC_KEY` e `VAPID_PRIVATE_KEY`: par VAPID gerado por `npx web-push generate-vapid-keys`.
-- `VAPID_SUBJECT`: endereço de contato `mailto:` real.
-- `ADMIN_SECRET`: segredo longo; o Blueprint gera um valor automaticamente.
-- `ALLOWED_ORIGIN`: origem exata do dashboard publicado.
-- `DATA_DIR`: diretório no disco persistente.
-- `POLL_MINUTES`: intervalo de monitoramento; mínimo 5 minutos.
-- `PORT`: fornecido pelo host.
-
-Nunca publique `.env`, `VAPID_PRIVATE_KEY` ou `ADMIN_SECRET`, nem os coloque no HTML do dashboard.
-
-## Rodar localmente
-```bash
-npm install
-cp .env.example .env
-npx web-push generate-vapid-keys
-# Configure as chaves no .env antes de iniciar
-npm start
-```
-Teste `http://localhost:8080/health`.
+- `VAPID_PUBLIC_KEY` e `VAPID_PRIVATE_KEY`: par VAPID.
+- `VAPID_SUBJECT`: endereço `mailto:` real ou subject válido suportado por Web Push.
+- `ADMIN_SECRET`: segredo longo para endpoints administrativos.
+- `ALLOWED_ORIGIN`: origem do dashboard publicado.
+- `DATA_DIR`: diretório usado para arquivos de estado e inscrições; precisa estar em armazenamento persistente para sobreviver a reinicializações.
+- `POLL_MINUTES`: intervalo de monitoramento (mínimo 5 minutos).
+- `PORT`: porta fornecida pelo host.
 
 ## Endpoints
 - `GET /health`
 - `GET /api/push/public-key`
 - `POST /api/push/subscribe`
 - `POST /api/push/unsubscribe`
-- `GET /api/market/signal`
+- `GET /api/market/signal` (heurística legada; não sincronizada com o motor oficial do app)
 - `POST /api/admin/notify` (requer `Authorization: Bearer <ADMIN_SECRET>`)
 - `POST /api/admin/check-now` (requer `Authorization: Bearer <ADMIN_SECRET>`)
 
-## Integração com o dashboard
-Após a hospedagem, configurar `PUSH_API_BASE` com a URL HTTPS do backend (sem barra final) e `PUSH_VAPID_PUBLIC_KEY` com a chave pública VAPID. O HTML atual já contém os pontos de integração, mas mantém esses valores vazios até a URL e as chaves reais existirem.
-
-Em iPhone, Web Push exige iOS/iPadOS compatível e normalmente que o site seja adicionado à Tela de Início e aberto como web app. O usuário precisa conceder permissão. O comportamento deve ser testado no dispositivo real.
+## iPhone
+Web Push exige versão compatível de iOS/iPadOS e normalmente que o site seja adicionado à Tela de Início e aberto como web app. O usuário precisa conceder permissão. Teste a entrega real no dispositivo antes de considerar o recurso operacional.
