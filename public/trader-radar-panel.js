@@ -4,7 +4,7 @@
     if (!root) throw new Error('Container do Trader Radar não encontrado');
     const base = String(apiBase || '').replace(/\/$/, '');
     const refreshMs = Math.max(5000, Number(options.refreshMs) || 10000);
-    let stopped = false, timer = null, chartInterval = '4h', lastChartEvents = [], lastDisplayTraders = [], lastValidated = false;
+    let stopped = false, timer = null, chartInterval = '4h', chartRenderSeq = 0, lastChartEvents = [], lastDisplayTraders = [], lastValidated = false;
     const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
     const money = n => Number(n).toLocaleString('en-US',{style:'currency',currency:'USD',maximumFractionDigits:2});
     const date = n => new Date(Number(n)).toLocaleString('pt-BR',{timeZone:'America/Sao_Paulo'});
@@ -31,20 +31,23 @@
     const statusEl = root.querySelector('[data-status]'), walletsEl = root.querySelector('[data-wallets]'), connectedEl = root.querySelector('[data-connected]'), countEl = root.querySelector('[data-count]'), eventsEl = root.querySelector('[data-events]'), rankingsEl = root.querySelector('[data-rankings]'), chartEl = root.querySelector('[data-trader-chart]'), openPositionsEl = root.querySelector('[data-open-positions]');
     async function renderTraderChart(el, events, eligible, validated = false) {
       if (!el) return;
+      const renderSeq = ++chartRenderSeq;
+      const intervalAtStart = chartInterval;
       try {
-        const res = await fetch(base+'/api/trader-radar/candles?interval='+encodeURIComponent(chartInterval)+'&limit=120', { cache: 'no-store' });
+        const res = await fetch(base+'/api/trader-radar/candles?interval='+encodeURIComponent(intervalAtStart)+'&limit=120', { cache: 'no-store' });
         if (!res.ok) throw new Error('Candles BTC indisponíveis na Hyperliquid');
         const payload = await res.json();
         const rows = Array.isArray(payload) ? payload : payload.candles;
         if (!Array.isArray(rows) || rows.length < 20) throw new Error('Histórico de candles insuficiente');
-        const candles = rows.map(r => ({ t:Number(r.t ?? r[0]), o:Number(r.o ?? r[1]), h:Number(r.h ?? r[2]), l:Number(r.l ?? r[3]), c:Number(r.c ?? r[4]) })).filter(c => c.t > 0 && c.o > 0 && c.h > 0 && c.l > 0 && c.c > 0);
+        const candles = rows.map(r => ({ t:Number(r.t ?? r[0]), o:Number(r.o ?? r[1]), h:Number(r.h ?? r[2]), l:Number(r.l ?? r[3]), c:Number(r.c ?? r[4]) })).filter(c => c.t > 0 && c.o > 0 && c.h > 0 && c.l > 0 && c.c > 0).sort((a,b)=>a.t-b.t);
         const allowed = new Set((eligible || []).slice(0, 5).map(t => String(t.address || '').toLowerCase()).filter(Boolean));
         const first = candles[0].t, last = candles[candles.length - 1].t, now = Date.now();
-        const eventMarks = events.filter(ev => { const wallet=String(ev.wallet || ev.address || '').toLowerCase(), ts=Number(ev.timestamp || Date.parse(ev.executedAt || '')), price=Number(ev.price); const walletMatches=!allowed.size || allowed.has(wallet); return walletMatches && Number.isFinite(ts) && ts >= first && ts <= now + 60000 && Number.isFinite(price) && price > 0; }).map(ev=>({...ev,timestamp:Number(ev.timestamp || Date.parse(ev.executedAt || ''))}));
+        const eventMarks = events.map(ev=>{const rawTs=Number(ev.timestamp || Date.parse(ev.executedAt || ''));return {...ev,timestamp:rawTs>0&&rawTs<1e12?rawTs*1000:rawTs};}).filter(ev=>{const wallet=String(ev.wallet||ev.address||'').toLowerCase(),ts=Number(ev.timestamp),price=Number(ev.price),walletMatches=!allowed.size||allowed.has(wallet);return walletMatches&&Number.isFinite(ts)&&ts>=first&&ts<=now+60000&&Number.isFinite(price)&&price>0;});
         let openPositions=[];
         try { const opRes=await fetch(base+'/api/trader-radar/open-positions',{cache:'no-store'}); const op=await opRes.json(); if(opRes.ok && op && op.ok===true && Array.isArray(op.positions)) openPositions=op.positions.slice(0,5); } catch (_) {}
-        const openMarks=openPositions.filter(pos=>Number(pos.entryPrice)>0).map(pos=>({type:'OPEN_POSITION',direction:String(pos.direction||'').toUpperCase(),wallet:pos.wallet,trader:pos.trader,price:Number(pos.entryPrice),timestamp:Number(pos.entryTime)>=first && Number(pos.entryTime)<=last?Number(pos.entryTime):last,entryTimeAvailable:Number(pos.entryTime)>=first && Number(pos.entryTime)<=last,notionalUsd:Number(pos.notionalUsd)||0}));
+        const openMarks=openPositions.filter(pos=>Number(pos.entryPrice)>0).map(pos=>{const rawTs=Number(pos.entryTime),entryTs=rawTs>0&&rawTs<1e12?rawTs*1000:rawTs;return {type:'OPEN_POSITION',direction:String(pos.direction||'').toUpperCase(),wallet:pos.wallet,trader:pos.trader,price:Number(pos.entryPrice),timestamp:entryTs>=first&&entryTs<=last?entryTs:last,entryTimeAvailable:entryTs>=first&&entryTs<=last,notionalUsd:Number(pos.notionalUsd)||0};});
         const marks=eventMarks.concat(openMarks).sort((a,b)=>Number(a.timestamp)-Number(b.timestamp));
+        if (renderSeq !== chartRenderSeq || intervalAtStart !== chartInterval || stopped) return;
         const W=760,H=320,L=66,R=16,T=18,B=30,plotW=W-L-R,plotH=H-T-B;
         const prices=candles.flatMap(c=>[c.h,c.l]).concat(marks.map(e=>Number(e.price)));
         const lo=Math.min(...prices)*0.999,hi=Math.max(...prices)*1.001,span=hi-lo||1;
@@ -56,8 +59,8 @@
         const dots=marks.map(ev=>{const entry=ev.type==='NEW_BTC_ENTRY',isOpen=ev.type==='OPEN_POSITION',green=isOpen?String(ev.direction).toUpperCase()==='LONG':entry?String(ev.direction).toUpperCase()==='LONG':String(ev.direction).toUpperCase()==='CLOSE_SHORT',col=green?'#4ade80':'#fb7185',cx=x(idx(Number(ev.timestamp))),cy=y(Number(ev.price)),kind=isOpen?(green?'POSIÇÃO ABERTA · LONG':'POSIÇÃO ABERTA · SHORT'):entry?(green?'ENTRADA · LONG':'ENTRADA · SHORT'):(ev.isFullClose?'SAÍDA ':'REDUÇÃO ')+(String(ev.direction).toUpperCase()==='CLOSE_LONG'?'LONG':'SHORT'),timeLabel=isOpen&&!ev.entryTimeAvailable?'horário de entrada indisponível; marcador no candle mais recente':new Date(Number(ev.timestamp)).toLocaleString("pt-BR"),label=(ev.trader||ev.wallet||'Trader')+' · '+kind+' · '+timeLabel+' · '+money(ev.price)+(isOpen?' · notional '+money(ev.notionalUsd):'');return '<g><circle class="tr-radar-pulse" cx="'+cx.toFixed(1)+'" cy="'+cy.toFixed(1)+'" r="'+(isOpen?'10':'8')+'" fill="'+col+'" opacity=".45"/><circle class="tr-radar-core" cx="'+cx.toFixed(1)+'" cy="'+cy.toFixed(1)+'" r="'+(isOpen?'7':'6')+'" fill="'+col+'"><title>'+esc(label)+'</title></circle></g>';}).join('');
         const livePrice=candles[candles.length-1].c;
         const note=openMarks.length+' posição(ões) aberta(s) marcada(s) por preço de entrada · '+eventMarks.length+' execução(ões) históricas. Posições sem horário de entrada ficam no candle mais recente; verde = LONG, vermelho = SHORT.';
-        el.innerHTML=`<div class="tr-metrics"><span><i class="tr-live-dot"></i> BTC · CANDLES ${chartInterval.toUpperCase()}</span><strong>${money(livePrice)}</strong><span>Atualizado ${new Date().toLocaleTimeString("pt-BR")}</span></div><svg class="tr-chart-svg" viewBox="0 0 ${W} ${H}" role="img" aria-label="Candles de Bitcoin com operações dos cinco traders mais bem classificados">${grid}${candleSvg}${dots}<text x="${L}" y="${H-7}" fill="#9db0c7" font-size="10">${new Date(first).toLocaleDateString("pt-BR",{day:"2-digit",month:"2-digit"})}</text><text x="${W-R}" y="${H-7}" fill="#9db0c7" font-size="10" text-anchor="end">AGORA</text></svg><div class="tr-chart-legend"><span><i class="tr-dot" style="background:#4ade80"></i>LONG / entrada ou posição aberta</span><span><i class="tr-dot" style="background:#fb7185"></i>SHORT / entrada ou posição aberta</span><span><i class="tr-dot" style="background:#a3a3a3"></i>Saídas e reduções históricas</span></div><div class="tr-meta">${note}. A marcação depende da chegada da execução pública da Hyperliquid.</div>`;
-      } catch (err) { el.innerHTML='<div class="tr-chart-empty">'+esc(err.message || 'Não foi possível carregar candles BTC')+'</div>'; }
+        el.innerHTML=`<div class="tr-metrics"><span><i class="tr-live-dot"></i> BTC · CANDLES ${intervalAtStart.toUpperCase()}</span><strong>${money(livePrice)}</strong><span>Atualizado ${new Date().toLocaleTimeString("pt-BR")}</span></div><svg class="tr-chart-svg" viewBox="0 0 ${W} ${H}" role="img" aria-label="Candles de Bitcoin com operações dos cinco traders mais bem classificados">${grid}${candleSvg}${dots}<text x="${L}" y="${H-7}" fill="#9db0c7" font-size="10">${new Date(first).toLocaleDateString("pt-BR",{day:"2-digit",month:"2-digit"})}</text><text x="${W-R}" y="${H-7}" fill="#9db0c7" font-size="10" text-anchor="end">AGORA</text></svg><div class="tr-chart-legend"><span><i class="tr-dot" style="background:#4ade80"></i>LONG / entrada ou posição aberta</span><span><i class="tr-dot" style="background:#fb7185"></i>SHORT / entrada ou posição aberta</span><span><i class="tr-dot" style="background:#a3a3a3"></i>Saídas e reduções históricas</span></div><div class="tr-meta">${note}. A marcação depende da chegada da execução pública da Hyperliquid.</div>`;
+      } catch (err) { if (renderSeq === chartRenderSeq && !stopped) el.innerHTML='<div class="tr-chart-empty">'+esc(err.message || 'Não foi possível carregar candles BTC')+'</div>'; }
     }
     async function refresh() {
       if (stopped) return;
