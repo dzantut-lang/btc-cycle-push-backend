@@ -236,7 +236,7 @@ app.get('/api/trader-radar/open-positions', async (req,res) => {
 });
 
 app.get('/api/trader-radar/status', (_req,res) => res.json(traderRadar.status()));
-app.get('/api/trader-radar/events', (req,res) => { const limit = Math.min(200, Math.max(1, Number(req.query.limit) || 50)); res.json({ events: traderRadar.events.slice(0, limit), count: Math.min(traderRadar.events.length, limit) }); });
+app.get('/api/trader-radar/events', (req,res) => { const limit = Math.min(500, Math.max(1, Number(req.query.limit) || 50)); res.json({ events: traderRadar.events.slice(0, limit), count: Math.min(traderRadar.events.length, limit) }); });
 app.get('/api/trader-radar/wallets', (_req,res) => res.json({ wallets: [...traderRadar.wallets.values()] }));
 app.get('/api/trader-radar/rankings', (_req,res) => { const traders = traderRadar.rankedTraders(); res.json({ traders, rankings: traders, criteria: { minimumClosedTrades: 20, minimumProfitFactor: 1.2, positiveRealizedPnl: true }, note: 'Ranking provisório baseado somente em fechamentos observados após o início do monitoramento; não representa o histórico completo da conta e ainda não normaliza drawdown/alavancagem.' }); });
 app.post('/api/admin/trader-radar/wallets', requireAdmin, (req,res) => { try { res.status(201).json({ ok: true, wallet: traderRadar.addWallet(req.body && req.body.address, req.body || {}) }); } catch (e) { res.status(400).json({ error: 'invalid_wallet', message: e.message }); } });
