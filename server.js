@@ -112,6 +112,7 @@ app.post('/api/admin/notify', requireAdmin, async (req,res) => {
 });
 app.get('/api/market/signal', async (_req,res) => { try { res.json(await computeSignal()); } catch (e) { res.status(502).json({ error: 'market_data_unavailable', message: e.message }); } });
 app.post('/api/admin/check-now', requireAdmin, async (_req,res) => { try { res.json(await monitorOnce()); } catch (e) { res.status(502).json({ error: 'monitor_failed', message: e.message }); } });
+app.get('/api/trader-radar/panel.js', (_req,res) => { res.type('application/javascript').set('Cache-Control','no-store').sendFile(path.join(__dirname,'public','trader-radar-panel.js')); });
 app.get('/api/trader-radar/status', (_req,res) => res.json(traderRadar.status()));
 app.get('/api/trader-radar/events', (req,res) => { const limit = Math.min(200, Math.max(1, Number(req.query.limit) || 50)); res.json({ events: traderRadar.events.slice(0, limit), count: Math.min(traderRadar.events.length, limit) }); });
 app.get('/api/trader-radar/wallets', (_req,res) => res.json({ wallets: [...traderRadar.wallets.values()] }));
