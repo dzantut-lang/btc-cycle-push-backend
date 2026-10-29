@@ -163,7 +163,7 @@ let hyperliquidOpenPositionsCache = { updatedAt: 0, positions: [], error: null }
 let hyperliquidOpenPositionsPromise = null;
 async function refreshHyperliquidOpenPositions(force = false) {
   const now = Date.now();
-  if (!force && now - hyperliquidOpenPositionsCache.updatedAt < 60000) return hyperliquidOpenPositionsCache;
+  if (!force && now - hyperliquidOpenPositionsCache.updatedAt < 10000) return hyperliquidOpenPositionsCache;
   if (hyperliquidOpenPositionsPromise) return hyperliquidOpenPositionsPromise;
   hyperliquidOpenPositionsPromise = (async () => {
     const wallets = [...traderRadar.wallets.values()].filter(w => /^0x[a-f0-9]{40}$/i.test(String(w.address || ''))).slice(0, 25);
