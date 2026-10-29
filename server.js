@@ -105,10 +105,15 @@ app.get('/health', (_req,res) => {
 });
 app.get('/api/push/public-key', (_req,res) => { if (!publicKey || publicKey.startsWith('REPLACE_')) return res.status(503).json({ error: 'VAPID_PUBLIC_KEY_NOT_CONFIGURED' }); res.json({ publicKey }); });
 app.post('/api/push/subscribe', (req,res) => {
+  // Never claim a device is registered when the server cannot actually deliver Web Push.
+  if (!pushReady) return res.status(503).json({ error: 'push_not_configured', message: 'Web Push is unavailable until valid VAPID keys are configured.' });
   const sub = req.body && req.body.subscription;
-  if (!validSubscription(sub)) return res.status(400).json({ error: 'invalid_subscription' });
-  const all = subscriptions(); const next = all.filter(x => x.endpoint !== sub.endpoint); next.push(sub); saveSubscriptions(next);
-  res.status(201).json({ ok: true, subscribers: next.length, pushReady });
+  if (!validSubscription(sub) || typeof sub.endpoint !== 'string' || !sub.endpoint.startsWith('https://')) return res.status(400).json({ error: 'invalid_subscription' });
+  const all = subscriptions();
+  const next = all.filter(x => x.endpoint !== sub.endpoint);
+  next.push({ endpoint: sub.endpoint, expirationTime: sub.expirationTime || null, keys: { p256dh: sub.keys.p256dh, auth: sub.keys.auth } });
+  saveSubscriptions(next);
+  res.status(201).json({ ok: true, subscribers: next.length, pushReady: true, storage: 'local-filesystem; persistence depends on Render disk configuration' });
 });
 app.post('/api/push/unsubscribe', (req,res) => {
   const endpoint = req.body && req.body.endpoint;
