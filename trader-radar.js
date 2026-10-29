@@ -72,22 +72,25 @@ class TraderRadar {
   recordClosedTrade(address,fill){
     if(String(fill.coin).toUpperCase()!=='BTC')return;
     const dir=String(fill.dir||'').toLowerCase();
+    const cycle=this.closeCycles[address];
+    // Include execution fees on every observed fill while the cycle is active.
+    // Funding is not yet included, so the metric is net of trading fees only.
+    if(cycle)cycle.realizedPnl-=Math.abs(num(fill.fee));
     if(dir!=='close long'&&dir!=='close short')return;
     const start=Number(fill.startPosition),size=num(fill.sz),closedPnl=Number(fill.closedPnl);
     if(!Number.isFinite(start)||!Number.isFinite(closedPnl)||size<=0)return;
     const signedDelta=String(fill.side).toUpperCase()==='B'?size:-size;
     const end=start+signedDelta;
-    const cycle=this.closeCycles[address];
     // Only score a round trip when its entry was observed by this radar.
     if(!cycle)return;
     cycle.realizedPnl+=closedPnl;cycle.fills+=1;cycle.direction=dir==='close long'?'LONG':'SHORT';
     if(Math.abs(end)<1e-8){
-      const m=this.performance[address]||{closedTrades:0,wins:0,losses:0,breakeven:0,realizedPnl:0,grossProfit:0,grossLoss:0,avgPnl:0,lastCloseAt:null};
+      const m=this.performance[address]||{closedTrades:0,wins:0,losses:0,breakeven:0,realizedPnl:0,grossProfit:0,grossLoss:0,avgPnl:0,lastCloseAt:null,feesIncluded:true,fundingIncluded:false};
       const pnl=cycle.realizedPnl;m.closedTrades+=1;m.realizedPnl+=pnl;
       if(pnl>0){m.wins+=1;m.grossProfit+=pnl;}else if(pnl<0){m.losses+=1;m.grossLoss+=Math.abs(pnl);}else m.breakeven+=1;
       m.avgPnl=m.realizedPnl/m.closedTrades;m.winRate=m.wins/Math.max(1,m.wins+m.losses);
       m.profitFactor=m.grossLoss>0?m.grossProfit/m.grossLoss:(m.grossProfit>0?3:0);m.profitFactorCapped=m.grossLoss===0&&m.grossProfit>0;
-      m.lastCloseAt=new Date(num(fill.time)).toISOString();this.performance[address]=m;delete this.closeCycles[address];
+      m.lastCloseAt=new Date(num(fill.time)).toISOString();m.feesIncluded=true;m.fundingIncluded=false;this.performance[address]=m;delete this.closeCycles[address];
     }else this.closeCycles[address]=cycle;
   }
   rankedTraders(){
@@ -111,7 +114,7 @@ class TraderRadar {
     const w=this.wallets.get(address);
     e.trader=w?.displayName||address.slice(0,6)+'…'+address.slice(-4);
     e.walletSource=w?.source||'Hyperliquid';
-    if(entry&&!this.closeCycles[address])this.closeCycles[address]={realizedPnl:0,direction:e.direction,fills:0,openedAt:e.executedAt};
+    if(entry&&!this.closeCycles[address])this.closeCycles[address]={realizedPnl:-Math.abs(num(fill.fee)),direction:e.direction,fills:0,openedAt:e.executedAt,feesIncluded:true,fundingIncluded:false};
     this.events.unshift(e);
     this.events=this.events.slice(0,500);
     this.save();
