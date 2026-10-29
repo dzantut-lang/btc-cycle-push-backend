@@ -53,7 +53,7 @@ class TraderRadar {
     this.eventsFile = path.join(dataDir,'trader-radar-events.json'); this.walletsFile = path.join(dataDir,'trader-radar-wallets.json'); this.stateFile = path.join(dataDir,'trader-radar-state.json');
     this.events = this.read(this.eventsFile,[]); this.seen = new Set(this.read(path.join(dataDir,'trader-radar-seen.json'),[]));
     const state = this.read(this.stateFile,{}); this.lastDiscoveryAt = state.lastDiscoveryAt || null; this.lastError = state.lastError || null;
-    this.initialized = new Set(state.initialized || []); this.cursors = state.cursors || {}; this.closeCycles = state.closeCycles || {}; this.performance = state.performance || {}; this.wallets = new Map();
+    this.initialized = new Set(state.initialized || []); this.cursors = state.cursors || {}; this.closeCycles = Object.fromEntries(Object.entries(state.closeCycles || {}).filter(([,cycle]) => cycle && cycle.modelVersion === 2)); this.performance = state.performance || {}; this.wallets = new Map();
     for (const w of [...this.read(this.walletsFile,[]), ...wallets]) this.addWallet(w.address || w, w, false);
   }
   read(f,d){try{return JSON.parse(fs.readFileSync(f,'utf8'));}catch{return d;}}
@@ -114,7 +114,7 @@ class TraderRadar {
     const w=this.wallets.get(address);
     e.trader=w?.displayName||address.slice(0,6)+'…'+address.slice(-4);
     e.walletSource=w?.source||'Hyperliquid';
-    if(entry&&!this.closeCycles[address])this.closeCycles[address]={realizedPnl:-Math.abs(num(fill.fee)),direction:e.direction,fills:0,openedAt:e.executedAt,feesIncluded:true,fundingIncluded:false};
+    if(entry&&!this.closeCycles[address])this.closeCycles[address]={modelVersion:2,realizedPnl:-Math.abs(num(fill.fee)),direction:e.direction,fills:0,openedAt:e.executedAt,feesIncluded:true,fundingIncluded:false};
     this.events.unshift(e);
     this.events=this.events.slice(0,500);
     this.save();
