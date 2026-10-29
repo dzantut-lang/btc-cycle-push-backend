@@ -3,11 +3,11 @@
   function mountTraderRadarPanel(root, apiBase, options = {}) {
     if (!root) throw new Error('Container do Trader Radar não encontrado');
     const base = String(apiBase || '').replace(/\/$/, '');
-    const refreshMs = Math.max(5000, Number(options.refreshMs) || 15000);
+    const refreshMs = Math.max(5000, Number(options.refreshMs) || 10000);
     let stopped = false, timer = null;
     const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
     const money = n => Number(n).toLocaleString('en-US',{style:'currency',currency:'USD',maximumFractionDigits:2});
-    const date = n => new Date(Number(n)).toLocaleString();
+    const date = n => new Date(Number(n)).toLocaleString('pt-BR',{timeZone:'America/Sao_Paulo'});
     root.innerHTML = `
       <section class="trader-radar" aria-label="BTC Trader Radar">
         <style>
@@ -26,7 +26,7 @@
         </style>
         <div class="tr-head"><div><div class="tr-title">₿ BTC Trader Radar</div><div class="tr-sub">Novas entradas públicas na Hyperliquid</div></div><span class="tr-pill" data-status>Conectando…</span></div>
         <div class="tr-stats"><div class="tr-stat"><strong data-wallets>—</strong><span>Carteiras monitoradas</span></div><div class="tr-stat"><strong data-connected>—</strong><span>Conectadas</span></div><div class="tr-stat"><strong data-count>—</strong><span>Eventos recentes</span></div></div>
-        <h3>Traders com histórico observado</h3><div class="tr-sub">Ranking provisório: exige ao menos 20 operações BTC encerradas e PnL realizado positivo. Não é garantia de acerto futuro.</div><div class="tr-rankings" data-rankings><div class="tr-empty">Calculando histórico…</div></div><h3>Entradas recentes em BTC</h3><div class="tr-events" data-events><div class="tr-empty">Carregando eventos…</div></div>
+        <h3>Traders com histórico observado</h3><div class="tr-sub">Ranking provisório: exige ao menos 20 operações BTC encerradas e PnL realizado positivo. Não é garantia de acerto futuro.</div><div class="tr-rankings" data-rankings><div class="tr-empty">Calculando histórico…</div></div><h3>Entradas recentes em BTC</h3><div class="tr-sub">O preço exibido é o preço executado na entrada observada. O radar não inventa alvo de venda; o fechamento só será mostrado quando houver um evento de fechamento disponível.</div><div class="tr-events" data-events><div class="tr-empty">Carregando eventos…</div></div>
         <div class="tr-foot">Dados públicos da Hyperliquid. *Pontuação provisória, não probabilidade de acerto. Taxa observada considera apenas ciclos fechados capturados pelo radar; histórico anterior à inclusão pode estar incompleto. LONG/SHORT descreve a nova posição observada, não uma recomendação.</div>
       </section>`;
     const statusEl = root.querySelector('[data-status]'), walletsEl = root.querySelector('[data-wallets]'), connectedEl = root.querySelector('[data-connected]'), countEl = root.querySelector('[data-count]'), eventsEl = root.querySelector('[data-events]'), rankingsEl = root.querySelector('[data-rankings]');
@@ -39,8 +39,11 @@
         statusEl.textContent = !s.running ? 'Monitor parado' : s.lastError ? 'Atenção: fonte indisponível' : Number(s.connectedWallets)>0 ? 'Monitor ativo' : 'Aguardando conexões';
         statusEl.className = 'tr-pill'+(s.running&&!s.lastError&&Number(s.connectedWallets)>0?' ok':'');
         walletsEl.textContent = s.watchedWallets ?? 0; connectedEl.textContent = s.connectedWallets ?? 0; countEl.textContent = e.events?.length ?? 0;
-        const eligible = (r.traders||[]).filter(t=>t.eligibleForRanking).slice(0,10);
-        rankingsEl.innerHTML = eligible.length ? eligible.map((t,i)=>'<article class="tr-rank"><div class="tr-rank-head"><strong>#'+(i+1)+' '+esc(t.displayName||t.address.slice(0,6)+'…'+t.address.slice(-4))+'</strong><span class="tr-score">'+esc(t.score)+'/100*</span></div><div class="tr-metrics"><span>Acerto observado: '+esc(((t.performance.winRate||0)*100).toFixed(1))+'%</span><span>Operações fechadas: '+esc(t.performance.closedTrades)+'</span><span>PnL realizado: '+esc(money(t.performance.realizedPnl))+'</span><span>Profit factor: '+esc(t.performance.profitFactorCapped?'≥'+Number(t.performance.profitFactor).toFixed(2):t.performance.profitFactor==null?'—':Number(t.performance.profitFactor).toFixed(2))+'</span></div><div class="tr-meta">'+esc(t.address)+'</div></article>').join('') : '<div class="tr-empty">Ainda não há carteiras com histórico suficiente para classificação. O ranking só aparece quando os fechamentos observados atenderem aos critérios.</div>';
+        const allTraders = r.traders||r.rankings||[];
+        const eligible = allTraders.filter(t=>t.eligibleForRanking).slice(0,10);
+        const candidates = allTraders.filter(t=>String(t.source||'').toLowerCase().includes('leaderboard')).sort((a,b)=>Number(b.monthPnl||0)-Number(a.monthPnl||0)).slice(0,10);
+        const candidateHtml = candidates.length ? '<h4 style="margin:12px 0 4px">Candidatos do leaderboard público</h4><div class="tr-sub">Filtrados por patrimônio e PnL semanal, mensal e histórico positivos. Isso não comprova taxa de acerto.</div>'+candidates.map((t,i)=>'<article class="tr-rank"><div class="tr-rank-head"><strong> Candidato '+(i+1)+' · '+esc(t.displayName||t.address.slice(0,6)+'…'+t.address.slice(-4))+'</strong><span class="tr-pill">Não validado</span></div><div class="tr-metrics"><span>PnL 7d: '+esc(money(t.weekPnl))+'</span><span>PnL 30d: '+esc(money(t.monthPnl))+'</span><span>PnL histórico: '+esc(money(t.allTimePnl))+'</span><span>Patrimônio: '+esc(money(t.accountValue))+'</span></div><div class="tr-meta">'+esc(t.address)+'</div></article>').join('') : '';
+        rankingsEl.innerHTML = (eligible.length ? '<h4 style="margin:4px 0">Traders validados pelo histórico observado</h4>'+eligible.map((t,i)=>'<article class="tr-rank"><div class="tr-rank-head"><strong>#'+(i+1)+' '+esc(t.displayName||t.address.slice(0,6)+'…'+t.address.slice(-4))+'</strong><span class="tr-score">'+esc(t.score)+'/100*</span></div><div class="tr-metrics"><span>Acerto observado: '+esc(((t.performance.winRate||0)*100).toFixed(1))+'%</span><span>Operações fechadas: '+esc(t.performance.closedTrades)+'</span><span>PnL realizado: '+esc(money(t.performance.realizedPnl))+'</span><span>Profit factor: '+esc(t.performance.profitFactorCapped?'≥'+Number(t.performance.profitFactor).toFixed(2):t.performance.profitFactor==null?'—':Number(t.performance.profitFactor).toFixed(2))+'</span></div><div class="tr-meta">'+esc(t.address)+'</div></article>').join('') : '<div class="tr-empty">Ainda não há histórico observado suficiente para declarar traders validados.</div>')+candidateHtml;
         if (!e.events?.length) eventsEl.innerHTML = '<div class="tr-empty">Nenhuma nova entrada de BTC registrada ainda. O painel atualiza automaticamente.</div>';
         else eventsEl.innerHTML = e.events.map(ev => {
           const isLong = ev.direction === 'LONG';
