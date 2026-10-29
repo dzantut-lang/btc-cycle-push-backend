@@ -114,7 +114,7 @@ class TraderRadar {
     const w=this.wallets.get(address);
     e.trader=w?.displayName||address.slice(0,6)+'…'+address.slice(-4);
     e.walletSource=w?.source||'Hyperliquid';
-    if(entry&&!this.closeCycles[address])this.closeCycles[address]={modelVersion:2,realizedPnl:-Math.abs(num(fill.fee)),direction:e.direction,fills:0,openedAt:e.executedAt,feesIncluded:true,fundingIncluded:false};
+    if(entry)this.closeCycles[address]={modelVersion:2,realizedPnl:-Math.abs(num(fill.fee)),direction:e.direction,fills:0,openedAt:e.executedAt,feesIncluded:true,fundingIncluded:false};
     this.events.unshift(e);
     this.events=this.events.slice(0,500);
     this.save();
