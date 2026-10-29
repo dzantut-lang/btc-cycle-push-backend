@@ -115,9 +115,12 @@
             openPositionsEl.innerHTML = '<div class="tr-empty">Não foi possível consultar as posições abertas: '+esc(positionError.message||'fonte indisponível')+'</div>';
           }
         }
-        const matchingEvents = (e.events||[]).filter(ev=>displayTraders.some(t=>String(t.address).toLowerCase()===String(ev.wallet||'').toLowerCase())).slice(0,5);
-        if (!matchingEvents.length) eventsEl.innerHTML = '<div class="tr-empty">Nenhuma execução recente dos traders '+(validated?'validados':'em observação')+'. As novas entradas e saídas aparecerão quando forem recebidas da Hyperliquid.</div>';
-        else eventsEl.innerHTML = matchingEvents.map(ev => {
+        const matchingEvents = (e.events||[]).filter(ev=>displayTraders.some(t=>String(t.address).toLowerCase()===String(ev.wallet||'').toLowerCase())).sort((a,b)=>{const ts=ev=>{const raw=Number(ev.timestamp||Date.parse(ev.executedAt||''));return raw>0&&raw<1e12?raw*1000:raw;};return ts(b)-ts(a);}).slice(0,5);
+        const latestObservedAt = e.latestEventAt ? date(e.latestEventAt) : null;
+        const eventAgeMs = e.latestEventAt ? Date.now()-Date.parse(e.latestEventAt) : null;
+        const eventFreshnessNote = latestObservedAt ? '<div class="tr-meta">Última execução registrada no histórico: '+esc(latestObservedAt)+(eventAgeMs>86400000?' · histórico sem novas execuções há '+Math.floor(eventAgeMs/86400000)+' dia(s)':'')+'. A conexão do monitor e a atualização das posições são indicadores separados.</div>' : '<div class="tr-meta">Nenhuma execução registrada ainda. Isso não significa que as carteiras estejam sem posição.</div>';
+        if (!matchingEvents.length) eventsEl.innerHTML = eventFreshnessNote+'<div class="tr-empty">Nenhuma execução recente dos traders '+(validated?'validados':'em observação')+'. O histórico de execuções é separado do estado atual das posições.</div>';
+        else eventsEl.innerHTML = eventFreshnessNote+matchingEvents.map(ev => {
           const isEntry = ev.type === 'NEW_BTC_ENTRY';
           const isLong = ev.direction === 'LONG' || ev.direction === 'CLOSE_LONG';
           const label = isEntry ? (isLong ? '▲ NOVA ENTRADA LONG' : '▼ NOVA ENTRADA SHORT') : ((ev.isFullClose ? '■ SAÍDA TOTAL ' : '↘ REDUÇÃO ') + (isLong ? 'LONG' : 'SHORT'));
