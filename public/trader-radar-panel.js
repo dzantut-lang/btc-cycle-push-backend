@@ -80,7 +80,7 @@
         const validated = eligible.length > 0;
         lastChartEvents = e.events||[]; lastDisplayTraders = displayTraders; lastValidated = validated;
 
-        rankingsEl.innerHTML = displayTraders.length ? displayTraders.map((t,i)=>'<article class="tr-rank"><div class="tr-rank-head"><strong>#'+(i+1)+' '+esc(t.displayName||t.address.slice(0,6)+'…'+t.address.slice(-4))+'</strong><span class="tr-score">'+(t.eligibleForRanking?'VALIDADO':'EM OBSERVAÇÃO')+'</span></div><div class="tr-meta">'+esc(t.performance.closedTrades||0)+' ciclos fechados observados · '+esc(money(t.performance.realizedPnl||0))+' PnL observado</div></article>').join('') : '<div class="tr-empty">Aguardando candidatos públicos da Hyperliquid. O gráfico de BTC continua ao vivo.</div>';
+        rankingsEl.innerHTML = displayTraders.length ? displayTraders.map((t,i)=>{const closed=Number(t.performance&&t.performance.closedTrades)||0;const pnl=Number(t.performance&&t.performance.realizedPnl);const pnlLabel=closed>0&&Number.isFinite(pnl)?esc(money(pnl))+' PnL observado':'PnL ainda indisponível — nenhum ciclo fechado confirmado';return '<article class="tr-rank"><div class="tr-rank-head"><strong>#'+(i+1)+' '+esc(t.displayName||t.address.slice(0,6)+'…'+t.address.slice(-4))+'</strong><span class="tr-score">'+(t.eligibleForRanking?'VALIDADO':'EM OBSERVAÇÃO')+'</span></div><div class="tr-meta">'+closed+' ciclos fechados observados · '+pnlLabel+'</div></article>';}).join('') : '<div class="tr-empty">Aguardando candidatos públicos da Hyperliquid. O gráfico de BTC continua ao vivo.</div>';
         if (openPositionsEl) {
           try {
             const pRes = await fetch(base+'/api/trader-radar/open-positions',{cache:'no-store'});
