@@ -156,6 +156,78 @@ app.get('/api/trader-radar/candles', async (req,res) => {
     res.status(502).json({error:'hyperliquid_candles_unavailable',message:e.message});
   }
 });
+
+// Snapshot of currently open BTC positions for monitored public Hyperliquid wallets.
+// This is deliberately limited to the Trader Radar's tracked wallets, not every Hyperliquid account.
+let hyperliquidOpenPositionsCache = { updatedAt: 0, positions: [], error: null };
+let hyperliquidOpenPositionsPromise = null;
+async function refreshHyperliquidOpenPositions(force = false) {
+  const now = Date.now();
+  if (!force && now - hyperliquidOpenPositionsCache.updatedAt < 60000) return hyperliquidOpenPositionsCache;
+  if (hyperliquidOpenPositionsPromise) return hyperliquidOpenPositionsPromise;
+  hyperliquidOpenPositionsPromise = (async () => {
+    const wallets = [...traderRadar.wallets.values()].filter(w => /^0x[a-f0-9]{40}$/i.test(String(w.address || ''))).slice(0, 25);
+    const results = await Promise.all(wallets.map(async wallet => {
+      try {
+        const response = await fetch('https://api.hyperliquid.xyz/info', {
+          method: 'POST',
+          headers: {'content-type':'application/json','accept':'application/json'},
+          body: JSON.stringify({type:'clearinghouseState',user:wallet.address}),
+          signal: AbortSignal.timeout(10000)
+        });
+        if (!response.ok) throw new Error('Hyperliquid HTTP ' + response.status);
+        const state = await response.json();
+        const assetPositions = Array.isArray(state.assetPositions) ? state.assetPositions : [];
+        return assetPositions.map(item => {
+          const p = item && item.position;
+          if (!p || String(p.coin).toUpperCase() !== 'BTC') return null;
+          const signedSize = Number(p.szi), entryPrice = Number(p.entryPx);
+          const notional = Math.abs(Number(p.positionValue)) || Math.abs(signedSize) * entryPrice;
+          if (!Number.isFinite(signedSize) || Math.abs(signedSize) < 1e-10 || !Number.isFinite(entryPrice) || entryPrice <= 0 || !Number.isFinite(notional) || notional <= 0) return null;
+          const direction = signedSize > 0 ? 'LONG' : 'SHORT';
+          const event = traderRadar.events.find(ev => ev.type === 'NEW_BTC_ENTRY' && String(ev.wallet).toLowerCase() === String(wallet.address).toLowerCase() && ev.direction === direction && Number(ev.price) > 0);
+          return {
+            wallet: wallet.address,
+            trader: wallet.displayName || wallet.address.slice(0,6) + '…' + wallet.address.slice(-4),
+            symbol: 'BTC',
+            direction,
+            size: Math.abs(signedSize),
+            entryPrice,
+            notionalUsd: notional,
+            unrealizedPnl: Number.isFinite(Number(p.unrealizedPnl)) ? Number(p.unrealizedPnl) : null,
+            leverage: p.leverage && Number.isFinite(Number(p.leverage.value)) ? Number(p.leverage.value) : null,
+            entryTime: event ? Number(event.timestamp) : null,
+            entryTimeSource: event ? 'observed Hyperliquid fill' : 'not available in clearinghouse snapshot',
+            source: 'Hyperliquid clearinghouseState',
+            observedAt: now
+          };
+        }).filter(Boolean);
+      } catch (error) {
+        return { __error: error.message };
+      }
+    }));
+    const failures = results.flat().filter(x => x && x.__error);
+    const positions = results.flat().filter(x => x && !x.__error).sort((a,b) => b.notionalUsd - a.notionalUsd).slice(0,5);
+    hyperliquidOpenPositionsCache = {
+      updatedAt: now,
+      positions,
+      error: positions.length ? null : (failures.length ? failures[0].__error : null),
+      monitoredWallets: wallets.length,
+      source: 'Hyperliquid public clearinghouseState · monitored Trader Radar wallets'
+    };
+    return hyperliquidOpenPositionsCache;
+  })().finally(() => { hyperliquidOpenPositionsPromise = null; });
+  return hyperliquidOpenPositionsPromise;
+}
+app.get('/api/trader-radar/open-positions', async (req,res) => {
+  try {
+    const snapshot = await refreshHyperliquidOpenPositions(String(req.query.refresh || '') === '1');
+    res.set('Cache-Control','no-store').json({ ok: true, ...snapshot, positions: snapshot.positions || [], note: 'Top 5 by current BTC notional among monitored wallets only; not a scan of all Hyperliquid accounts.' });
+  } catch (error) {
+    res.status(502).json({ ok: false, error: 'hyperliquid_open_positions_unavailable', message: error.message, positions: [] });
+  }
+});
+
 app.get('/api/trader-radar/status', (_req,res) => res.json(traderRadar.status()));
 app.get('/api/trader-radar/events', (req,res) => { const limit = Math.min(200, Math.max(1, Number(req.query.limit) || 50)); res.json({ events: traderRadar.events.slice(0, limit), count: Math.min(traderRadar.events.length, limit) }); });
 app.get('/api/trader-radar/wallets', (_req,res) => res.json({ wallets: [...traderRadar.wallets.values()] }));
