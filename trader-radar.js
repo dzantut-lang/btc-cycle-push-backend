@@ -16,8 +16,10 @@ function selectCandidates(payload, minEquity = 10000, max = 25) {
   return rows.map(r => ({ address: String(r.ethAddress || r.address || r.user || '').toLowerCase(), displayName: r.displayName || null,
     accountValue: num(r.accountValue ?? r.account_value), weekPnl: windowPnl(r, 'week'), monthPnl: windowPnl(r, 'month'), allTimePnl: windowPnl(r, 'allTime'),
     source: 'Hyperliquid public leaderboard; candidato, não garantia de desempenho' }))
-    .filter(r => validAddress(r.address) && r.accountValue >= minEquity && r.weekPnl > 0 && r.monthPnl > 0 && r.allTimePnl > 0)
-    .sort((a,b) => b.monthPnl-a.monthPnl).slice(0, max);
+    .filter(r => validAddress(r.address) && r.accountValue >= minEquity && r.monthPnl > 0 && r.allTimePnl > 0)
+    // A negative weekly window can be a normal pullback; do not discard a trader
+    // whose monthly and all-time realized leaderboard PnL remain positive.
+    .sort((a,b) => (b.monthPnl + 0.25*b.allTimePnl) - (a.monthPnl + 0.25*a.allTimePnl)).slice(0, max);
 }
 function classifyCloseFill(fill, address) {
   if (!fill || String(fill.coin).toUpperCase() !== 'BTC') return null;
