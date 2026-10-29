@@ -29,7 +29,7 @@
         <div class="tr-foot">Dados públicos da Hyperliquid. Os pontos refletem execuções observadas e podem ter atraso; não são recomendações.</div>
       </section>`;
     const statusEl = root.querySelector('[data-status]'), walletsEl = root.querySelector('[data-wallets]'), connectedEl = root.querySelector('[data-connected]'), countEl = root.querySelector('[data-count]'), eventsEl = root.querySelector('[data-events]'), rankingsEl = root.querySelector('[data-rankings]'), chartEl = root.querySelector('[data-trader-chart]');
-    async function renderTraderChart(el, events, eligible) {
+    async function renderTraderChart(el, events, eligible, validated = false) {
       if (!el) return;
       try {
         const res = await fetch('https://api.binance.us/api/v3/klines?symbol=BTCUSDT&interval=1m&limit=120', { cache: 'no-store' });
@@ -73,7 +73,7 @@
         const validated = eligible.length > 0;
 
         rankingsEl.innerHTML = displayTraders.length ? displayTraders.map((t,i)=>'<article class="tr-rank"><div class="tr-rank-head"><strong>#'+(i+1)+' '+esc(t.displayName||t.address.slice(0,6)+'…'+t.address.slice(-4))+'</strong><span class="tr-score">'+(t.eligibleForRanking?'VALIDADO':'EM OBSERVAÇÃO')+'</span></div><div class="tr-meta">'+esc(t.performance.closedTrades||0)+' ciclos fechados observados · '+esc(money(t.performance.realizedPnl||0))+' PnL realizado</div></article>').join('') : '<div class="tr-empty">Aguardando candidatos públicos da Hyperliquid. O gráfico de BTC continua ao vivo.</div>';
-        await renderTraderChart(chartEl, e.events||[], displayTraders);
+        await renderTraderChart(chartEl, e.events||[], displayTraders, validated);
         const matchingEvents = (e.events||[]).filter(ev=>displayTraders.some(t=>String(t.address).toLowerCase()===String(ev.wallet||'').toLowerCase())).slice(0,5);
         if (!matchingEvents.length) eventsEl.innerHTML = '<div class="tr-empty">Nenhuma execução recente dos traders '+(validated?'validados':'em observação')+'. As novas entradas e saídas aparecerão quando forem recebidas da Hyperliquid.</div>';
         else eventsEl.innerHTML = matchingEvents.map(ev => {
