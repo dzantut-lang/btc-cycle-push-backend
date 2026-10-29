@@ -5,6 +5,7 @@ const cors = require('cors');
 const webpush = require('web-push');
 const fs = require('fs');
 const path = require('path');
+const { TraderRadar } = require('./trader-radar');
 
 const app = express();
 app.use(express.json({ limit: '64kb' }));
@@ -25,6 +26,7 @@ const subject = process.env.VAPID_SUBJECT || 'mailto:admin@example.com';
 const pushReady = Boolean(publicKey && privateKey && !publicKey.startsWith('REPLACE_') && !privateKey.startsWith('REPLACE_'));
 if (pushReady) webpush.setVapidDetails(subject, publicKey, privateKey);
 const adminSecret = process.env.ADMIN_SECRET || '';
+const traderRadar = new TraderRadar({ dataDir: DATA_DIR, sendPush, wallets: (process.env.TRADER_RADAR_WALLETS || '').split(',').map(s => s.trim()).filter(Boolean), WebSocketImpl: require('ws'), logger: console });
 
 function requireAdmin(req, res, next) {
   if (!adminSecret || req.get('authorization') !== `Bearer ${adminSecret}`) return res.status(401).json({ error: 'unauthorized' });
@@ -110,8 +112,14 @@ app.post('/api/admin/notify', requireAdmin, async (req,res) => {
 });
 app.get('/api/market/signal', async (_req,res) => { try { res.json(await computeSignal()); } catch (e) { res.status(502).json({ error: 'market_data_unavailable', message: e.message }); } });
 app.post('/api/admin/check-now', requireAdmin, async (_req,res) => { try { res.json(await monitorOnce()); } catch (e) { res.status(502).json({ error: 'monitor_failed', message: e.message }); } });
+app.get('/api/trader-radar/status', (_req,res) => res.json(traderRadar.status()));
+app.get('/api/trader-radar/events', (req,res) => { const limit = Math.min(200, Math.max(1, Number(req.query.limit) || 50)); res.json({ events: traderRadar.events.slice(0, limit), count: Math.min(traderRadar.events.length, limit) }); });
+app.get('/api/trader-radar/wallets', (_req,res) => res.json({ wallets: [...traderRadar.wallets.values()] }));
+app.post('/api/admin/trader-radar/wallets', requireAdmin, (req,res) => { try { res.status(201).json({ ok: true, wallet: traderRadar.addWallet(req.body && req.body.address, req.body || {}) }); } catch (e) { res.status(400).json({ error: 'invalid_wallet', message: e.message }); } });
+app.delete('/api/admin/trader-radar/wallets/:address', requireAdmin, (req,res) => { if (!/^0x[a-fA-F0-9]{40}$/.test(req.params.address)) return res.status(400).json({ error: 'invalid_wallet' }); traderRadar.removeWallet(req.params.address); res.json({ ok: true }); });
+app.post('/api/admin/trader-radar/discover', requireAdmin, async (_req,res) => { try { res.json({ ok: true, candidates: await traderRadar.discoverCandidates(), status: traderRadar.status() }); } catch (e) { res.status(502).json({ error: 'leaderboard_unavailable', message: e.message }); } });
 
 const intervalMs = Math.max(5, Number(process.env.POLL_MINUTES || 15)) * 60 * 1000;
 let monitorBusy = false;
 async function safeMonitor() { if (monitorBusy) return; monitorBusy = true; try { await monitorOnce(); } catch (e) { console.error('Market monitor failed:', e.message); } finally { monitorBusy = false; } }
-app.listen(Number(process.env.PORT || 8080), () => { console.log(`BTC Cycle Desk Push listening on ${process.env.PORT || 8080}`); safeMonitor(); setInterval(safeMonitor, intervalMs); });
+app.listen(Number(process.env.PORT || 8080), () => { console.log(`BTC Cycle Desk Push listening on ${process.env.PORT || 8080}`); safeMonitor(); setInterval(safeMonitor, intervalMs); traderRadar.start(); });
