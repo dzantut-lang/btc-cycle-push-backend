@@ -108,7 +108,7 @@ app.get('/health', (_req,res) => {
   if (!publicKey || !privateKey || publicKey.startsWith('REPLACE_') || privateKey.startsWith('REPLACE_')) pushRequirementsMissing.push('VAPID_KEYS');
   if (!subjectConfigured) pushRequirementsMissing.push('VAPID_SUBJECT');
   if (!persistentStorageConfigured) pushRequirementsMissing.push('PERSISTENT_STORAGE');
-  res.json({ ok: true, service: 'BTC Cycle Desk Push', pushReady, pushRequirementsMissing, persistentStorageConfigured, subscribers: subscriptions().length, pollingMinutes: Math.max(5, Number(process.env.POLL_MINUTES || 15)), marketSignalAlertsEnabled: false, marketSignalAlertNote: 'Automatic market-signal pushes are suppressed until they share the official app engine.', traderRadar: { running: radar.running, source: radar.source, watchedWallets: radar.watchedWallets, connectedWallets: radar.connectedWallets, eventCount: radar.eventCount, rankedEligible: radar.rankedEligible, lastDiscoveryAt: radar.lastDiscoveryAt, lastError: radar.lastError } });
+  res.json({ ok: true, service: 'BTC Cycle Desk Push', pushReady, pushRequirementsMissing, persistentStorageConfigured, subscribers: subscriptions().length, pollingMinutes: Math.max(5, Number(process.env.POLL_MINUTES || 15)), officialMarketEngineIntegrated: false, officialMarketTimeframe: '3d', legacyMarketEngineTimeframe: '1d', marketSignalAlertsEnabled: false, marketSignalAlertNote: 'Public market-signal endpoint is blocked until backend and dashboard use the same official 3-day engine.', traderRadar: { running: radar.running, source: radar.source, watchedWallets: radar.watchedWallets, connectedWallets: radar.connectedWallets, eventCount: radar.eventCount, rankedEligible: radar.rankedEligible, lastDiscoveryAt: radar.lastDiscoveryAt, lastError: radar.lastError } });
 });
 app.get('/api/push/public-key', (_req,res) => { if (!pushReady) return res.status(503).json({ error: 'PUSH_NOT_READY', message: 'Configure valid VAPID credentials, a real VAPID subject, and persistent storage before enabling Web Push.' }); res.json({ publicKey }); });
 app.post('/api/push/subscribe', (req,res) => {
@@ -133,7 +133,7 @@ app.post('/api/admin/notify', requireAdmin, async (req,res) => {
   const result = await sendPush({ title: String(title).slice(0,120), body: String(body).slice(0,500), tag: tag || `btc-${Date.now()}`, url: url || '/', eventType: eventType || 'manual' });
   res.json({ ok: true, ...result });
 });
-app.get('/api/market/signal', async (_req,res) => { try { res.json(await computeSignal()); } catch (e) { res.status(502).json({ error: 'market_data_unavailable', message: e.message }); } });
+app.get('/api/market/signal', (_req,res) => res.status(503).json({ error: 'official_engine_not_integrated', message: 'O motor público do backend não está sincronizado com o motor oficial do dashboard. O endpoint de sinal foi bloqueado para impedir que uma heurística diária seja confundida com o sinal oficial de 3 dias.', officialEngineIntegrated: false, officialTimeframe: '3d', legacyEngineTimeframe: '1d', marketSignalAlertsEnabled: false }));
 app.post('/api/admin/check-now', requireAdmin, async (_req,res) => { try { res.json(await monitorOnce()); } catch (e) { res.status(502).json({ error: 'monitor_failed', message: e.message }); } });
 app.get('/api/trader-radar/panel.js', (_req,res) => { res.type('application/javascript').set('Cache-Control','no-store').sendFile(path.join(__dirname,'public','trader-radar-panel.js')); });
 app.get('/api/trader-radar/candles', async (req,res) => {
