@@ -32,7 +32,6 @@
     const statusEl = root.querySelector('[data-status]'), walletsEl = root.querySelector('[data-wallets]'), connectedEl = root.querySelector('[data-connected]'), countEl = root.querySelector('[data-count]'), eventsEl = root.querySelector('[data-events]'), rankingsEl = root.querySelector('[data-rankings]'), chartEl = root.querySelector('[data-trader-chart]');
     async function renderTraderChart(el, events, eligible) {
       if (!el) return;
-      if (!eligible.length) { el.innerHTML='<div class="tr-chart-empty">Ainda não há cinco traders validados. O gráfico não usará candidatos não comprovados.</div>'; return; }
       try {
         const res=await fetch('https://api.binance.us/api/v3/klines?symbol=BTCUSDT&interval=1d&limit=90',{cache:'no-store'});
         if(!res.ok) throw new Error('Candles BTC indisponíveis');
@@ -83,7 +82,7 @@
   global.mountTraderRadarPanel = mountTraderRadarPanel;
 })(typeof window !== 'undefined' ? window : globalThis);
 +Number(ev.price).toLocaleString('en-US');return '<circle cx="'+cx.toFixed(1)+'" cy="'+cy.toFixed(1)+'" r="5" fill="'+color+'" stroke="#10151e" stroke-width="1.5"><title>'+esc(label)+'</title></circle>';}).join('');
-        const countLabel=marks.length+' evento(s) dos 5 traders validados no período';
+        const countLabel=eligible.length+' trader(s) validados no ranking · '+marks.length+' evento(s) no período'+(eligible.length<5?' · ainda não há cinco traders validados; candidatos não comprovados ficam fora do gráfico':'');
         el.innerHTML='<svg class="tr-chart-svg" viewBox="0 0 '+W+' '+H+'" role="img" aria-label="Preço do Bitcoin com entradas e saídas observadas dos cinco traders validados">'+grid+'<path d="'+path+'" fill="none" stroke="#fbbf24" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round"/>'+dots+'<text x="'+L+'" y="'+(H-8)+'" fill="#aab4c4" font-size="10">'+new Date(candles[0].t).toLocaleDateString('pt-BR')+'</text><text x="'+(W-R)+'" y="'+(H-8)+'" fill="#aab4c4" font-size="10" text-anchor="end">'+new Date(candles[candles.length-1].t).toLocaleDateString('pt-BR')+'</text></svg><div class="tr-meta">'+countLabel+'. Toque nos pontos para ver trader, tipo e horário.</div>';
       } catch(err) { el.innerHTML='<div class="tr-chart-empty">'+esc(err.message||'Não foi possível carregar o gráfico BTC')+'</div>'; }
     }
