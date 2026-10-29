@@ -25,7 +25,7 @@ function classifyCloseFill(fill, address) {
   if (dir !== 'close long' && dir !== 'close short') return null;
   const startPosition = Number(fill.startPosition), price = num(fill.px), size = num(fill.sz), time = num(fill.time);
   const closedPnl = Number(fill.closedPnl);
-  if (!Number.isFinite(startPosition) || Math.abs(startPosition) < 1e-12 || price <= 0 || size <= 0 || time <= 0) return null;
+  if (!Number.isFinite(startPosition) || Math.abs(startPosition) < 1e-12 || price <= 0 || size <= 0 || time <= 0 || !Number.isFinite(closedPnl)) return null;
   const delta = String(fill.side || '').toUpperCase() === 'B' ? size : -size;
   const remainingPosition = startPosition + delta;
   const isFullClose = Math.abs(remainingPosition) < 1e-8;
