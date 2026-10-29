@@ -63,7 +63,9 @@
         const s = await sRes.json(), e = await eRes.json(), r = await rRes.json();
         statusEl.textContent = !s.running ? 'Monitor parado' : s.lastError ? 'Atenção: fonte indisponível' : Number(s.connectedWallets)>0 ? 'Monitor ativo' : 'Aguardando conexões';
         statusEl.className = 'tr-pill'+(s.running&&!s.lastError&&Number(s.connectedWallets)>0?' ok':'');
-        walletsEl.textContent = s.watchedWallets ?? 0; connectedEl.textContent = s.connectedWallets ?? 0; countEl.textContent = e.events?.length ?? 0;
+        if (walletsEl) walletsEl.textContent = s.watchedWallets ?? 0;
+        if (connectedEl) connectedEl.textContent = s.connectedWallets ?? 0;
+        if (countEl) countEl.textContent = e.events?.length ?? 0;
         const allTraders = r.traders||r.rankings||[];
         const eligible = allTraders.filter(t=>t.eligibleForRanking).slice(0,5);
 
