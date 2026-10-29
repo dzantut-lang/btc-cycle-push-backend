@@ -25,10 +25,10 @@
           @media(max-width:420px){.trader-radar{padding:12px}.tr-stats{grid-template-columns:repeat(3,minmax(0,1fr));gap:5px}.tr-stat{padding:8px}.tr-stat strong{font-size:1rem}}
         </style>
         <div class="tr-head"><div><div class="tr-title">₿ Trader Radar · BTC</div><div class="tr-sub">Execuções ao vivo de traders monitorados na Hyperliquid</div></div><span class="tr-pill" data-status>Conectando…</span></div>
-<h3>Traders monitorados</h3><div class="tr-sub">Os primeiros pontos aparecem enquanto o histórico é construído. O selo “validado” exige pelo menos 20 ciclos fechados, PnL positivo e profit factor ≥ 1,2. O ranking novo desconta taxas de execução; funding ainda não incluído.</div><div class="tr-rankings" data-rankings><div class="tr-empty">Calculando histórico…</div></div><h3>BTC ao vivo · candles e operações</h3><div class="tr-chart-wrap"><div data-trader-chart><div class="tr-chart-empty">Carregando candles e operações validadas…</div></div></div><h3>Entradas e saídas recentes em BTC</h3><div class="tr-sub">Entradas mostram o preço executado de abertura; saídas e reduções mostram a execução real e o PnL realizado por fill quando disponível. Reduções parciais não são tratadas como ciclo encerrado.</div><div class="tr-events" data-events><div class="tr-empty">Carregando eventos…</div></div>
+<h3>Traders monitorados</h3><div class="tr-sub">Os primeiros pontos aparecem enquanto o histórico é construído. O selo “validado” exige pelo menos 20 ciclos fechados, PnL positivo e profit factor ≥ 1,2. O ranking novo desconta taxas de execução; funding ainda não incluído.</div><div class="tr-rankings" data-rankings><div class="tr-empty">Calculando histórico…</div></div><h3>As 5 maiores posições BTC abertas agora</h3><div class="tr-sub">As bolinhas aparecem no gráfico principal, com os mesmos períodos de 4h, diário, 3D, semanal e mensal. Verde = compra/LONG; vermelho = venda/SHORT. A lista abaixo mostra as posições abertas de maior notional entre as carteiras monitoradas.</div><div data-open-positions class="tr-rankings"><div class="tr-empty">Consultando posições abertas na Hyperliquid…</div></div><h3>Entradas e saídas recentes em BTC</h3><div class="tr-sub">Entradas mostram o preço executado de abertura; saídas e reduções mostram a execução real e o PnL realizado por fill quando disponível. Reduções parciais não são tratadas como ciclo encerrado.</div><div class="tr-events" data-events><div class="tr-empty">Carregando eventos…</div></div>
         <div class="tr-foot">Dados públicos da Hyperliquid. Os pontos refletem execuções observadas e podem ter atraso; não são recomendações.</div>
       </section>`;
-    const statusEl = root.querySelector('[data-status]'), walletsEl = root.querySelector('[data-wallets]'), connectedEl = root.querySelector('[data-connected]'), countEl = root.querySelector('[data-count]'), eventsEl = root.querySelector('[data-events]'), rankingsEl = root.querySelector('[data-rankings]'), chartEl = root.querySelector('[data-trader-chart]');
+    const statusEl = root.querySelector('[data-status]'), walletsEl = root.querySelector('[data-wallets]'), connectedEl = root.querySelector('[data-connected]'), countEl = root.querySelector('[data-count]'), eventsEl = root.querySelector('[data-events]'), rankingsEl = root.querySelector('[data-rankings]'), chartEl = root.querySelector('[data-trader-chart]'), openPositionsEl = root.querySelector('[data-open-positions]');
     async function renderTraderChart(el, events, eligible, validated = false) {
       if (!el) return;
       try {
@@ -73,7 +73,23 @@
         const validated = eligible.length > 0;
 
         rankingsEl.innerHTML = displayTraders.length ? displayTraders.map((t,i)=>'<article class="tr-rank"><div class="tr-rank-head"><strong>#'+(i+1)+' '+esc(t.displayName||t.address.slice(0,6)+'…'+t.address.slice(-4))+'</strong><span class="tr-score">'+(t.eligibleForRanking?'VALIDADO':'EM OBSERVAÇÃO')+'</span></div><div class="tr-meta">'+esc(t.performance.closedTrades||0)+' ciclos fechados observados · '+esc(money(t.performance.realizedPnl||0))+' PnL observado</div></article>').join('') : '<div class="tr-empty">Aguardando candidatos públicos da Hyperliquid. O gráfico de BTC continua ao vivo.</div>';
-        await renderTraderChart(chartEl, e.events||[], displayTraders, validated);
+        if (openPositionsEl) {
+          try {
+            const pRes = await fetch(base+'/api/trader-radar/open-positions',{cache:'no-store'});
+            const p = await pRes.json();
+            if (!pRes.ok || !p || p.ok !== true) throw new Error(p && (p.message || p.error) || 'Posições indisponíveis');
+            const positions = Array.isArray(p.positions) ? p.positions.slice(0,5) : [];
+            openPositionsEl.innerHTML = positions.length ? positions.map((pos,i) => {
+              const long = String(pos.direction).toUpperCase() === 'LONG';
+              const dir = long ? '▲ COMPRA · LONG' : '▼ VENDA · SHORT';
+              const entry = money(pos.entryPrice), notional = money(pos.notionalUsd);
+              const pnl = Number(pos.unrealizedPnl);
+              return '<article class="tr-rank"><div class="tr-rank-head"><strong>#'+(i+1)+' '+esc(pos.trader||pos.wallet||'Trader')+'</strong><span class="tr-direction '+(long?'tr-long':'tr-short')+'">'+dir+'</span></div><div class="tr-meta">Entrada: '+esc(entry)+' · Notional aberto: '+esc(notional)+'</div><div class="tr-meta">'+esc(pos.size)+' BTC'+(Number.isFinite(pnl)?' · PnL não realizado: '+esc(money(pnl)):'')+(Number.isFinite(Number(pos.leverage))?' · alavancagem: '+esc(pos.leverage)+'×':'')+'</div></article>';
+            }).join('') : '<div class="tr-empty">Nenhuma posição BTC aberta foi encontrada nas carteiras monitoradas agora.</div>';
+          } catch (positionError) {
+            openPositionsEl.innerHTML = '<div class="tr-empty">Não foi possível consultar as posições abertas: '+esc(positionError.message||'fonte indisponível')+'</div>';
+          }
+        }
         const matchingEvents = (e.events||[]).filter(ev=>displayTraders.some(t=>String(t.address).toLowerCase()===String(ev.wallet||'').toLowerCase())).slice(0,5);
         if (!matchingEvents.length) eventsEl.innerHTML = '<div class="tr-empty">Nenhuma execução recente dos traders '+(validated?'validados':'em observação')+'. As novas entradas e saídas aparecerão quando forem recebidas da Hyperliquid.</div>';
         else eventsEl.innerHTML = matchingEvents.map(ev => {
