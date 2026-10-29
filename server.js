@@ -22,8 +22,11 @@ function subscriptions() { return readJson(SUBS_FILE, []); }
 function saveSubscriptions(value) { writeJson(SUBS_FILE, value); }
 const publicKey = process.env.VAPID_PUBLIC_KEY || '';
 const privateKey = process.env.VAPID_PRIVATE_KEY || '';
-const subject = process.env.VAPID_SUBJECT || 'mailto:admin@example.com';
-const pushReady = Boolean(publicKey && privateKey && !publicKey.startsWith('REPLACE_') && !privateKey.startsWith('REPLACE_'));
+const subject = process.env.VAPID_SUBJECT || '';
+const subjectConfigured = (/^mailto:[^@\\s]+@[^@\\s]+\\.[^@\\s]+$/.test(subject) && !/example\\.(com|org|net)$/i.test(subject)) || /^https:\\/\\/\\S+$/.test(subject);
+// Do not report push as ready unless the credentials, contact subject, and durable storage are all configured.
+const persistentStorageConfigured = process.env.DATA_PERSISTENT === 'true';
+const pushReady = Boolean(publicKey && privateKey && !publicKey.startsWith('REPLACE_') && !privateKey.startsWith('REPLACE_') && subjectConfigured && persistentStorageConfigured);
 if (pushReady) webpush.setVapidDetails(subject, publicKey, privateKey);
 const adminSecret = process.env.ADMIN_SECRET || '';
 const traderRadar = new TraderRadar({ dataDir: DATA_DIR, sendPush, wallets: (process.env.TRADER_RADAR_WALLETS || '').split(',').map(s => s.trim()).filter(Boolean), WebSocketImpl: require('ws'), logger: console });
@@ -103,10 +106,10 @@ app.get('/health', (_req,res) => {
   const radar = traderRadar.status();
   res.json({ ok: true, service: 'BTC Cycle Desk Push', pushReady, subscribers: subscriptions().length, pollingMinutes: Math.max(5, Number(process.env.POLL_MINUTES || 15)), marketSignalAlertsEnabled: false, marketSignalAlertNote: 'Automatic market-signal pushes are suppressed until they share the official app engine.', traderRadar: { running: radar.running, source: radar.source, watchedWallets: radar.watchedWallets, connectedWallets: radar.connectedWallets, eventCount: radar.eventCount, rankedEligible: radar.rankedEligible, lastDiscoveryAt: radar.lastDiscoveryAt, lastError: radar.lastError } });
 });
-app.get('/api/push/public-key', (_req,res) => { if (!publicKey || publicKey.startsWith('REPLACE_')) return res.status(503).json({ error: 'VAPID_PUBLIC_KEY_NOT_CONFIGURED' }); res.json({ publicKey }); });
+app.get('/api/push/public-key', (_req,res) => { if (!pushReady) return res.status(503).json({ error: 'PUSH_NOT_READY', message: 'Configure valid VAPID credentials, a real VAPID subject, and persistent storage before enabling Web Push.' }); res.json({ publicKey }); });
 app.post('/api/push/subscribe', (req,res) => {
   // Never claim a device is registered when the server cannot actually deliver Web Push.
-  if (!pushReady) return res.status(503).json({ error: 'push_not_configured', message: 'Web Push is unavailable until valid VAPID keys are configured.' });
+  if (!pushReady) return res.status(503).json({ error: 'push_not_ready', message: 'Configure valid VAPID credentials, a real VAPID subject, and persistent storage before enabling Web Push.' });
   const sub = req.body && req.body.subscription;
   if (!validSubscription(sub) || typeof sub.endpoint !== 'string' || !sub.endpoint.startsWith('https://')) return res.status(400).json({ error: 'invalid_subscription' });
   const all = subscriptions();
