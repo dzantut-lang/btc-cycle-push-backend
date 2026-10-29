@@ -33,58 +33,37 @@
     async function renderTraderChart(el, events, eligible) {
       if (!el) return;
       try {
-        const res=await fetch('https://api.binance.us/api/v3/klines?symbol=BTCUSDT&interval=1d&limit=90',{cache:'no-store'});
-        if(!res.ok) throw new Error('Candles BTC indisponíveis');
-        const rows=await res.json();
-        if(!Array.isArray(rows)||rows.length<10) throw new Error('Histórico de candles insuficiente');
-        const candles=rows.map(r=>({t:Number(r[0]),c:Number(r[4])})).filter(r=>r.t>0&&r.c>0);
-        const allowed=new Set(eligible.map(t=>String(t.address).toLowerCase()));
-        const marks=events.filter(ev=>allowed.has(String(ev.wallet||'').toLowerCase())&&Number(ev.timestamp)>0&&Number(ev.price)>0&&Number(ev.timestamp)>=candles[0].t&&Number(ev.timestamp)<=candles[candles.length-1].t+86400000);
-        const W=760,H=300,L=58,R=14,T=16,B=30,innerW=W-L-R,innerH=H-T-B;
-        const prices=candles.map(c=>c.c).concat(marks.map(e=>Number(e.price)));
-        const min=Math.min(...prices)*.995,max=Math.max(...prices)*1.005,range=max-min||1;
-        const x=t=>L+((t-candles[0].t)/(candles[candles.length-1].t-candles[0].t||1))*innerW;
-        const y=p=>T+(max-p)/range*innerH;
-        const path=candles.map((c,i)=>(i?'L':'M')+x(c.t).toFixed(1)+','+y(c.c).toFixed(1)).join(' ');
-        const grid=[0,1,2,3].map(i=>{const p=max-(range*i/3),yy=y(p);return '<line x1="'+L+'" y1="'+yy+'" x2="'+(W-R)+'" y2="'+yy+'" stroke="#293241" stroke-width="1"/><text x="'+(L-7)+'" y="'+(yy+4)+'" fill="#aab4c4" font-size="10" text-anchor="end">'+Math.round(p).toLocaleString('en-US')+'</text>';}).join('');
-        const dots=marks.map(ev=>{const entry=ev.type==='NEW_BTC_ENTRY',long=ev.direction==='LONG',color=entry?(long?'#4ade80':'#fb7185'):'#60a5fa',cx=x(Number(ev.timestamp)),cy=y(Number(ev.price)),label=(ev.trader||ev.wallet||'Trader')+' · '+(entry?(long?'ENTRADA LONG':'ENTRADA SHORT'):(ev.isFullClose?'SAÍDA ':'REDUÇÃO ')+ev.direction)+' · '+new Date(Number(ev.timestamp)).toLocaleString('pt-BR')+' · 
-      if (stopped) return;
-      try {
-        const [sRes,eRes,rRes] = await Promise.all([fetch(base+'/api/trader-radar/status',{cache:'no-store'}),fetch(base+'/api/trader-radar/events?limit=50',{cache:'no-store'}),fetch(base+'/api/trader-radar/rankings',{cache:'no-store'})]);
-        if (!sRes.ok || !eRes.ok || !rRes.ok) throw new Error('API indisponível (HTTP '+(!sRes.ok?sRes.status:!eRes.ok?eRes.status:rRes.status)+')');
-        const s = await sRes.json(), e = await eRes.json(), r = await rRes.json();
-        statusEl.textContent = !s.running ? 'Monitor parado' : s.lastError ? 'Atenção: fonte indisponível' : Number(s.connectedWallets)>0 ? 'Monitor ativo' : 'Aguardando conexões';
-        statusEl.className = 'tr-pill'+(s.running&&!s.lastError&&Number(s.connectedWallets)>0?' ok':'');
-        walletsEl.textContent = s.watchedWallets ?? 0; connectedEl.textContent = s.connectedWallets ?? 0; countEl.textContent = e.events?.length ?? 0;
-        const allTraders = r.traders||r.rankings||[];
-        const eligible = allTraders.filter(t=>t.eligibleForRanking).slice(0,5);
-        const candidates = allTraders.filter(t=>String(t.source||'').toLowerCase().includes('leaderboard')).sort((a,b)=>Number(b.monthPnl||0)-Number(a.monthPnl||0)).slice(0,10);
-        const candidateHtml = candidates.length ? '<h4 style="margin:12px 0 4px">Candidatos do leaderboard público</h4><div class="tr-sub">Filtrados por patrimônio e PnL semanal, mensal e histórico positivos. Isso não comprova taxa de acerto.</div>'+candidates.map((t,i)=>'<article class="tr-rank"><div class="tr-rank-head"><strong> Candidato '+(i+1)+' · '+esc(t.displayName||t.address.slice(0,6)+'…'+t.address.slice(-4))+'</strong><span class="tr-pill">Não validado</span></div><div class="tr-metrics"><span>PnL 7d: '+esc(money(t.weekPnl))+'</span><span>PnL 30d: '+esc(money(t.monthPnl))+'</span><span>PnL histórico: '+esc(money(t.allTimePnl))+'</span><span>Patrimônio: '+esc(money(t.accountValue))+'</span></div><div class="tr-meta">'+esc(t.address)+'</div></article>').join('') : '';
-        rankingsEl.innerHTML = (eligible.length ? '<h4 style="margin:4px 0">Traders validados pelo histórico observado</h4>'+eligible.map((t,i)=>'<article class="tr-rank"><div class="tr-rank-head"><strong>#'+(i+1)+' '+esc(t.displayName||t.address.slice(0,6)+'…'+t.address.slice(-4))+'</strong><span class="tr-score">'+esc(t.score)+'/100*</span></div><div class="tr-metrics"><span>Acerto observado: '+esc(((t.performance.winRate||0)*100).toFixed(1))+'%</span><span>Operações fechadas: '+esc(t.performance.closedTrades)+'</span><span>PnL realizado: '+esc(money(t.performance.realizedPnl))+'</span><span>Profit factor: '+esc(t.performance.profitFactorCapped?'≥'+Number(t.performance.profitFactor).toFixed(2):t.performance.profitFactor==null?'—':Number(t.performance.profitFactor).toFixed(2))+'</span></div><div class="tr-meta">'+esc(t.address)+'</div></article>').join('') : '<div class="tr-empty">Ainda não há histórico observado suficiente para declarar traders validados.</div>')+candidateHtml;
-        renderTraderChart(chartEl, e.events||[], eligible);
-        if (!e.events?.length) eventsEl.innerHTML = '<div class="tr-empty">Nenhuma entrada ou saída de BTC registrada ainda. O painel atualiza automaticamente.</div>';
-        else eventsEl.innerHTML = e.events.map(ev => {
-          const isEntry = ev.type === 'NEW_BTC_ENTRY';
-          const isLong = ev.direction === 'LONG' || ev.direction === 'CLOSE_LONG';
-          const label = isEntry ? (isLong ? '▲ NOVA ENTRADA LONG' : '▼ NOVA ENTRADA SHORT') : ((ev.isFullClose ? '■ SAÍDA TOTAL ' : '↘ REDUÇÃO ') + (isLong ? 'LONG' : 'SHORT'));
-          const pnl = ev.closedPnl === null || ev.closedPnl === undefined ? '' : '<div class="tr-meta">PnL realizado nesta execução: '+esc(money(ev.closedPnl))+'</div>';
-          return '<article class="tr-event"><div class="tr-event-top"><span class="tr-direction '+(isLong?'tr-long':'tr-short')+'">'+label+'</span><span class="tr-meta">'+esc(date(ev.timestamp))+'</span></div><strong>'+esc(ev.trader||ev.wallet||'Carteira')+'</strong><div>'+esc(money(ev.notionalUsd))+' <span class="tr-meta">notional estimado · '+esc(ev.size)+' BTC</span></div><div class="tr-meta">Preço executado: '+esc(money(ev.price))+'</div>'+pnl+'<div class="tr-meta">Carteira: '+esc(ev.wallet||'')+'</div></article>';
+        const res = await fetch('https://api.binance.us/api/v3/klines?symbol=BTCUSDT&interval=1d&limit=90', { cache: 'no-store' });
+        if (!res.ok) throw new Error('Candles BTC indisponíveis');
+        const rows = await res.json();
+        if (!Array.isArray(rows) || rows.length < 10) throw new Error('Histórico de candles insuficiente');
+        const candles = rows.map(r => ({ t: Number(r[0]), c: Number(r[4]) })).filter(r => r.t > 0 && r.c > 0);
+        const allowed = new Set(eligible.map(t => String(t.address).toLowerCase()));
+        const marks = events.filter(ev => allowed.has(String(ev.wallet || '').toLowerCase()) && Number(ev.timestamp) > 0 && Number(ev.price) > 0 && Number(ev.timestamp) >= candles[0].t && Number(ev.timestamp) <= candles[candles.length - 1].t + 86400000);
+        const W = 760, H = 300, L = 58, R = 14, T = 16, B = 30, innerW = W - L - R;
+        const prices = candles.map(c => c.c).concat(marks.map(e => Number(e.price)));
+        const min = Math.min(...prices) * 0.995, max = Math.max(...prices) * 1.005, range = max - min || 1;
+        const x = t => L + ((t - candles[0].t) / (candles[candles.length - 1].t - candles[0].t || 1)) * innerW;
+        const y = p => T + (max - p) / range * (H - T - B);
+        const path = candles.map((c, i) => (i ? 'L' : 'M') + x(c.t).toFixed(1) + ',' + y(c.c).toFixed(1)).join(' ');
+        const grid = [0, 1, 2, 3].map(i => {
+          const p = max - range * i / 3, yy = y(p);
+          return '<line x1="' + L + '" y1="' + yy + '" x2="' + (W - R) + '" y2="' + yy + '" stroke="#293241"/><text x="' + (L - 7) + '" y="' + (yy + 4) + '" fill="#aab4c4" font-size="10" text-anchor="end">' + Math.round(p).toLocaleString('en-US') + '</text>';
         }).join('');
+        const dots = marks.map(ev => {
+          const entry = ev.type === 'NEW_BTC_ENTRY';
+          const long = ev.direction === 'LONG' || ev.direction === 'CLOSE_LONG';
+          const color = entry ? (long ? '#4ade80' : '#fb7185') : '#60a5fa';
+          const cx = x(Number(ev.timestamp)), cy = y(Number(ev.price));
+          const kind = entry ? (long ? 'ENTRADA LONG' : 'ENTRADA SHORT') : ((ev.isFullClose ? 'SAÍDA ' : 'REDUÇÃO ') + ev.direction);
+          const label = (ev.trader || ev.wallet || 'Trader') + ' · ' + kind + ' · ' + new Date(Number(ev.timestamp)).toLocaleString('pt-BR') + ' · $' + Number(ev.price).toLocaleString('en-US');
+          return '<circle cx="' + cx.toFixed(1) + '" cy="' + cy.toFixed(1) + '" r="5" fill="' + color + '" stroke="#10151e" stroke-width="1.5"><title>' + esc(label) + '</title></circle>';
+        }).join('');
+        const note = eligible.length + ' trader(s) validados · ' + marks.length + ' evento(s) no período' + (eligible.length < 5 ? ' · ainda não há cinco traders validados; candidatos não comprovados ficam fora do gráfico' : '');
+        el.innerHTML = '<svg class="tr-chart-svg" viewBox="0 0 ' + W + ' ' + H + '" role="img" aria-label="Preço do Bitcoin com entradas e saídas observadas dos cinco traders validados">' + grid + '<path d="' + path + '" fill="none" stroke="#fbbf24" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round"/>' + dots + '<text x="' + L + '" y="' + (H - 8) + '" fill="#aab4c4" font-size="10">' + new Date(candles[0].t).toLocaleDateString('pt-BR') + '</text><text x="' + (W - R) + '" y="' + (H - 8) + '" fill="#aab4c4" font-size="10" text-anchor="end">' + new Date(candles[candles.length - 1].t).toLocaleDateString('pt-BR') + '</text></svg><div class="tr-meta">' + note + '</div>';
       } catch (err) {
-        statusEl.textContent = 'Falha ao atualizar'; statusEl.className = 'tr-pill';
-        eventsEl.innerHTML = '<div class="tr-error">'+esc(err.message)+'<br><span class="tr-meta">Confira a disponibilidade do backend e tente novamente.</span></div>';
-      } finally { if (!stopped) timer = setTimeout(refresh,refreshMs); }
-    }
-    refresh();
-    return { refresh, destroy(){stopped=true;clearTimeout(timer);root.innerHTML='';} };
-  }
-  if (typeof module !== 'undefined' && module.exports) module.exports = { mountTraderRadarPanel };
-  global.mountTraderRadarPanel = mountTraderRadarPanel;
-})(typeof window !== 'undefined' ? window : globalThis);
-+Number(ev.price).toLocaleString('en-US');return '<circle cx="'+cx.toFixed(1)+'" cy="'+cy.toFixed(1)+'" r="5" fill="'+color+'" stroke="#10151e" stroke-width="1.5"><title>'+esc(label)+'</title></circle>';}).join('');
-        const countLabel=eligible.length+' trader(s) validados no ranking · '+marks.length+' evento(s) no período'+(eligible.length<5?' · ainda não há cinco traders validados; candidatos não comprovados ficam fora do gráfico':'');
-        el.innerHTML='<svg class="tr-chart-svg" viewBox="0 0 '+W+' '+H+'" role="img" aria-label="Preço do Bitcoin com entradas e saídas observadas dos cinco traders validados">'+grid+'<path d="'+path+'" fill="none" stroke="#fbbf24" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round"/>'+dots+'<text x="'+L+'" y="'+(H-8)+'" fill="#aab4c4" font-size="10">'+new Date(candles[0].t).toLocaleDateString('pt-BR')+'</text><text x="'+(W-R)+'" y="'+(H-8)+'" fill="#aab4c4" font-size="10" text-anchor="end">'+new Date(candles[candles.length-1].t).toLocaleDateString('pt-BR')+'</text></svg><div class="tr-meta">'+countLabel+'. Toque nos pontos para ver trader, tipo e horário.</div>';
-      } catch(err) { el.innerHTML='<div class="tr-chart-empty">'+esc(err.message||'Não foi possível carregar o gráfico BTC')+'</div>'; }
+        el.innerHTML = '<div class="tr-chart-empty">' + esc(err.message || 'Não foi possível carregar o gráfico BTC') + '</div>';
+      }
     }
     async function refresh() {
       if (stopped) return;
