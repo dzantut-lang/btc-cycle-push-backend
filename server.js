@@ -78,22 +78,30 @@ async function computeSignal() {
   score += volRatio >= 1.15 && price > fast ? 5 : 0;
   score = Math.max(0, Math.min(100, Math.round(score)));
   const signal = score >= 70 ? 'COMPRA POTENCIAL' : score <= 35 ? 'VENDA POTENCIAL' : 'AGUARDAR';
-  return { signal, score, price, rsi: Number(currentRsi.toFixed(1)), ema20: Number(fast.toFixed(2)), ema50: Number(slow.toFixed(2)), volumeRatio: Number(volRatio.toFixed(2)), checkedAt: new Date().toISOString(), source: 'Binance public API', model: 'server heuristic v1' };
+  return { signal, score, price, rsi: Number(currentRsi.toFixed(1)), ema20: Number(fast.toFixed(2)), ema50: Number(slow.toFixed(2)), volumeRatio: Number(volRatio.toFixed(2)), checkedAt: new Date().toISOString(), source: 'Binance public API', model: 'legacy server heuristic v1 (not synchronized with the official app engine)', alertsEnabled: false };
 }
 async function monitorOnce() {
   const current = await computeSignal();
   const previous = readJson(STATE_FILE, null);
-  if (previous && previous.signal !== current.signal) {
-    const body = `${previous.signal} → ${current.signal}. Score ${current.score}/100; BTC ${new Intl.NumberFormat('en-US',{style:'currency',currency:'USD',maximumFractionDigits:0}).format(current.price)}; RSI ${current.rsi}. Sinal informativo, não é ordem.`;
-    await sendPush({ title: `BTC Cycle Desk: ${current.signal}`, body, tag: `btc-signal-${current.signal.toLowerCase().replace(/[^a-z]+/g,'-')}`, url: '/', signal: current.signal, score: current.score, price: current.price, checkedAt: current.checkedAt });
-  }
+  const changed = Boolean(previous && previous.signal !== current.signal);
+  // Do not send market-signal pushes from this legacy server heuristic.
+  // The published app's official motor is the source of truth; until a shared
+  // signal contract is wired end-to-end, suppressing these pushes prevents
+  // alerts from contradicting the dashboard.
   writeJson(STATE_FILE, current);
-  return { ...current, changed: Boolean(previous && previous.signal !== current.signal) };
+  return {
+    ...current,
+    changed,
+    notificationSuppressed: changed,
+    notificationReason: changed
+      ? 'Alert suppressed: server heuristic is not synchronized with the official app engine.'
+      : null
+  };
 }
 
 app.get('/health', (_req,res) => {
   const radar = traderRadar.status();
-  res.json({ ok: true, service: 'BTC Cycle Desk Push', pushReady, subscribers: subscriptions().length, pollingMinutes: Math.max(5, Number(process.env.POLL_MINUTES || 15)), traderRadar: { running: radar.running, source: radar.source, watchedWallets: radar.watchedWallets, connectedWallets: radar.connectedWallets, eventCount: radar.eventCount, rankedEligible: radar.rankedEligible, lastDiscoveryAt: radar.lastDiscoveryAt, lastError: radar.lastError } });
+  res.json({ ok: true, service: 'BTC Cycle Desk Push', pushReady, subscribers: subscriptions().length, pollingMinutes: Math.max(5, Number(process.env.POLL_MINUTES || 15)), marketSignalAlertsEnabled: false, marketSignalAlertNote: 'Automatic market-signal pushes are suppressed until they share the official app engine.', traderRadar: { running: radar.running, source: radar.source, watchedWallets: radar.watchedWallets, connectedWallets: radar.connectedWallets, eventCount: radar.eventCount, rankedEligible: radar.rankedEligible, lastDiscoveryAt: radar.lastDiscoveryAt, lastError: radar.lastError } });
 });
 app.get('/api/push/public-key', (_req,res) => { if (!publicKey || publicKey.startsWith('REPLACE_')) return res.status(503).json({ error: 'VAPID_PUBLIC_KEY_NOT_CONFIGURED' }); res.json({ publicKey }); });
 app.post('/api/push/subscribe', (req,res) => {
