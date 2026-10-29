@@ -104,7 +104,11 @@ async function monitorOnce() {
 
 app.get('/health', (_req,res) => {
   const radar = traderRadar.status();
-  res.json({ ok: true, service: 'BTC Cycle Desk Push', pushReady, subscribers: subscriptions().length, pollingMinutes: Math.max(5, Number(process.env.POLL_MINUTES || 15)), marketSignalAlertsEnabled: false, marketSignalAlertNote: 'Automatic market-signal pushes are suppressed until they share the official app engine.', traderRadar: { running: radar.running, source: radar.source, watchedWallets: radar.watchedWallets, connectedWallets: radar.connectedWallets, eventCount: radar.eventCount, rankedEligible: radar.rankedEligible, lastDiscoveryAt: radar.lastDiscoveryAt, lastError: radar.lastError } });
+  const pushRequirementsMissing = [];
+  if (!publicKey || !privateKey || publicKey.startsWith('REPLACE_') || privateKey.startsWith('REPLACE_')) pushRequirementsMissing.push('VAPID_KEYS');
+  if (!subjectConfigured) pushRequirementsMissing.push('VAPID_SUBJECT');
+  if (!persistentStorageConfigured) pushRequirementsMissing.push('PERSISTENT_STORAGE');
+  res.json({ ok: true, service: 'BTC Cycle Desk Push', pushReady, pushRequirementsMissing, persistentStorageConfigured, subscribers: subscriptions().length, pollingMinutes: Math.max(5, Number(process.env.POLL_MINUTES || 15)), marketSignalAlertsEnabled: false, marketSignalAlertNote: 'Automatic market-signal pushes are suppressed until they share the official app engine.', traderRadar: { running: radar.running, source: radar.source, watchedWallets: radar.watchedWallets, connectedWallets: radar.connectedWallets, eventCount: radar.eventCount, rankedEligible: radar.rankedEligible, lastDiscoveryAt: radar.lastDiscoveryAt, lastError: radar.lastError } });
 });
 app.get('/api/push/public-key', (_req,res) => { if (!pushReady) return res.status(503).json({ error: 'PUSH_NOT_READY', message: 'Configure valid VAPID credentials, a real VAPID subject, and persistent storage before enabling Web Push.' }); res.json({ publicKey }); });
 app.post('/api/push/subscribe', (req,res) => {
