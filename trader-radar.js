@@ -85,7 +85,7 @@ class TraderRadar {
     if(!cycle)return;
     cycle.realizedPnl+=closedPnl;cycle.fills+=1;cycle.direction=dir==='close long'?'LONG':'SHORT';
     if(Math.abs(end)<1e-8){
-      const m=this.performance[address]||{closedTrades:0,wins:0,losses:0,breakeven:0,realizedPnl:0,grossProfit:0,grossLoss:0,avgPnl:0,lastCloseAt:null,feesIncluded:true,fundingIncluded:false};
+      let m=this.performance[address];if(!m||m.modelVersion!==2)m={modelVersion:2,closedTrades:0,wins:0,losses:0,breakeven:0,realizedPnl:0,grossProfit:0,grossLoss:0,avgPnl:0,lastCloseAt:null,feesIncluded:true,fundingIncluded:false};
       const pnl=cycle.realizedPnl;m.closedTrades+=1;m.realizedPnl+=pnl;
       if(pnl>0){m.wins+=1;m.grossProfit+=pnl;}else if(pnl<0){m.losses+=1;m.grossLoss+=Math.abs(pnl);}else m.breakeven+=1;
       m.avgPnl=m.realizedPnl/m.closedTrades;m.winRate=m.wins/Math.max(1,m.wins+m.losses);
@@ -94,7 +94,7 @@ class TraderRadar {
     }else this.closeCycles[address]=cycle;
   }
   rankedTraders(){
-    return [...this.wallets.values()].map(w=>{const m=this.performance[w.address]||{closedTrades:0,wins:0,losses:0,realizedPnl:0,winRate:0,profitFactor:0};const eligible=m.closedTrades>=20&&m.realizedPnl>0&&m.profitFactor>=1.2;
+    return [...this.wallets.values()].map(w=>{const m=this.performance[w.address]||{closedTrades:0,wins:0,losses:0,realizedPnl:0,winRate:0,profitFactor:0};const eligible=m.modelVersion===2&&m.closedTrades>=20&&m.realizedPnl>0&&m.profitFactor>=1.2;
       const score=eligible?Math.round(Math.min(35,m.winRate*35)+Math.min(25,(m.profitFactor||0)/2*25)+Math.min(20,Math.max(0,m.realizedPnl)/(Math.max(1,w.accountValue||10000))*100)+Math.min(20,m.closedTrades/100*20)):null;
       return {...w,performance:m,eligibleForRanking:eligible,score,rankingNote:eligible?'Amostra observada suficiente; ainda sem ajuste completo de drawdown/alavancagem':'Sem amostra suficiente ou critérios de rentabilidade/profit factor não atendidos'};
     }).sort((a,b)=>(b.score??-1)-(a.score??-1));
