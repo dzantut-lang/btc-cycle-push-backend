@@ -7,7 +7,7 @@
     let stopped = false, timer = null, chartInterval = '4h', chartRenderSeq = 0, lastChartEvents = [], lastDisplayTraders = [], lastValidated = false;
     const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
     const money = n => Number(n).toLocaleString('en-US',{style:'currency',currency:'USD',maximumFractionDigits:2});
-    const compactMoney = n => { const value = Number(n); if (!Number.isFinite(value)) return '—'; return Math.abs(value) >= 1e9 ? '
+    const compactMoney = n => { const value = Number(n); if (!Number.isFinite(value)) return '—'; const abs = Math.abs(value); if (abs >= 1e9) return '$' + (value / 1e9).toFixed(2) + 'B'; if (abs >= 1e6) return '$' + (value / 1e6).toFixed(2) + 'M'; if (abs >= 1e4) return '$' + (value / 1e3).toFixed(1) + 'K'; return money(value); };
     const date = n => new Date(Number(n)).toLocaleString('pt-BR',{timeZone:'America/Sao_Paulo'});
     root.innerHTML = `
       <section class="trader-radar" aria-label="BTC Trader Radar">
