@@ -65,7 +65,7 @@ class TraderRadar {
   stop(){this.running=false;clearInterval(this.discoveryTimer);for(const t of this.timers.values())clearTimeout(t);for(const t of this.heartbeats.values())clearInterval(t);for(const s of this.sockets.values())try{s.close()}catch{}this.timers.clear();this.heartbeats.clear();this.sockets.clear();this.connected.clear();}
   connect(address){if(!this.running||this.sockets.has(address)||!this.WS)return;let ws;try{ws=new this.WS(HL_WS)}catch(e){return this.reconnect(address)}this.sockets.set(address,ws);
     ws.addEventListener('open',()=>{this.connected.add(address);ws.send(JSON.stringify({method:'subscribe',subscription:{type:'userFills',user:address,aggregateByTime:true}}));clearInterval(this.heartbeats.get(address));this.heartbeats.set(address,setInterval(()=>{try{if(ws.readyState===1)ws.send(JSON.stringify({method:'ping'}));}catch{}},25000));});
-    ws.addEventListener('message',e=>{try{const m=JSON.parse(typeof e.data==='string'?e.data:String(e.data));if(m.channel!=='userFills'||!m.data)return;const d=m.data, fills=Array.isArray(d.fills)?d.fills:[];if(d.isSnapshot){const was=this.initialized.has(address),cursor=num(this.cursors[address]);for(const f of fills.sort((a,b)=>num(a.time)-num(b.time))){const id=this.fillId(address,f);if(was&&num(f.time)>cursor&&!this.seen.has(id))this.processFill(address,f);else{this.seen.add(id);this.cursors[address]=Math.max(num(this.cursors[address]),num(f.time));}}this.initialized.add(address);this.save();return;}for(const f of fills)this.processFill(address,f).catch(err=>this.logger.error(err.message));}catch(err){this.logger.warn('Mensagem Hyperliquid inválida:',err.message);}});
+    ws.addEventListener('message',e=>{try{const m=JSON.parse(typeof e.data==='string'?e.data:String(e.data));if(m.channel!=='userFills'||!m.data)return;const d=m.data,fills=Array.isArray(d.fills)?d.fills:[];if(d.isSnapshot){const was=this.initialized.has(address),cursor=num(this.cursors[address]);for(const f of fills.sort((a,b)=>num(a.time)-num(b.time))){const id=this.fillId(address,f);if(!this.seen.has(id)&&(!was||num(f.time)>cursor)){this.processFill(address,f,{suppressPush:!was}).catch(err=>this.logger.error('Snapshot fill:',err.message));}else{this.seen.add(id);this.cursors[address]=Math.max(num(this.cursors[address]),num(f.time));}}this.initialized.add(address);this.save();return;}for(const f of fills)this.processFill(address,f).catch(err=>this.logger.error(err.message));}catch(err){this.logger.warn('Mensagem Hyperliquid inválida:',err.message);}});
     ws.addEventListener('close',()=>{this.connected.delete(address);if(this.sockets.get(address)===ws)this.sockets.delete(address);clearInterval(this.heartbeats.get(address));this.heartbeats.delete(address);this.reconnect(address)});ws.addEventListener('error',()=>{this.connected.delete(address);try{ws.close()}catch{}});}
   reconnect(a){if(!this.running||this.timers.has(a))return;this.timers.set(a,setTimeout(()=>{this.timers.delete(a);this.connect(a)},5000));}
   fillId(a,f){return [a,f.hash||'',f.oid??'',f.tid??'',f.time,f.coin,f.side,f.sz].join(':');}
@@ -99,7 +99,7 @@ class TraderRadar {
       return {...w,performance:m,eligibleForRanking:eligible,score,rankingNote:eligible?'Amostra observada suficiente; ainda sem ajuste completo de drawdown/alavancagem':'Sem amostra suficiente ou critérios de rentabilidade/profit factor não atendidos'};
     }).sort((a,b)=>(b.score??-1)-(a.score??-1));
   }
-  async processFill(address,fill){
+  async processFill(address,fill,{suppressPush=false}={}){
     const id=this.fillId(address,fill);
     if(this.seen.has(id))return null;
     this.seen.add(id);
@@ -124,6 +124,7 @@ class TraderRadar {
     const body=isEntry
       ? e.trader+' abriu '+(e.direction==='LONG'?'LONG':'SHORT')+' em BTC a $'+e.price.toLocaleString('en-US')+' · '+e.size+' BTC. Entrada observada; não é recomendação.'
       : e.trader+' '+(e.isFullClose?'encerrou':'reduziu')+' '+(e.direction==='CLOSE_LONG'?'LONG':'SHORT')+' em BTC a $'+e.price.toLocaleString('en-US')+' · '+e.size+' BTC'+pnl+'. Execução observada; não é recomendação.';
+    if(suppressPush)return e;
     try{await this.sendPush({title,body,tag:'trader-radar-'+id,url:'/?panel=trader-radar',eventType:isEntry?'trader-radar-new-btc-entry':'trader-radar-position-exit',trade:e});}
     catch(err){this.logger.error('Trader Radar push:',err.message);}
     return e;
