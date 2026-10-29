@@ -20,7 +20,7 @@ function selectCandidates(payload, minEquity = 10000, max = 25) {
     .sort((a,b) => b.monthPnl-a.monthPnl).slice(0, max);
 }
 function classifyFill(fill, address) {
-  if (!fill || String(fill.coin).toUpperCase() !== 'BTC' || Math.abs(num(fill.startPosition)) > 1e-12) return null;
+  const startPosition = Number(fill && fill.startPosition); if (!fill || String(fill.coin).toUpperCase() !== 'BTC' || !Number.isFinite(startPosition) || Math.abs(startPosition) > 1e-12) return null;
   const dir = String(fill.dir || '').toLowerCase();
   const direction = dir === 'open long' ? 'LONG' : dir === 'open short' ? 'SHORT' : null;
   const price = num(fill.px), size = num(fill.sz), time = num(fill.time);
