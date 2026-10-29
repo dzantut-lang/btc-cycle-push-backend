@@ -206,12 +206,17 @@ async function refreshHyperliquidOpenPositions(force = false) {
         return { __error: error.message };
       }
     }));
-    const failures = results.flat().filter(x => x && x.__error);
-    const positions = results.flat().filter(x => x && !x.__error).sort((a,b) => b.notionalUsd - a.notionalUsd).slice(0,5);
+    const flatResults = results.flat();
+    const failures = flatResults.filter(x => x && x.__error);
+    const successfulWallets = Math.max(0, wallets.length - failures.length);
+    const positions = flatResults.filter(x => x && !x.__error).sort((a,b) => b.notionalUsd - a.notionalUsd).slice(0,5);
     hyperliquidOpenPositionsCache = {
       updatedAt: now,
       positions,
       error: positions.length ? null : (failures.length ? failures[0].__error : null),
+      partial: failures.length > 0 && positions.length > 0,
+      failedWallets: failures.length,
+      successfulWallets,
       monitoredWallets: wallets.length,
       source: 'Hyperliquid public clearinghouseState · monitored Trader Radar wallets'
     };
