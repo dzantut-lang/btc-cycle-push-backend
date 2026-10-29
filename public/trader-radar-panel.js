@@ -34,7 +34,7 @@
       const renderSeq = ++chartRenderSeq;
       const intervalAtStart = chartInterval;
       try {
-        const res = await fetch(base+'/api/trader-radar/candles?interval='+encodeURIComponent(intervalAtStart)+'&limit=240', { cache: 'no-store' });
+        const res = await fetch(base+'/api/trader-radar/candles?interval='+encodeURIComponent(intervalAtStart)+'&limit=500', { cache: 'no-store' });
         if (!res.ok) throw new Error('Candles BTC indisponíveis na Hyperliquid');
         const payload = await res.json();
         const rows = Array.isArray(payload) ? payload : payload.candles;
