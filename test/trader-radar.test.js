@@ -34,7 +34,7 @@ test('ignores non-BTC fills and unrecognized directions', () => {
   assert.equal(classifyBtcExit({ ...base, coin: 'BTC', dir: 'Liquidation' }, wallet), null);
 });
 
-test('leaderboard candidates require valid addresses, equity, and positive week/month/all-time PnL', () => {
+test('leaderboard candidates require valid addresses, equity, and positive month/all-time PnL; weekly pullbacks remain eligible', () => {
   const candidate = {
     ethAddress: wallet,
     accountValue: '20000',
@@ -48,5 +48,5 @@ test('leaderboard candidates require valid addresses, equity, and positive week/
   assert.equal(selected.length, 1);
   assert.equal(selected[0].address, wallet);
   assert.equal(selectLeaderboardCandidates([{ ...candidate, accountValue: '500' }], 10000, 25).length, 0);
-  assert.equal(selectLeaderboardCandidates([{ ...candidate, windowPerformances: [['week', { pnl: '-1' }], ['month', { pnl: '500' }], ['allTime', { pnl: '1000' }]] }], 10000, 25).length, 0);
+  const pullback = selectLeaderboardCandidates([{ ...candidate, windowPerformances: [['week', { pnl: '-1' }], ['month', { pnl: '500' }], ['allTime', { pnl: '1000' }]] }], 10000, 25);\n  assert.equal(pullback.length, 1);\n  assert.equal(pullback[0].weekPnl, -1);
 });
