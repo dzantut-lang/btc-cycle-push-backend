@@ -4,7 +4,7 @@
     if (!root) throw new Error('Container do Trader Radar não encontrado');
     const base = String(apiBase || '').replace(/\/$/, '');
     const refreshMs = Math.max(5000, Number(options.refreshMs) || 10000);
-    let stopped = false, timer = null, chartInterval = '4h';
+    let stopped = false, timer = null, chartInterval = '4h', lastChartEvents = [], lastDisplayTraders = [], lastValidated = false;
     const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
     const money = n => Number(n).toLocaleString('en-US',{style:'currency',currency:'USD',maximumFractionDigits:2});
     const date = n => new Date(Number(n)).toLocaleString('pt-BR',{timeZone:'America/Sao_Paulo'});
@@ -71,6 +71,7 @@
         const provisional = allTraders.filter(t=>String(t.source||'').toLowerCase().includes('public leaderboard')).slice(0,5);
         const displayTraders = eligible.length ? eligible : provisional;
         const validated = eligible.length > 0;
+        lastChartEvents = e.events||[]; lastDisplayTraders = displayTraders; lastValidated = validated;
 
         rankingsEl.innerHTML = displayTraders.length ? displayTraders.map((t,i)=>'<article class="tr-rank"><div class="tr-rank-head"><strong>#'+(i+1)+' '+esc(t.displayName||t.address.slice(0,6)+'…'+t.address.slice(-4))+'</strong><span class="tr-score">'+(t.eligibleForRanking?'VALIDADO':'EM OBSERVAÇÃO')+'</span></div><div class="tr-meta">'+esc(t.performance.closedTrades||0)+' ciclos fechados observados · '+esc(money(t.performance.realizedPnl||0))+' PnL observado</div></article>').join('') : '<div class="tr-empty">Aguardando candidatos públicos da Hyperliquid. O gráfico de BTC continua ao vivo.</div>';
         if (openPositionsEl) {
@@ -105,7 +106,7 @@
         eventsEl.innerHTML = '<div class="tr-error">'+esc(err.message)+'<br><span class="tr-meta">Confira a disponibilidade do backend e tente novamente.</span></div>';
       } finally { if (!stopped) timer = setTimeout(refresh,refreshMs); }
     }
-    root.querySelectorAll('[data-tr-interval]').forEach(button=>button.addEventListener('click',()=>{chartInterval=button.getAttribute('data-tr-interval')||'4h';root.querySelectorAll('[data-tr-interval]').forEach(b=>b.classList.toggle('active',b===button));renderTraderChart(chartEl,[],[],false);}));
+    root.querySelectorAll('[data-tr-interval]').forEach(button=>button.addEventListener('click',()=>{chartInterval=button.getAttribute('data-tr-interval')||'4h';root.querySelectorAll('[data-tr-interval]').forEach(b=>b.classList.toggle('active',b===button));renderTraderChart(chartEl,lastChartEvents,lastDisplayTraders,lastValidated);}));
     refresh();
     return { refresh, destroy(){stopped=true;clearTimeout(timer);root.innerHTML='';} };
   }
