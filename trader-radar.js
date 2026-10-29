@@ -62,7 +62,9 @@ class TraderRadar {
     if(!Number.isFinite(start)||!Number.isFinite(closedPnl)||size<=0)return;
     const signedDelta=String(fill.side).toUpperCase()==='B'?size:-size;
     const end=start+signedDelta;
-    const cycle=this.closeCycles[address]||{realizedPnl:0,direction:dir==='close long'?'LONG':'SHORT',fills:0};
+    const cycle=this.closeCycles[address];
+    // Only score a round trip when its entry was observed by this radar.
+    if(!cycle)return;
     cycle.realizedPnl+=closedPnl;cycle.fills+=1;cycle.direction=dir==='close long'?'LONG':'SHORT';
     if(Math.abs(end)<1e-8){
       const m=this.performance[address]||{closedTrades:0,wins:0,losses:0,breakeven:0,realizedPnl:0,grossProfit:0,grossLoss:0,avgPnl:0,lastCloseAt:null};
@@ -79,7 +81,9 @@ class TraderRadar {
       return {...w,performance:m,eligibleForRanking:eligible,score,rankingNote:eligible?'Amostra observada suficiente; ainda sem ajuste completo de drawdown/alavancagem':'Sem amostra suficiente ou critérios de rentabilidade/profit factor não atendidos'};
     }).sort((a,b)=>(b.score??-1)-(a.score??-1));
   }
-  async processFill(address,fill){const id=this.fillId(address,fill);if(this.seen.has(id))return null;this.seen.add(id);this.cursors[address]=Math.max(num(this.cursors[address]),num(fill.time));this.recordClosedTrade(address,fill);const e=classifyFill(fill,address);if(!e){this.save();return null;}e.id=id;const w=this.wallets.get(address);e.trader=w?.displayName||address.slice(0,6)+'…'+address.slice(-4);e.walletSource=w?.source||'Hyperliquid';this.events.unshift(e);this.events=this.events.slice(0,500);this.save();const dir=e.direction==='LONG'?'COMPRA (LONG)':'VENDA (SHORT)';try{await this.sendPush({title:'BTC Trader Radar: '+e.direction,body:e.trader+' abriu '+dir+' em BTC a $'+e.price.toLocaleString('en-US')+' · '+e.size+' BTC. Evento público da Hyperliquid; não é recomendação.',tag:'trader-radar-'+id,url:'/?panel=trader-radar',eventType:'trader-radar-new-btc-entry',trade:e});}catch(err){this.logger.error('Trader Radar push:',err.message);}return e;}
+  async processFill(address,fill){const id=this.fillId(address,fill);if(this.seen.has(id))return null;this.seen.add(id);this.cursors[address]=Math.max(num(this.cursors[address]),num(fill.time));this.recordClosedTrade(address,fill);const e=classifyFill(fill,address);if(!e){this.save();return null;}e.id=id;const w=this.wallets.get(address);e.trader=w?.displayName||address.slice(0,6)+'…'+address.slice(-4);e.walletSource=w?.source||'Hyperliquid';
+    if(!this.closeCycles[address])this.closeCycles[address]={realizedPnl:0,direction:e.direction,fills:0,openedAt:e.executedAt};
+    this.events.unshift(e);this.events=this.events.slice(0,500);this.save();const dir=e.direction==='LONG'?'COMPRA (LONG)':'VENDA (SHORT)';try{await this.sendPush({title:'BTC Trader Radar: '+e.direction,body:e.trader+' abriu '+dir+' em BTC a $'+e.price.toLocaleString('en-US')+' · '+e.size+' BTC. Evento público da Hyperliquid; não é recomendação.',tag:'trader-radar-'+id,url:'/?panel=trader-radar',eventType:'trader-radar-new-btc-entry',trade:e});}catch(err){this.logger.error('Trader Radar push:',err.message);}return e;}
   status(){return {ok:true,running:this.running,source:'Hyperliquid public API/WebSocket',websocketUrl:HL_WS,watchedWallets:this.wallets.size,connectedWallets:this.sockets.size,lastDiscoveryAt:this.lastDiscoveryAt,lastError:this.lastError,eventCount:this.events.length,rankedEligible:this.rankedTraders().filter(x=>x.eligibleForRanking).length,rankingMinimumClosedTrades:20,rules:{symbol:'BTC',events:'somente novas entradas',acceptedDirections:['Open Long','Open Short'],requiresFlatStartPosition:true,snapshotAlerts:false,deduplication:true}};}
 }
 module.exports={TraderRadar,validAddress,classifyNewBtcEntry:classifyFill,selectLeaderboardCandidates:selectCandidates};
