@@ -32,9 +32,10 @@
     async function renderTraderChart(el, events, eligible, validated = false) {
       if (!el) return;
       try {
-        const res = await fetch('https://api.binance.us/api/v3/klines?symbol=BTCUSDT&interval=1m&limit=120', { cache: 'no-store' });
-        if (!res.ok) throw new Error('Candles BTC indisponíveis');
-        const rows = await res.json();
+        const res = await fetch(base+'/api/trader-radar/candles?interval=1m&limit=120', { cache: 'no-store' });
+        if (!res.ok) throw new Error('Candles BTC indisponíveis na Hyperliquid');
+        const payload = await res.json();
+        const rows = Array.isArray(payload) ? payload : payload.candles;
         if (!Array.isArray(rows) || rows.length < 20) throw new Error('Histórico de candles insuficiente');
         const candles = rows.map(r => ({ t:Number(r[0]), o:Number(r[1]), h:Number(r[2]), l:Number(r[3]), c:Number(r[4]) })).filter(c => c.t > 0 && c.o > 0 && c.h > 0 && c.l > 0 && c.c > 0);
         const allowed = new Set(eligible.slice(0, 5).map(t => String(t.address).toLowerCase()));
@@ -49,9 +50,8 @@
         const cw=Math.max(2,Math.min(5,plotW/candles.length*.62));
         const candleSvg=candles.map((c,i)=>{const cx=x(i),up=c.c>=c.o,col=up?'#35d49a':'#fb6477',top=y(Math.max(c.o,c.c)),bottom=y(Math.min(c.o,c.c));return '<g><line x1="'+cx.toFixed(1)+'" y1="'+y(c.h).toFixed(1)+'" x2="'+cx.toFixed(1)+'" y2="'+y(c.l).toFixed(1)+'" stroke="'+col+'" stroke-width="1.2"/><rect x="'+(cx-cw/2).toFixed(1)+'" y="'+top.toFixed(1)+'" width="'+cw.toFixed(1)+'" height="'+Math.max(1.5,bottom-top).toFixed(1)+'" rx=".5" fill="'+col+'"/></g>';}).join('');
         const dots=marks.map(ev=>{const entry=ev.type==='NEW_BTC_ENTRY',green=entry?ev.direction==='LONG':ev.direction==='CLOSE_SHORT',col=green?'#4ade80':'#fb7185',cx=x(idx(Number(ev.timestamp))),cy=y(Number(ev.price)),kind=entry?(green?'COMPRA · LONG':'VENDA · SHORT'):(ev.isFullClose?'SAÍDA ':'REDUÇÃO ')+(ev.direction==='CLOSE_LONG'?'LONG':'SHORT'),label=(ev.trader||ev.wallet||'Trader')+' · '+kind+' · '+new Date(Number(ev.timestamp)).toLocaleString('pt-BR')+' · '+money(ev.price);return '<g><circle class="tr-radar-pulse" cx="'+cx.toFixed(1)+'" cy="'+cy.toFixed(1)+'" r="5" fill="'+col+'"/><circle class="tr-radar-core" cx="'+cx.toFixed(1)+'" cy="'+cy.toFixed(1)+'" r="4.5" fill="'+col+'"><title>'+esc(label)+'</title></circle></g>';}).join('');
-        let livePrice=candles[candles.length-1].c;
-        try { const tr=await fetch('https://api.binance.us/api/v3/ticker/price?symbol=BTCUSDT',{cache:'no-store'}); if(tr.ok){const q=await tr.json();if(Number(q.price)>0)livePrice=Number(q.price);} } catch (_) {}
-        const note=validated?'Mostrando operações dos '+Math.min(5,eligible.length)+' traders validados · '+marks.length+' operação(ões) no período':'Sem traders validados ainda; exibindo operações dos candidatos em observação ('+marks.length+' no período).';
+        const livePrice=candles[candles.length-1].c;
+        const note=validated?'Operações dos '+Math.min(5,eligible.length)+' traders validados · '+marks.length+' evento(s) no período.':'Sem traders validados; exibindo candidatos em observação ('+marks.length+' evento(s)).';
         el.innerHTML='<div class="tr-metrics"><span><i class="tr-live-dot"></i> BTC · CANDLES 1 MIN</span><strong>'+money(livePrice)+'</strong><span>Atualizado '+new Date().toLocaleTimeString('pt-BR')+'</span></div><svg class="tr-chart-svg" viewBox="0 0 '+W+' '+H+'" role="img" aria-label="Candles de Bitcoin com operações dos cinco traders mais bem classificados">'+grid+candleSvg+dots+'<text x="'+L+'" y="'+(H-7)+'" fill="#9db0c7" font-size="10">'+new Date(first).toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'})+'</text><text x="'+(W-R)+'" y="'+(H-7)+'" fill="#9db0c7" font-size="10" text-anchor="end">AGORA</text></svg><div class="tr-chart-legend"><span><i class="tr-dot" style="background:#4ade80"></i>Compra / saída SHORT</span><span><i class="tr-dot" style="background:#fb7185"></i>Venda / saída LONG</span></div><div class="tr-meta">'+note+'. A marcação depende da chegada da execução pública da Hyperliquid.</div>';
       } catch (err) { el.innerHTML='<div class="tr-chart-empty">'+esc(err.message || 'Não foi possível carregar candles BTC')+'</div>'; }
     }
@@ -72,7 +72,7 @@
         const displayTraders = eligible.length ? eligible : provisional;
         const validated = eligible.length > 0;
 
-        rankingsEl.innerHTML = displayTraders.length ? displayTraders.map((t,i)=>'<article class="tr-rank"><div class="tr-rank-head"><strong>#'+(i+1)+' '+esc(t.displayName||t.address.slice(0,6)+'…'+t.address.slice(-4))+'</strong><span class="tr-score">'+(t.eligibleForRanking?'VALIDADO':'EM OBSERVAÇÃO')+'</span></div><div class="tr-meta">'+esc(t.performance.closedTrades||0)+' ciclos fechados observados · '+esc(money(t.performance.realizedPnl||0))+' PnL realizado</div></article>').join('') : '<div class="tr-empty">Aguardando candidatos públicos da Hyperliquid. O gráfico de BTC continua ao vivo.</div>';
+        rankingsEl.innerHTML = displayTraders.length ? displayTraders.map((t,i)=>'<article class="tr-rank"><div class="tr-rank-head"><strong>#'+(i+1)+' '+esc(t.displayName||t.address.slice(0,6)+'…'+t.address.slice(-4))+'</strong><span class="tr-score">'+(t.eligibleForRanking?'VALIDADO':'EM OBSERVAÇÃO')+'</span></div><div class="tr-meta">'+(t.performance.modelVersion===2?esc(t.performance.closedTrades||0)+' ciclos fechados · '+esc(money(t.performance.realizedPnl||0))+' PnL líquido de taxas de execução (funding não incluído)':'Histórico anterior à métrica líquida; validação reiniciada')</div></article>').join('') : '<div class="tr-empty">Aguardando candidatos públicos da Hyperliquid. O gráfico de BTC continua ao vivo.</div>';
         await renderTraderChart(chartEl, e.events||[], displayTraders, validated);
         const matchingEvents = (e.events||[]).filter(ev=>displayTraders.some(t=>String(t.address).toLowerCase()===String(ev.wallet||'').toLowerCase())).slice(0,5);
         if (!matchingEvents.length) eventsEl.innerHTML = '<div class="tr-empty">Nenhuma execução recente dos traders '+(validated?'validados':'em observação')+'. As novas entradas e saídas aparecerão quando forem recebidas da Hyperliquid.</div>';
