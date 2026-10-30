@@ -124,6 +124,10 @@ app.get('/health', (_req,res) => {
   res.json({ ok: true, service: 'BTC Cycle Desk Push', pushReady, pushRequirementsMissing, persistentStorageConfigured, subscribers: subscriptions().length, pollingMinutes: Math.max(5, Number(process.env.POLL_MINUTES || 15)), officialMarketEngineIntegrated: false, officialSignalObserverIntegrated: true, officialMarketTimeframe: '3d', aiObserver: signalObserver.status(), legacyMarketEngineTimeframe: '1d', marketSignalAlertsEnabled: false, marketSignalAlertNote: 'Public market-signal endpoint is blocked until backend and dashboard use the same official 3-day engine.', traderRadar: { running: radar.running, source: radar.source, watchedWallets: radar.watchedWallets, connectedWallets: radar.connectedWallets, eventCount: radar.eventCount, rankedEligible: radar.rankedEligible, lastDiscoveryAt: radar.lastDiscoveryAt, lastError: radar.lastError } });
 });
 app.post('/api/ai/observer/snapshot', observerRateLimit, (req,res) => {
+  const origin = req.get('origin') || '';
+  const allowedOrigins = (process.env.ALLOWED_ORIGIN || 'https://headless-tlsmzediahg-8jsw69yvfg-140a.wix-site-host.com')
+    .split(',').map(value => value.trim()).filter(Boolean);
+  if (!origin || !allowedOrigins.includes(origin)) return res.status(403).json({ error: 'origin_not_allowed' });
   try { res.status(202).json(signalObserver.ingest(req.body || {})); }
   catch (error) { res.status(400).json({ error: 'invalid_observer_snapshot', message: error.message }); }
 });
