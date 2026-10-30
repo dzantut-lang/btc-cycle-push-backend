@@ -6,6 +6,7 @@ const path = require('path');
 const SYMBOLS = new Set(['BTCUSDT', 'ETHUSDT', 'SOLUSDT', 'LINKUSDT']);
 const MAX_SIGNALS = 1500;
 const MAX_CANDLES_PER_SYMBOL = 1200;
+const THREE_D_MS = 3 * 24 * 60 * 60 * 1000;
 const HORIZONS = [1, 3, 5, 10];
 const THREE_D_MS = 3 * 24 * 60 * 60 * 1000;
 
@@ -61,6 +62,7 @@ class SignalObserver {
     bucket.candles = [...candleMap.values()].sort((a,b) => a.closeTime - b.closeTime).slice(-MAX_CANDLES_PER_SYMBOL);
     const candleByCloseTime = new Map(bucket.candles.map(c => [c.closeTime, c]));
 
+    const candleByCloseTime = new Map(bucket.candles.map(c => [c.closeTime, c]));
     const signalMap = new Map(bucket.signals.map(s => [s.id, s]));
     let acceptedSignals = 0;
     for (const raw of input.signals) {
