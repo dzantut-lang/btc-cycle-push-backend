@@ -47,7 +47,7 @@
         const topFive=(Array.isArray(positions)?positions:[]).filter(p=>['LONG','SHORT'].includes(String(p.direction||'').toUpperCase())).sort((a,b)=>(Number(b.notionalUsd)||0)-(Number(a.notionalUsd)||0)).slice(0,5);
         const maAt=t=>{let lo=0,hi=dailyEMA.length-1;while(lo<hi){const mid=(lo+hi+1)>>1;if(dailyEMA[mid].t<=t)lo=mid;else hi=mid-1;}return dailyEMA[lo]||{};};
         const maPoints=candles.map(c=>({t:c.t,...maAt(c.t)}));
-        const priceValues=candles.flatMap(c=>[c.h,c.l]).concat(topFive.map(p=>Number(p.entryPrice)).filter(v=>Number.isFinite(v)&&v>0),maPoints.flatMap(m=>[m.ma50,m.ma200]).filter(Number.isFinite)),rawLo=Math.min(...priceValues),rawHi=Math.max(...priceValues),padding=Math.max((rawHi-rawLo)*.07,rawHi*.002),lo=rawLo-padding,hi=rawHi+padding,span=hi-lo||1;
+        const priceValues=candles.flatMap(c=>[c.h,c.l]).concat(topFive.map(p=>Number(p.entryPrice)).filter(v=>Number.isFinite(v)&&v>0),maPoints.flatMap(m=>[m.ema50,m.ema200]).filter(Number.isFinite)),rawLo=Math.min(...priceValues),rawHi=Math.max(...priceValues),padding=Math.max((rawHi-rawLo)*.07,rawHi*.002),lo=rawLo-padding,hi=rawHi+padding,span=hi-lo||1;
         const x=i=>L+i/(candles.length-1)*plotW,y=p=>T+(hi-p)/span*plotH;
         const grid=[0,1,2,3,4].map(i=>{const p=hi-span*i/4,yy=y(p);return '<line x1="'+L+'" y1="'+yy.toFixed(1)+'" x2="'+(W-R)+'" y2="'+yy.toFixed(1)+'" stroke="#243247"/><text x="'+(L-8)+'" y="'+(yy+4).toFixed(1)+'" fill="#9db0c7" font-size="10" text-anchor="end">'+Math.round(p).toLocaleString('en-US')+'</text>';}).join('');
         const cw=Math.max(2,Math.min(5,plotW/candles.length*.62));
