@@ -7,6 +7,7 @@ const fs = require('fs');
 const path = require('path');
 const { TraderRadar } = require('./trader-radar');
 const { SignalObserver } = require('./signal-observer');
+const { getAnalysis: getEtfFlowAnalysis } = require('./etf-flow');
 
 const app = express();
 app.use(express.json({ limit: '64kb' }));
@@ -114,6 +115,20 @@ async function monitorOnce() {
       : null
   };
 }
+
+app.get('/api/etf-flow', async (req,res) => {
+  try {
+    const result = await getEtfFlowAnalysis(String(req.query.refresh || '') === '1');
+    res.set('Cache-Control','no-store').json(result);
+  } catch (error) {
+    console.error('ETF Flow feed unavailable:', error.message);
+    res.status(502).set('Cache-Control','no-store').json({
+      ok:false, error:'etf_flow_unavailable',
+      message:'Não foi possível validar a série oficial de ETF Flow neste momento.',
+      retryable:true, source:'The Commoner Bitcoin ETF Tracker by TFTC'
+    });
+  }
+});
 
 app.get('/health', (_req,res) => {
   const radar = traderRadar.status();
