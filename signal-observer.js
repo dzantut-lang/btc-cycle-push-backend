@@ -8,7 +8,6 @@ const MAX_SIGNALS = 1500;
 const MAX_CANDLES_PER_SYMBOL = 1200;
 const THREE_D_MS = 3 * 24 * 60 * 60 * 1000;
 const HORIZONS = [1, 3, 5, 10];
-const THREE_D_MS = 3 * 24 * 60 * 60 * 1000;
 
 class SignalObserver {
   constructor({ dataDir, persistent = false, now = () => Date.now() }) {
