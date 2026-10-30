@@ -2,6 +2,13 @@
 
 Backend do BTC Cycle Desk / BTC Cycle Intelligence. O serviço oferece endpoints de saúde, inscrições Web Push e o Trader Radar informativo da Hyperliquid.
 
+## Monitor de IA — modo observador
+- O dashboard publicado envia ao backend snapshots do motor oficial 3D para auditoria estatística, sem criar, vetar ou alterar sinais.
+- O monitor deduplica eventos e mede o retorno direcional após 1, 3, 5 e 10 candles de 3 dias fechados.
+- Endpoints: `POST /api/ai/observer/snapshot`, `GET /api/ai/observer/status` e `GET /api/ai/observer/audit/:symbol`.
+- A persistência depende de `DATA_PERSISTENT=true` e armazenamento persistente real. No serviço Render Free atual, os dados podem ser perdidos em reinicializações/deploys; não trate os resultados como histórico durável até configurar armazenamento persistente.
+- O monitor é estatístico e determinístico nesta fase; não usa API generativa nem gera sinais de trading.
+
 ## Estado e segurança
 - O monitor de mercado do servidor usa uma heurística legada com candles diários (EMA20/EMA50, RSI e volume). **Ela não é o motor oficial do dashboard e não deve ser usada como fonte dos sinais exibidos no app.**
 - Alertas automáticos de compra/venda do monitor legado estão intencionalmente suprimidos para evitar divergência com o painel.
