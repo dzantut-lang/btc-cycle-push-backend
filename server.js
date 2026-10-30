@@ -196,7 +196,7 @@ async function refreshHyperliquidOpenPositions(force = false) {
   if (!force && now - hyperliquidOpenPositionsCache.updatedAt < 10000) return hyperliquidOpenPositionsCache;
   if (hyperliquidOpenPositionsPromise) return hyperliquidOpenPositionsPromise;
   hyperliquidOpenPositionsPromise = (async () => {
-    const wallets = [...traderRadar.wallets.values()].filter(w => /^0x[a-f0-9]{40}$/i.test(String(w.address || ''))).sort((a,b) => (Number(b.accountValue) || 0) - (Number(a.accountValue) || 0)).slice(0, 25);
+    const wallets = [...traderRadar.wallets.values()].filter(w => /^0x[a-f0-9]{40}$/i.test(String(w.address || ''))).sort((a,b) => (Number(b.accountValue) || 0) - (Number(a.accountValue) || 0)).slice(0, 50);
     const results = [];
     // Query in small batches to broaden coverage without bursting the upstream API.
     for (let offset = 0; offset < wallets.length; offset += 10) {
@@ -230,7 +230,7 @@ async function refreshHyperliquidOpenPositions(force = false) {
             size: Math.abs(signedSize),
             entryPrice,
             notionalUsd: notional,
-            unrealizedPnl: Number.isFinite(Number(p.unrealizedPnl)) ? Number(p.unrealizedPnl) : null,
+            unrealizedPnl: p.unrealizedPnl !== null && p.unrealizedPnl !== undefined && p.unrealizedPnl !== '' && Number.isFinite(Number(p.unrealizedPnl)) ? Number(p.unrealizedPnl) : null,
             leverage: p.leverage && Number.isFinite(Number(p.leverage.value)) ? Number(p.leverage.value) : null,
             entryTime: Number.isFinite(entryTime) && entryTime > 0 ? entryTime : null,
             entryTimeSource: Number.isFinite(entryTime) && entryTime > 0 ? 'active observed trade cycle' : 'not available with confidence; entry fill not linked to active cycle',
@@ -247,14 +247,32 @@ async function refreshHyperliquidOpenPositions(force = false) {
     const failures = flatResults.filter(x => x && x.__error);
     const successfulWallets = Math.max(0, wallets.length - failures.length);
     const positions = flatResults.filter(x => x && !x.__error).sort((a,b) => b.notionalUsd - a.notionalUsd).slice(0,5);
+    // If every upstream wallet query failed, preserve the last good snapshot.
+    // An outage must never be rendered as "no open positions".
+    if (wallets.length > 0 && failures.length === wallets.length) {
+      hyperliquidOpenPositionsCache = {
+        ...hyperliquidOpenPositionsCache,
+        stale: true,
+        error: failures[0]?.__error || 'Todas as consultas de carteiras falharam',
+        partial: false,
+        failedWallets: failures.length,
+        successfulWallets: 0,
+        monitoredWallets: wallets.length,
+        lastAttemptAt: new Date(now).toISOString(),
+        source: 'Hyperliquid public clearinghouseState · último snapshot válido preservado'
+      };
+      return hyperliquidOpenPositionsCache;
+    }
     hyperliquidOpenPositionsCache = {
       updatedAt: now,
       positions,
-      error: positions.length ? null : (failures.length ? failures[0].__error : null),
-      partial: failures.length > 0 && positions.length > 0,
+      stale: false,
+      error: failures.length ? failures[0].__error : null,
+      partial: failures.length > 0,
       failedWallets: failures.length,
       successfulWallets,
       monitoredWallets: wallets.length,
+      lastAttemptAt: new Date(now).toISOString(),
       source: 'Hyperliquid public clearinghouseState · monitored Trader Radar wallets'
     };
     return hyperliquidOpenPositionsCache;
