@@ -196,7 +196,7 @@ async function refreshHyperliquidOpenPositions(force = false) {
   if (!force && now - hyperliquidOpenPositionsCache.updatedAt < 10000) return hyperliquidOpenPositionsCache;
   if (hyperliquidOpenPositionsPromise) return hyperliquidOpenPositionsPromise;
   hyperliquidOpenPositionsPromise = (async () => {
-    const wallets = [...traderRadar.wallets.values()].filter(w => /^0x[a-f0-9]{40}$/i.test(String(w.address || ''))).slice(0, 25);
+    const wallets = [...traderRadar.wallets.values()].filter(w => /^0x[a-f0-9]{40}$/i.test(String(w.address || ''))).sort((a,b) => (Number(b.accountValue) || 0) - (Number(a.accountValue) || 0)).slice(0, 25);
     const results = await Promise.all(wallets.map(async wallet => {
       try {
         const response = await fetch('https://api.hyperliquid.xyz/info', {
