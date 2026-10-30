@@ -193,7 +193,7 @@ let hyperliquidOpenPositionsCache = { updatedAt: 0, positions: [], error: null }
 let hyperliquidOpenPositionsPromise = null;
 async function refreshHyperliquidOpenPositions(force = false) {
   const now = Date.now();
-  if (!force && now - hyperliquidOpenPositionsCache.updatedAt < 10000) return hyperliquidOpenPositionsCache;
+  if (!force && now - hyperliquidOpenPositionsCache.updatedAt < 5000) return hyperliquidOpenPositionsCache;
   if (hyperliquidOpenPositionsPromise) return hyperliquidOpenPositionsPromise;
   hyperliquidOpenPositionsPromise = (async () => {
     const wallets = [...traderRadar.wallets.values()].filter(w => /^0x[a-f0-9]{40}$/i.test(String(w.address || ''))).sort((a,b) => (Number(b.accountValue) || 0) - (Number(a.accountValue) || 0)).slice(0, 50);
@@ -246,7 +246,7 @@ async function refreshHyperliquidOpenPositions(force = false) {
     const flatResults = results.flat();
     const failures = flatResults.filter(x => x && x.__error);
     const successfulWallets = Math.max(0, wallets.length - failures.length);
-    const positions = flatResults.filter(x => x && !x.__error).sort((a,b) => b.notionalUsd - a.notionalUsd).slice(0,5);
+    const allPositions = flatResults.filter(x => x && !x.__error).sort((a,b) => b.notionalUsd - a.notionalUsd);
     // If every upstream wallet query failed, preserve the last good snapshot.
     // An outage must never be rendered as "no open positions".
     if (wallets.length > 0 && failures.length === wallets.length) {
@@ -265,7 +265,8 @@ async function refreshHyperliquidOpenPositions(force = false) {
     }
     hyperliquidOpenPositionsCache = {
       updatedAt: now,
-      positions,
+      positions: allPositions.slice(0,5),
+      allPositions,
       stale: false,
       error: failures.length ? failures[0].__error : null,
       partial: failures.length > 0,
@@ -282,7 +283,7 @@ async function refreshHyperliquidOpenPositions(force = false) {
 app.get('/api/trader-radar/open-positions', async (req,res) => {
   try {
     const snapshot = await refreshHyperliquidOpenPositions(String(req.query.refresh || '') === '1');
-    res.set('Cache-Control','no-store').json({ ok: true, ...snapshot, positions: snapshot.positions || [], note: 'Top 5 by current BTC notional among monitored wallets only; not a scan of all Hyperliquid accounts.' });
+    res.set('Cache-Control','no-store').json({ ok: true, ...snapshot, positions: snapshot.positions || [], allPositions: snapshot.allPositions || snapshot.positions || [], note: 'Top 5 by current BTC notional among monitored wallets only; not a scan of all Hyperliquid accounts.' });
   } catch (error) {
     res.status(502).json({ ok: false, error: 'hyperliquid_open_positions_unavailable', message: error.message, positions: [] });
   }
