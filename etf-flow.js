@@ -150,7 +150,7 @@ async function load(force = false) {
 async function getAnalysis(force = false) {
   try {
     const result = await load(force);
-    return { ok:true, ...result.analysis, history:result.sessions.slice(-90).map(s=>({date:s.date,netFlowUsd:s.netFlowUsd,totalNetAssetsUsd:s.totalNetAssetsUsd,perEtfUsd:s.perEtfUsd})) };
+    return { ok:true, ...result.analysis, history:result.sessions.map(s=>({date:s.date,netFlowUsd:s.netFlowUsd,totalNetAssetsUsd:s.totalNetAssetsUsd,perEtfUsd:s.perEtfUsd})) };
   } catch (error) {
     if (cache) return { ok:false, stale:true, error:String(error.message||error), ...cache.analysis };
     throw error;
