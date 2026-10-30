@@ -197,7 +197,11 @@ async function refreshHyperliquidOpenPositions(force = false) {
   if (hyperliquidOpenPositionsPromise) return hyperliquidOpenPositionsPromise;
   hyperliquidOpenPositionsPromise = (async () => {
     const wallets = [...traderRadar.wallets.values()].filter(w => /^0x[a-f0-9]{40}$/i.test(String(w.address || ''))).sort((a,b) => (Number(b.accountValue) || 0) - (Number(a.accountValue) || 0)).slice(0, 25);
-    const results = await Promise.all(wallets.map(async wallet => {
+    const results = [];
+    // Query in small batches to broaden coverage without bursting the upstream API.
+    for (let offset = 0; offset < wallets.length; offset += 10) {
+      const batch = wallets.slice(offset, offset + 10);
+      results.push(...await Promise.all(batch.map(async wallet => {
       try {
         const response = await fetch('https://api.hyperliquid.xyz/info', {
           method: 'POST',
@@ -237,7 +241,8 @@ async function refreshHyperliquidOpenPositions(force = false) {
       } catch (error) {
         return { __error: error.message };
       }
-    }));
+      })));
+    }
     const flatResults = results.flat();
     const failures = flatResults.filter(x => x && x.__error);
     const successfulWallets = Math.max(0, wallets.length - failures.length);
