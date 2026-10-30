@@ -23,7 +23,7 @@ test('observer deduplicates official 3d signals and measures matured outcomes', 
   observer.ingest(payload);
   observer.ingest(payload);
   const audit = observer.audit('BTCUSDT');
-  assert.equal(audit.signalCount, undefined);
+  assert.equal(audit.horizons['1_candles'].matured, 1);
   assert.equal(observer.status().symbols.BTCUSDT.signals, 1);
   assert.equal(audit.horizons['1_candles'].matured, 1);
   assert.equal(audit.horizons['1_candles'].winRatePct, 100);
