@@ -149,7 +149,7 @@ app.get('/api/trader-radar/candles', async (req,res) => {
   const key = interval + ':' + limit;
   const now = Date.now();
   const cached = traderRadarCandleCache.get(key);
-  if (cached && now - cached.fetchedAt < 10000) {
+  if (cached && now - cached.fetchedAt < 5000) {
     return res.set('Cache-Control','no-store').json({...cached.payload, cache:{state:'fresh',ageMs:now-cached.fetchedAt}});
   }
   try {
