@@ -39,8 +39,10 @@
         if (!res.ok) throw new Error('Candles BTC indisponíveis');
         const payload = await res.json(), rows = Array.isArray(payload) ? payload : payload.candles;
         const dailyPayload=dailyRes.ok?await dailyRes.json():[],dailyRows=Array.isArray(dailyPayload)?dailyPayload:dailyPayload.candles||[];
-        const dailyCandles=dailyRows.map(r=>({t:Number(r.t??r[0]),c:Number(r.c??r[4])})).filter(c=>c.t>0&&c.c>0).sort((a,b)=>a.t-b.t);
-        let ema50=null,ema200=null;const k50=2/51,k200=2/201;const dailyEMA=dailyCandles.map((c,i)=>{ema50=ema50===null?c.c:c.c*k50+ema50*(1-k50);ema200=ema200===null?c.c:c.c*k200+ema200*(1-k200);return {t:c.t,ema50:i>=49?ema50:null,ema200:i>=199?ema200:null};});
+        const dailyCandles=dailyRows.map(r=>({t:Number(r.t??r[0]),c:Number(r.c??r[4])})).filter(c=>Number.isFinite(c.t)&&c.t>0&&Number.isFinite(c.c)&&c.c>0).sort((a,b)=>a.t-b.t);
+        const emaSeries=(values,period)=>{const out=Array(values.length).fill(null);if(values.length<period)return out;const k=2/(period+1);let value=values.slice(0,period).reduce((sum,n)=>sum+n,0)/period;out[period-1]=value;for(let i=period;i<values.length;i++){value=values[i]*k+value*(1-k);out[i]=value;}return out;};
+        const ema50Series=emaSeries(dailyCandles.map(c=>c.c),50),ema200Series=emaSeries(dailyCandles.map(c=>c.c),200);
+        const dailyEMA=dailyCandles.map((c,i)=>({t:c.t,ema50:ema50Series[i],ema200:ema200Series[i]}));
         if (!Array.isArray(rows) || rows.length < 20) throw new Error('Histórico de candles insuficiente');
         const candles = rows.map(r=>({t:Number(r.t??r[0]),o:Number(r.o??r[1]),h:Number(r.h??r[2]),l:Number(r.l??r[3]),c:Number(r.c??r[4])})).filter(c=>c.t>0&&c.o>0&&c.h>0&&c.l>0&&c.c>0).sort((a,b)=>a.t-b.t);
         const W=900,H=380,L=72,R=34,T=22,B=34,plotW=W-L-R,plotH=H-T-B,first=candles[0].t,last=candles[candles.length-1].t;
@@ -75,8 +77,12 @@
         });
       } catch(err){if(renderSeq===chartRenderSeq&&!stopped)chartEl.innerHTML='<div class="tr-chart-empty">'+esc(err.message||'Não foi possível carregar candles BTC')+'</div>';}
     }
+    let refreshBusy=false;
     async function refresh() {
       if(stopped)return;
+      clearTimeout(timer);
+      if(refreshBusy)return;
+      refreshBusy=true;
       try {
         const [sRes,pRes]=await Promise.all([fetch(base+'/api/trader-radar/status',{cache:'no-store'}),fetch(base+'/api/trader-radar/open-positions',{cache:'no-store'})]);
         if(!sRes.ok||!pRes.ok)throw new Error('API indisponível (HTTP '+(!sRes.ok?sRes.status:pRes.status)+')');
@@ -102,7 +108,7 @@
         if(flowSummaryEl)flowSummaryEl.innerHTML='<div class="tr-meta">CONFLUÊNCIA DOS 5 MAIORES · EXPOSIÇÃO ABERTA</div><div class="tr-flow-bias">'+bias+' · saldo '+(netPct>0?'+':'')+netPct.toFixed(1)+'%</div><div class="tr-flow-bar"><span class="tr-flow-long" style="width:'+longPct.toFixed(2)+'%"></span><span class="tr-flow-short" style="width:'+shortPct.toFixed(2)+'%"></span></div><div class="tr-flow-stats"><div><strong style="color:#35d49a">'+money(longUsd)+'</strong><span>LONG · '+longPositions.length+' posição(ões) · '+longPct.toFixed(1)+'%</span></div><div><strong style="color:#fb7185">'+money(shortUsd)+'</strong><span>SHORT · '+shortPositions.length+' posição(ões) · '+shortPct.toFixed(1)+'%</span></div></div><div class="tr-flow-note">Notional combinado: '+money(totalUsd)+'. Maior posição representa '+concentration.toFixed(1)+'% do total. Leitura de posicionamento, não previsão: posições grandes podem estar protegidas, alavancadas ou em hedge.</div>';
         await renderTraderChart(positions,recentEvents);
       } catch(err){statusEl.textContent='Falha ao atualizar';statusEl.className='tr-pill';if(openPositionsEl)openPositionsEl.innerHTML='<div class="tr-error">'+esc(err.message)+'<br><span class="tr-meta">Confira a disponibilidade do backend e tente novamente.</span></div>';}
-      finally{if(!stopped)timer=setTimeout(refresh,refreshMs);}
+      finally{refreshBusy=false;if(!stopped)timer=setTimeout(refresh,refreshMs);}
     }
     root.querySelectorAll('[data-tr-interval]').forEach(button=>button.addEventListener('click',()=>{chartInterval=button.getAttribute('data-tr-interval')||'4h';root.querySelectorAll('[data-tr-interval]').forEach(b=>b.classList.toggle('active',b===button));refresh();}));
     refresh();
