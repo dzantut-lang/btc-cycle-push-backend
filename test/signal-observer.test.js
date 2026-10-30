@@ -8,7 +8,7 @@ const path = require('node:path');
 const { SignalObserver } = require('../signal-observer');
 
 const DAY = 86400000;
-function fixture(now = 30 * DAY) {
+function fixture(now = 40 * DAY) {
   const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'btc-observer-'));
   const observer = new SignalObserver({ dataDir: dir, persistent: true, now: () => now });
   const candles = Array.from({ length: 12 }, (_, i) => ({
@@ -19,11 +19,10 @@ function fixture(now = 30 * DAY) {
   return { dir, observer, candles, now };
 }
 
-test('observer deduplicates signals and calculates BUY/SELL directional outcomes', () => {
+test('deduplicates official 3d signals and separates BUY/SELL outcomes', () => {
   const { observer, candles } = fixture();
-  const signalTime = candles[0].closeTime;
   const payload = { symbol: 'BTCUSDT', timeframe: '3d', candles, signals: [
-    { side: 'BUY', signalTime, signalPrice: 100, ema50: 110, ema200: 120, macd: 1, macdSignal: 0, strong: true },
+    { side: 'BUY', signalTime: candles[0].closeTime, signalPrice: 100 },
     { side: 'SELL', signalTime: candles[1].closeTime, signalPrice: 105 }
   ] };
   observer.ingest(payload);
@@ -35,7 +34,7 @@ test('observer deduplicates signals and calculates BUY/SELL directional outcomes
   assert.equal(audit.horizons['1_candles'].all.matured, 2);
 });
 
-test('observer rejects mismatched timeframe, unsupported symbol, and mismatched signal price', () => {
+test('rejects wrong symbol/timeframe and mismatched signal price', () => {
   const { observer, candles } = fixture();
   assert.throws(() => observer.ingest({ symbol: 'BTCUSDT', timeframe: '1d', candles, signals: [] }), /official_timeframe_must_be_3d/);
   assert.throws(() => observer.ingest({ symbol: 'DOGEUSDT', timeframe: '3d', candles, signals: [] }), /unsupported_symbol/);
@@ -45,10 +44,10 @@ test('observer rejects mismatched timeframe, unsupported symbol, and mismatched 
   assert.equal(observer.status().symbols.BTCUSDT.signals, 0);
 });
 
-test('observer persists atomically and marks stale market data', () => {
-  const { dir, observer, candles, now } = fixture(100 * DAY);
+test('persists via atomic rename and flags stale market data', () => {
+  const { dir, observer, candles } = fixture(100 * DAY);
   observer.ingest({ symbol: 'BTCUSDT', timeframe: '3d', candles, signals: [] });
-  const restored = new SignalObserver({ dataDir: dir, persistent: true, now: () => now });
+  const restored = new SignalObserver({ dataDir: dir, persistent: true, now: () => 100 * DAY });
   assert.equal(restored.status().symbols.BTCUSDT.candles, 12);
   assert.equal(restored.audit('BTCUSDT').dataFresh, false);
   assert.equal(fs.existsSync(path.join(dir, 'ai-signal-observer.json.tmp')), false);
