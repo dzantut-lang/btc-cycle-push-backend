@@ -124,7 +124,7 @@ function calculate(snapshot) {
 }
 
 async function load(force = false) {
-  if (!force && cache && Date.now()-cache.fetchedAt < CACHE_TTL_MS) return cache;
+  if (!force && cache && Date.now()-cache.cachedAtMs < CACHE_TTL_MS) return cache;
   if (pending) return pending;
   pending = (async () => {
     const headers = { accept:'application/json', 'user-agent':'BTC-Cycle-Desk/1.0' };
@@ -140,7 +140,7 @@ async function load(force = false) {
     sessions.sort((a,b)=>a.date.localeCompare(b.date));
     if (sessions.length < 5) throw new Error('TFTC_FEED_SCHEMA_UNRECOGNIZED');
     const snapshot = { sessions, updatedThrough:latest.updatedThrough || latestRow?.date || null, fetchedAt:new Date().toISOString() };
-    const result = { sessions, updatedThrough:snapshot.updatedThrough, fetchedAt:snapshot.fetchedAt, analysis:calculate(snapshot) };
+    const result = { sessions, updatedThrough:snapshot.updatedThrough, fetchedAt:snapshot.fetchedAt, cachedAtMs:Date.now(), analysis:calculate(snapshot) };
     cache = result;
     return result;
   })().finally(()=>{ pending=null; });
