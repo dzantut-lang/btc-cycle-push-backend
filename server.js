@@ -6,6 +6,7 @@ const webpush = require('web-push');
 const fs = require('fs');
 const path = require('path');
 const { TraderRadar } = require('./trader-radar');
+const { SignalObserver } = require('./signal-observer');
 
 const app = express();
 app.use(express.json({ limit: '64kb' }));
@@ -29,6 +30,18 @@ const persistentStorageConfigured = process.env.DATA_PERSISTENT === 'true';
 const pushReady = Boolean(publicKey && privateKey && !publicKey.startsWith('REPLACE_') && !privateKey.startsWith('REPLACE_') && subjectConfigured && persistentStorageConfigured);
 if (pushReady) webpush.setVapidDetails(subject, publicKey, privateKey);
 const adminSecret = process.env.ADMIN_SECRET || '';
+const signalObserver = new SignalObserver({ dataDir: DATA_DIR, persistent: persistentStorageConfigured });
+const observerRate = new Map();
+function observerRateLimit(req, res, next) {
+  const key = req.ip || req.socket.remoteAddress || 'unknown';
+  const now = Date.now();
+  const previous = observerRate.get(key) || { start: now, count: 0 };
+  if (now - previous.start > 60000) { previous.start = now; previous.count = 0; }
+  previous.count++;
+  observerRate.set(key, previous);
+  if (previous.count > 30) return res.status(429).json({ error: 'rate_limited' });
+  next();
+}
 const traderRadar = new TraderRadar({ dataDir: DATA_DIR, sendPush, wallets: (process.env.TRADER_RADAR_WALLETS || '').split(',').map(s => s.trim()).filter(Boolean), WebSocketImpl: require('ws'), logger: console });
 
 function requireAdmin(req, res, next) {
@@ -108,7 +121,16 @@ app.get('/health', (_req,res) => {
   if (!publicKey || !privateKey || publicKey.startsWith('REPLACE_') || privateKey.startsWith('REPLACE_')) pushRequirementsMissing.push('VAPID_KEYS');
   if (!subjectConfigured) pushRequirementsMissing.push('VAPID_SUBJECT');
   if (!persistentStorageConfigured) pushRequirementsMissing.push('PERSISTENT_STORAGE');
-  res.json({ ok: true, service: 'BTC Cycle Desk Push', pushReady, pushRequirementsMissing, persistentStorageConfigured, subscribers: subscriptions().length, pollingMinutes: Math.max(5, Number(process.env.POLL_MINUTES || 15)), officialMarketEngineIntegrated: false, officialMarketTimeframe: '3d', legacyMarketEngineTimeframe: '1d', marketSignalAlertsEnabled: false, marketSignalAlertNote: 'Public market-signal endpoint is blocked until backend and dashboard use the same official 3-day engine.', traderRadar: { running: radar.running, source: radar.source, watchedWallets: radar.watchedWallets, connectedWallets: radar.connectedWallets, eventCount: radar.eventCount, rankedEligible: radar.rankedEligible, lastDiscoveryAt: radar.lastDiscoveryAt, lastError: radar.lastError } });
+  res.json({ ok: true, service: 'BTC Cycle Desk Push', pushReady, pushRequirementsMissing, persistentStorageConfigured, subscribers: subscriptions().length, pollingMinutes: Math.max(5, Number(process.env.POLL_MINUTES || 15)), officialMarketEngineIntegrated: true, officialMarketTimeframe: '3d', aiObserver: signalObserver.status(), legacyMarketEngineTimeframe: '1d', marketSignalAlertsEnabled: false, marketSignalAlertNote: 'Public market-signal endpoint is blocked until backend and dashboard use the same official 3-day engine.', traderRadar: { running: radar.running, source: radar.source, watchedWallets: radar.watchedWallets, connectedWallets: radar.connectedWallets, eventCount: radar.eventCount, rankedEligible: radar.rankedEligible, lastDiscoveryAt: radar.lastDiscoveryAt, lastError: radar.lastError } });
+});
+app.post('/api/ai/observer/snapshot', observerRateLimit, (req,res) => {
+  try { res.status(202).json(signalObserver.ingest(req.body || {})); }
+  catch (error) { res.status(400).json({ error: 'invalid_observer_snapshot', message: error.message }); }
+});
+app.get('/api/ai/observer/status', (_req,res) => res.json(signalObserver.status()));
+app.get('/api/ai/observer/audit/:symbol', (req,res) => {
+  try { res.json(signalObserver.audit(req.params.symbol)); }
+  catch (error) { res.status(400).json({ error: 'invalid_symbol', message: error.message }); }
 });
 app.get('/api/push/public-key', (_req,res) => { if (!pushReady) return res.status(503).json({ error: 'PUSH_NOT_READY', message: 'Configure valid VAPID credentials, a real VAPID subject, and persistent storage before enabling Web Push.' }); res.json({ publicKey }); });
 app.post('/api/push/subscribe', (req,res) => {
