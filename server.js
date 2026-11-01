@@ -152,7 +152,7 @@ function tagValue(xml, tag) {
   return match ? decodeXml(match[1]) : '';
 }
 function parseRss(xml, source) {
-  const blocks = String(xml || '').match(/<item(?:\\s[^>]*)?>[\\s\\S]*?<\\/item>/gi) || [];
+  const blocks = String(xml || '').match(/<item[^>]*>[\s\S]*?<\/item>/gi) || [];
   return blocks.map(block => {
     const title = tagValue(block, 'title');
     const link = tagValue(block, 'link') || ((block.match(/<link[^>]*href=["']([^"']+)["']/i) || [])[1] || '');
