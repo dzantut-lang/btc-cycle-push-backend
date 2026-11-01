@@ -195,13 +195,40 @@ async function fetchCryptoNews(force = false) {
     }));
     const merged = results.flatMap(result => result.items || [])
       .sort((a,b) => Date.parse(b.publishedAt) - Date.parse(a.publishedAt));
-    const seen = new Set();
-    const unique = merged.filter(item => {
-      const key = item.title.toLowerCase().replace(/[^a-z0-9]+/g, ' ').trim();
-      if (seen.has(key)) return false;
-      seen.add(key);
-      return true;
-    }).slice(0, 18);
+    // Deduplicação editorial conservadora: só agrupa manchetes muito semelhantes,
+    // publicadas em janela curta. Mantém a matéria mais recente e os créditos das fontes.
+    const editorialStopWords = new Set(['para','com','sobre','como','mais','menos','após','antes','entre','pela','pelo','uma','umas','uns','dos','das','que','por','the','and','for','from','this','that','with','bitcoin','btc','criptomoeda','criptomoedas']);
+    function editorialTokens(value) {
+      return new Set(String(value || '').normalize('NFD').replace(/[\\u0300-\\u036f]/g, '')
+        .toLowerCase().replace(/[^a-z0-9]+/g, ' ').trim().split(/\\s+/)
+        .filter(word => word.length > 2 && !editorialStopWords.has(word)));
+    }
+    function titleSimilarity(a, b) {
+      const aa = editorialTokens(a), bb = editorialTokens(b);
+      if (aa.size < 3 || bb.size < 3) return 0;
+      let intersection = 0;
+      aa.forEach(word => { if (bb.has(word)) intersection++; });
+      return intersection / (aa.size + bb.size - intersection);
+    }
+    const unique = [];
+    for (const item of merged) {
+      const published = Date.parse(item.publishedAt);
+      const match = unique.find(existing =>
+        Math.abs(published - Date.parse(existing.publishedAt)) <= 36 * 60 * 60 * 1000 &&
+        titleSimilarity(item.title, existing.title) >= 0.62
+      );
+      if (!match) {
+        unique.push({ ...item, relatedSources: [item.source], coverageCount: 1, editorialHighlight: false });
+      } else {
+        if (!match.relatedSources.includes(item.source)) match.relatedSources.push(item.source);
+        match.coverageCount = match.relatedSources.length;
+        match.editorialHighlight = match.coverageCount >= 2;
+        if (item.description && item.description.length > (match.description || '').length) {
+          match.description = item.description;
+        }
+      }
+    }
+    unique.splice(18);
     const sourceStatus = results.map(({source,language,ok,count,newestAt,checkedAt,durationMs,error}) => ({ source, language, ok, count, newestAt: newestAt || null, checkedAt, durationMs, error: error || null }));
     if (unique.length) newsCache = { fetchedAt: Date.now(), items: unique, sourceStatus };
     if (!newsCache.items.length) throw new Error('Nenhuma fonte de notícias respondeu com conteúdo válido.');
