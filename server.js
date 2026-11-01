@@ -133,9 +133,18 @@ app.get('/api/etf-flow', async (req,res) => {
 
 // Fontes editoriais em português para o público brasileiro.
 const newsFeeds = [
+  // Fontes brasileiras: prioridade editorial em português.
   { id: 'livecoins', name: 'Livecoins', url: 'https://livecoins.com.br/feed/', language: 'pt-BR' },
   { id: 'guiadobitcoin', name: 'Guia do Bitcoin', url: 'https://guiadobitcoin.com.br/noticias/feed/', language: 'pt-BR' },
-  { id: 'criptofacil', name: 'CriptoFácil', url: 'https://www.criptofacil.com/feed/', language: 'pt-BR' }
+  { id: 'criptofacil', name: 'CriptoFácil', url: 'https://www.criptofacil.com/feed/', language: 'pt-BR' },
+  // Fontes internacionais para ampliar cobertura e reduzir dependência de publishers locais.
+  { id: 'cointelegraph', name: 'Cointelegraph', url: 'https://cointelegraph.com/rss', language: 'en' },
+  { id: 'coindesk', name: 'CoinDesk', url: 'https://www.coindesk.com/arc/outboundfeeds/rss/?outputType=xml', language: 'en' },
+  { id: 'theblock', name: 'The Block', url: 'https://www.theblock.co/rss.xml', language: 'en' },
+  { id: 'decrypt', name: 'Decrypt', url: 'https://decrypt.co/feed', language: 'en' },
+  { id: 'cryptoslate', name: 'CryptoSlate', url: 'https://cryptoslate.com/feed/', language: 'en' },
+  { id: 'bitcoincom', name: 'Bitcoin.com News', url: 'https://news.bitcoin.com/feed/', language: 'en' },
+  { id: 'bitcoinmagazine', name: 'Bitcoin Magazine', url: 'https://bitcoinmagazine.com/feed', language: 'en' }
 ];
 let newsCache = { fetchedAt: 0, items: [], sourceStatus: [] };
 let newsPending = null;
@@ -152,6 +161,10 @@ function tagValue(xml, tag) {
   const match = String(xml || '').match(re);
   return match ? decodeXml(match[1]) : '';
 }
+function sourceLanguage(source) {
+  const feed = newsFeeds.find(item => item.name === source);
+  return feed ? (feed.language || 'pt-BR') : 'pt-BR';
+}
 function parseRss(xml, source) {
   const blocks = String(xml || '').match(/<item[^>]*>[\s\S]*?<\/item>/gi) || [];
   return blocks.map(block => {
@@ -166,7 +179,7 @@ function parseRss(xml, source) {
       : /ethereum|\beth\b|solana|\bsol\b|xrp|altcoin|chainlink/.test(text) ? 'ALTCOINS'
       : /bitcoin|\bbtc\b|etf|halving/.test(text) ? 'BITCOIN'
       : 'MERCADO';
-    return { title, description: description.slice(0, 360), url: link, publishedAt: new Date(timestamp).toISOString(), source, category };
+    return { title, description: description.slice(0, 360), url: link, publishedAt: new Date(timestamp).toISOString(), source, language: sourceLanguage(source), category };
   }).filter(Boolean);
 }
 async function fetchCryptoNews(force = false) {
@@ -228,7 +241,7 @@ async function fetchCryptoNews(force = false) {
         }
       }
     }
-    unique.splice(18);
+    unique.splice(36);
     const sourceStatus = results.map(({source,language,ok,count,newestAt,checkedAt,durationMs,error}) => ({ source, language, ok, count, newestAt: newestAt || null, checkedAt, durationMs, error: error || null }));
     if (unique.length) newsCache = { fetchedAt: Date.now(), items: unique, sourceStatus };
     if (!newsCache.items.length) throw new Error('Nenhuma fonte de notícias respondeu com conteúdo válido.');
