@@ -130,6 +130,100 @@ app.get('/api/etf-flow', async (req,res) => {
   }
 });
 
+
+const newsFeeds = [
+  { id: 'coindesk', name: 'CoinDesk', url: 'https://www.coindesk.com/arc/outboundfeeds/rss/' },
+  { id: 'cointelegraph', name: 'Cointelegraph', url: 'https://cointelegraph.com/rss' },
+  { id: 'theblock', name: 'The Block', url: 'https://www.theblock.co/rss.xml' }
+];
+let newsCache = { fetchedAt: 0, items: [], sourceStatus: [] };
+let newsPending = null;
+function decodeXml(value) {
+  return String(value || '').replace(/<!\[CDATA\[([\s\S]*?)\]\]>/g, '$1')
+    .replace(/&amp;/g, '&').replace(/&quot;/g, '"').replace(/&#39;|&apos;/g, "'")
+    .replace(/&lt;/g, '<').replace(/&gt;/g, '>')
+    .replace(/&#(\d+);/g, (_, n) => String.fromCodePoint(Number(n)))
+    .replace(/&#x([\da-f]+);/gi, (_, n) => String.fromCodePoint(parseInt(n, 16)))
+    .replace(/<[^>]*>/g, '').replace(/\s+/g, ' ').trim();
+}
+function tagValue(xml, tag) {
+  const re = new RegExp('<' + tag + '(?:\\s[^>]*)?>([\\s\\S]*?)<\\/' + tag + '>', 'i');
+  const match = String(xml || '').match(re);
+  return match ? decodeXml(match[1]) : '';
+}
+function parseRss(xml, source) {
+  const blocks = String(xml || '').match(/<item(?:\\s[^>]*)?>[\\s\\S]*?<\\/item>/gi) || [];
+  return blocks.map(block => {
+    const title = tagValue(block, 'title');
+    const link = tagValue(block, 'link') || ((block.match(/<link[^>]*href=["']([^"']+)["']/i) || [])[1] || '');
+    const published = tagValue(block, 'pubDate') || tagValue(block, 'published') || tagValue(block, 'updated');
+    const description = tagValue(block, 'description') || tagValue(block, 'summary') || '';
+    const timestamp = Date.parse(published);
+    if (!title || !/^https:\/\//i.test(link) || !Number.isFinite(timestamp)) return null;
+    const text = (title + ' ' + description).toLowerCase();
+    const category = /hack|hacke|exploit|stolen|stolen|breach|security|ataque|roubo|golpe|fraud/.test(text) ? 'SEGURANÇA'
+      : /ethereum|\beth\b|solana|\bsol\b|xrp|altcoin|chainlink/.test(text) ? 'ALTCOINS'
+      : /bitcoin|\bbtc\b|etf|halving/.test(text) ? 'BITCOIN'
+      : 'MERCADO';
+    return { title, description: description.slice(0, 360), url: link, publishedAt: new Date(timestamp).toISOString(), source, category };
+  }).filter(Boolean);
+}
+async function fetchCryptoNews(force = false) {
+  const now = Date.now();
+  if (!force && newsCache.items.length && now - newsCache.fetchedAt < 5 * 60 * 1000) {
+    return { ...newsCache, cache: 'fresh' };
+  }
+  if (newsPending) return newsPending;
+  newsPending = (async () => {
+    const results = await Promise.all(newsFeeds.map(async feed => {
+      try {
+        const response = await fetch(feed.url, {
+          headers: { accept: 'application/rss+xml, application/xml, text/xml;q=0.9, */*;q=0.8', 'user-agent': 'CriptoManiaFun-NewsBot/1.0' },
+          signal: AbortSignal.timeout(9000)
+        });
+        if (!response.ok) throw new Error('HTTP ' + response.status);
+        const xml = await response.text();
+        const items = parseRss(xml, feed.name);
+        if (!items.length) throw new Error('Feed sem notícias válidas');
+        return { source: feed.name, ok: true, count: items.length, items };
+      } catch (error) {
+        return { source: feed.name, ok: false, count: 0, error: String(error.message || error) };
+      }
+    }));
+    const merged = results.flatMap(result => result.items || [])
+      .sort((a,b) => Date.parse(b.publishedAt) - Date.parse(a.publishedAt));
+    const seen = new Set();
+    const unique = merged.filter(item => {
+      const key = item.title.toLowerCase().replace(/[^a-z0-9]+/g, ' ').trim();
+      if (seen.has(key)) return false;
+      seen.add(key);
+      return true;
+    }).slice(0, 18);
+    if (unique.length) newsCache = { fetchedAt: Date.now(), items: unique, sourceStatus: results.map(({source,ok,count,error}) => ({source,ok,count,error:error || null})) };
+    if (!newsCache.items.length) throw new Error('Nenhuma fonte de notícias respondeu com conteúdo válido.');
+    return { ...newsCache, cache: 'refreshed', stale: results.every(x => !x.ok), sourceStatus: results.map(({source,ok,count,error}) => ({source,ok,count,error:error || null})) };
+  })().finally(() => { newsPending = null; });
+  return newsPending;
+}
+app.get('/api/crypto-news', async (req,res) => {
+  try {
+    const result = await fetchCryptoNews(String(req.query.refresh || '') === '1');
+    res.set('Cache-Control', 'public, max-age=60, stale-while-revalidate=240').json({
+      ok: true, updatedAt: new Date(result.fetchedAt).toISOString(),
+      stale: Boolean(result.stale), items: result.items,
+      sources: result.sourceStatus, cache: result.cache
+    });
+  } catch (error) {
+    console.error('Crypto news feed unavailable:', error.message);
+    res.status(502).set('Cache-Control','no-store').json({
+      ok: false, error: 'crypto_news_unavailable',
+      message: 'As fontes de notícias estão temporariamente indisponíveis.',
+      retryable: true, updatedAt: newsCache.fetchedAt ? new Date(newsCache.fetchedAt).toISOString() : null,
+      stale: newsCache.items.length > 0, items: newsCache.items
+    });
+  }
+});
+
 app.get('/health', (_req,res) => {
   const radar = traderRadar.status();
   const pushRequirementsMissing = [];
