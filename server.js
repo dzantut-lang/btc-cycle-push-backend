@@ -177,6 +177,8 @@ async function fetchCryptoNews(force = false) {
   if (newsPending) return newsPending;
   newsPending = (async () => {
     const results = await Promise.all(newsFeeds.map(async feed => {
+      const checkedAt = new Date().toISOString();
+      const startedAt = Date.now();
       try {
         const response = await fetch(feed.url, {
           headers: { accept: 'application/rss+xml, application/xml, text/xml;q=0.9, */*;q=0.8', 'user-agent': 'CriptoManiaFun-NewsBot/1.0' },
@@ -186,9 +188,9 @@ async function fetchCryptoNews(force = false) {
         const xml = await response.text();
         const items = parseRss(xml, feed.name);
         if (!items.length) throw new Error('Feed sem notícias válidas');
-        return { source: feed.name, ok: true, count: items.length, items };
+        return { source: feed.name, language: feed.language || 'pt-BR', ok: true, count: items.length, newestAt: items[0].publishedAt, checkedAt, durationMs: Date.now() - startedAt, items };
       } catch (error) {
-        return { source: feed.name, ok: false, count: 0, error: String(error.message || error) };
+        return { source: feed.name, language: feed.language || 'pt-BR', ok: false, count: 0, newestAt: null, checkedAt, durationMs: Date.now() - startedAt, error: String(error.message || error) };
       }
     }));
     const merged = results.flatMap(result => result.items || [])
@@ -200,9 +202,10 @@ async function fetchCryptoNews(force = false) {
       seen.add(key);
       return true;
     }).slice(0, 18);
-    if (unique.length) newsCache = { fetchedAt: Date.now(), items: unique, sourceStatus: results.map(({source,ok,count,error}) => ({source,ok,count,error:error || null})) };
+    const sourceStatus = results.map(({source,language,ok,count,newestAt,checkedAt,durationMs,error}) => ({ source, language, ok, count, newestAt: newestAt || null, checkedAt, durationMs, error: error || null }));
+    if (unique.length) newsCache = { fetchedAt: Date.now(), items: unique, sourceStatus };
     if (!newsCache.items.length) throw new Error('Nenhuma fonte de notícias respondeu com conteúdo válido.');
-    return { ...newsCache, cache: 'refreshed', stale: results.every(x => !x.ok), sourceStatus: results.map(({source,ok,count,error}) => ({source,ok,count,error:error || null})) };
+    return { ...newsCache, cache: 'refreshed', stale: results.every(x => !x.ok), sourceStatus };
   })().finally(() => { newsPending = null; });
   return newsPending;
 }
@@ -212,7 +215,8 @@ app.get('/api/crypto-news', async (req,res) => {
     res.set('Cache-Control', 'public, max-age=60, stale-while-revalidate=240').json({
       ok: true, updatedAt: new Date(result.fetchedAt).toISOString(),
       stale: Boolean(result.stale), items: result.items,
-      sources: result.sourceStatus, cache: result.cache
+      sources: result.sourceStatus, cache: result.cache,
+      health: { totalSources: newsFeeds.length, activeSources: result.sourceStatus.filter(x => x.ok).length, failedSources: result.sourceStatus.filter(x => !x.ok).length, itemCount: result.items.length, newestNewsAt: result.items[0]?.publishedAt || null, language: 'pt-BR' }
     });
   } catch (error) {
     console.error('Crypto news feed unavailable:', error.message);
