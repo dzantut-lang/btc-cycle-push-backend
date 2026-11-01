@@ -131,10 +131,11 @@ app.get('/api/etf-flow', async (req,res) => {
 });
 
 
+// Fontes editoriais em português para o público brasileiro.
 const newsFeeds = [
-  { id: 'coindesk', name: 'CoinDesk', url: 'https://www.coindesk.com/arc/outboundfeeds/rss/' },
-  { id: 'cointelegraph', name: 'Cointelegraph', url: 'https://cointelegraph.com/rss' },
-  { id: 'theblock', name: 'The Block', url: 'https://www.theblock.co/rss.xml' }
+  { id: 'livecoins', name: 'Livecoins', url: 'https://livecoins.com.br/feed/', language: 'pt-BR' },
+  { id: 'guiadobitcoin', name: 'Guia do Bitcoin', url: 'https://guiadobitcoin.com.br/noticias/feed/', language: 'pt-BR' },
+  { id: 'criptofacil', name: 'CriptoFácil', url: 'https://www.criptofacil.com/feed/', language: 'pt-BR' }
 ];
 let newsCache = { fetchedAt: 0, items: [], sourceStatus: [] };
 let newsPending = null;
