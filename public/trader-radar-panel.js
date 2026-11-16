@@ -87,12 +87,12 @@
         const [sRes,pRes]=await Promise.all([fetch(base+'/api/trader-radar/status',{cache:'no-store'}),fetch(base+'/api/trader-radar/open-positions',{cache:'no-store'})]);
         if(!sRes.ok||!pRes.ok)throw new Error('API indisponível (HTTP '+(!sRes.ok?sRes.status:pRes.status)+')');
         const s=await sRes.json(),p=await pRes.json();
-        statusEl.textContent=!s.running?'Monitor parado':s.lastError?'Atenção: fonte indisponível':Number(s.connectedWallets)>0?'Monitor ativo':'Aguardando conexões';
-        statusEl.className='tr-pill'+(s.running&&!s.lastError&&Number(s.connectedWallets)>0?' ok':'');
+        statusEl.textContent=p.stale?'Fonte indisponível · último snapshot preservado':p.partial?'Monitor ativo · consulta parcial':!s.running?'Monitor parado':Number(p.successfulWallets??s.connectedWallets)>0?'Monitor ativo':'Aguardando conexões';
+        statusEl.className='tr-pill'+(s.running&&!p.stale&&Number(p.successfulWallets??s.connectedWallets)>0?' ok':'');
         const updatedAt=Number(p.updatedAt)||0,ageSec=updatedAt?Math.max(0,Math.round((Date.now()-updatedAt)/1000)):null;
         const connectionText=Number(p.successfulWallets??s.connectedWallets??0)+'/'+Number(p.monitoredWallets??s.watchedWallets??0)+' carteiras consultadas com sucesso';
         const freshness=ageSec===null?'horário da consulta indisponível':ageSec<90?'posições consultadas há '+ageSec+' s':'ATENÇÃO: consulta há '+Math.floor(ageSec/60)+' min';
-        if(freshnessEl)freshnessEl.textContent=connectionText+' · '+freshness+(p.stale?' · ATENÇÃO: exibindo último snapshot válido; a consulta atual falhou':p.partial?' · consulta parcial: '+Number(p.failedWallets||0)+' carteira(s) falharam':'')+((p.error||s.lastError)?' · erro: '+String(p.error||s.lastError):'')+'. Universo limitado às até 50 carteiras elegíveis monitoradas; não representa todas as contas da Hyperliquid. Atualização automática aproximada a cada 5 s.';
+        if(freshnessEl)freshnessEl.textContent=connectionText+' · '+freshness+(p.stale?' · ATENÇÃO: exibindo último snapshot válido; a consulta atual falhou':p.partial?' · consulta parcial: '+Number(p.failedWallets||0)+' carteira(s) sem resposta nesta rodada':'')+(p.stale&&(p.error||s.lastError)?' · detalhe: '+String(p.error||s.lastError):'')+'. Universo limitado às até 50 carteiras elegíveis monitoradas; não representa todas as contas da Hyperliquid. Atualização automática aproximada a cada 5 s.';
         if(!pRes.ok||p.ok!==true)throw new Error(p.message||p.error||'Posições indisponíveis');
         const allPositions=(Array.isArray(p.allPositions)?p.allPositions:(Array.isArray(p.positions)?p.positions:[])).filter(pos=>['LONG','SHORT'].includes(String(pos.direction||'').toUpperCase()));
         const positions=allPositions.slice().sort((a,b)=>(Number(b.notionalUsd)||0)-(Number(a.notionalUsd)||0)).slice(0,5);
