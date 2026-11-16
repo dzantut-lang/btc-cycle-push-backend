@@ -378,16 +378,17 @@ async function refreshHyperliquidOpenPositions(force = false) {
   hyperliquidOpenPositionsPromise = (async () => {
     const wallets = [...traderRadar.wallets.values()].filter(w => /^0x[a-f0-9]{40}$/i.test(String(w.address || ''))).sort((a,b) => (Number(b.accountValue) || 0) - (Number(a.accountValue) || 0)).slice(0, 50);
     const results = [];
-    // Query in small batches to broaden coverage without bursting the upstream API.
-    for (let offset = 0; offset < wallets.length; offset += 10) {
-      const batch = wallets.slice(offset, offset + 10);
+    // Use bounded concurrency to reduce total refresh latency without flooding Hyperliquid.
+    // Each wallet remains isolated: one timeout must not cancel or delay successful peers.
+    for (let offset = 0; offset < wallets.length; offset += 20) {
+      const batch = wallets.slice(offset, offset + 20);
       results.push(...await Promise.all(batch.map(async wallet => {
       try {
         const response = await fetch('https://api.hyperliquid.xyz/info', {
           method: 'POST',
           headers: {'content-type':'application/json','accept':'application/json'},
           body: JSON.stringify({type:'clearinghouseState',user:wallet.address}),
-          signal: AbortSignal.timeout(10000)
+          signal: AbortSignal.timeout(7000)
         });
         if (!response.ok) throw new Error('Hyperliquid HTTP ' + response.status);
         const state = await response.json();
