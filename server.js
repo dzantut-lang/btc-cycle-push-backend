@@ -161,6 +161,16 @@ app.get('/api/halving-history', async (req,res) => {
     res.set('Cache-Control','public, max-age=21600, stale-while-revalidate=86400').json(result);
     return;
   } catch (error) { errors.push('Coin Metrics: '+String(error.message||error)); }
+  try {
+    const url = 'https://api.blockchain.info/charts/market-price?format=json&sampled=false&start='+new Date(range.start).toISOString().slice(0,10)+'&end='+new Date(range.end).toISOString().slice(0,10);
+    const response = await fetch(url,{headers:{accept:'application/json'},signal:AbortSignal.timeout(20000)});
+    if (!response.ok) throw new Error('HTTP '+response.status);
+    const json = await response.json();
+    if (!json || !Array.isArray(json.values)) throw new Error('formato de dados inválido');
+    const result = validate(json.values.map(x=>({t:Number(x.x)*1000,p:Number(x.y)})),'Blockchain.com');
+    res.set('Cache-Control','public, max-age=21600, stale-while-revalidate=86400').json(result);
+    return;
+  } catch (error) { errors.push('Blockchain.com: '+String(error.message||error)); }
   console.error('Halving historical series unavailable, cycle '+cycle+': '+errors.join(' | '));
   res.status(502).set('Cache-Control','no-store').json({ok:false,error:'halving_history_unavailable',cycle,message:'Fontes históricas indisponíveis no momento.',details:errors});
 });
