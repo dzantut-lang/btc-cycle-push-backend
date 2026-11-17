@@ -162,7 +162,7 @@ app.get('/api/halving-history', async (req,res) => {
     return;
   } catch (error) { errors.push('Coin Metrics: '+String(error.message||error)); }
   try {
-    const url = 'https://api.blockchain.info/charts/market-price?format=json&sampled=false&timespan=all';
+    const url = 'https://api.blockchain.info/charts/market-price?format=json&timespan=all';
     const response = await fetch(url,{headers:{accept:'application/json'},signal:AbortSignal.timeout(20000)});
     if (!response.ok) throw new Error('HTTP '+response.status);
     const json = await response.json();
@@ -173,6 +173,44 @@ app.get('/api/halving-history', async (req,res) => {
   } catch (error) { errors.push('Blockchain.com: '+String(error.message||error)); }
   console.error('Halving historical series unavailable, cycle '+cycle+': '+errors.join(' | '));
   res.status(502).set('Cache-Control','no-store').json({ok:false,error:'halving_history_unavailable',cycle,message:'Fontes históricas indisponíveis no momento.',details:errors});
+});
+
+/* On-chain metrics proxy: keeps Coin Metrics requests server-side and returns partial, validated data. */
+let onchainMetricsCache = { fetchedAt: 0, data: [], source: 'Coin Metrics Community API' };
+let onchainMetricsPending = null;
+app.get('/api/onchain-metrics', async (req,res) => {
+  const now = Date.now();
+  if (onchainMetricsCache.data.length && now - onchainMetricsCache.fetchedAt < 15 * 60 * 1000 && String(req.query.refresh || '') !== '1') {
+    return res.set('Cache-Control','public, max-age=300, stale-while-revalidate=900').json({ ok:true, ...onchainMetricsCache, stale:false, cache:'fresh' });
+  }
+  if (onchainMetricsPending) {
+    try { return res.set('Cache-Control','no-store').json(await onchainMetricsPending); }
+    catch (error) { return res.status(502).json({ ok:false, error:'onchain_metrics_unavailable', message:'Fonte on-chain indisponível no momento.', details:String(error.message || error) }); }
+  }
+  onchainMetricsPending = (async () => {
+    const metrics = 'CapMVRVCur,IssTotUSD,CapMrktCurUSD,CapRealUSD';
+    const url = 'https://community-api.coinmetrics.io/v4/timeseries/asset-metrics?assets=btc&metrics=' + metrics + '&frequency=1d&page_size=400&sort=time';
+    const response = await fetch(url,{headers:{accept:'application/json'},signal:AbortSignal.timeout(18000)});
+    if (!response.ok) throw new Error('Coin Metrics HTTP ' + response.status);
+    const json = await response.json();
+    if (!json || !Array.isArray(json.data)) throw new Error('Formato Coin Metrics inválido');
+    const rows = json.data.filter(row => row && row.time).sort((a,b) => String(a.time).localeCompare(String(b.time)));
+    if (!rows.length) throw new Error('Coin Metrics retornou série vazia');
+    return { ok:true, fetchedAt:Date.now(), data:rows, source:'Coin Metrics Community API', cache:'refreshed', stale:false };
+  })().then(result => {
+    onchainMetricsCache = { fetchedAt:result.fetchedAt, data:result.data, source:result.source };
+    return result;
+  }).finally(() => { onchainMetricsPending = null; });
+  try {
+    const result = await onchainMetricsPending;
+    res.set('Cache-Control','public, max-age=300, stale-while-revalidate=900').json(result);
+  } catch (error) {
+    console.error('On-chain metrics feed unavailable:', error.message);
+    if (onchainMetricsCache.data.length) {
+      return res.set('Cache-Control','no-store').json({ ok:true, ...onchainMetricsCache, stale:true, cache:'stale', warning:'Fonte atual indisponível; último snapshot validado preservado.' });
+    }
+    res.status(502).set('Cache-Control','no-store').json({ ok:false, error:'onchain_metrics_unavailable', message:'Fonte on-chain indisponível no momento.', details:String(error.message || error) });
+  }
 });
 
 app.get('/api/etf-flow', async (req,res) => {
