@@ -99,6 +99,7 @@ function computeRadar(input, options = {}) {
   const volumes = candles.map(c => c.volume);
   const timeframes = String(input.timeframe || '1d').toLowerCase();
   const daysPerCandle = timeframes === '3d' ? 3 : timeframes === '1w' ? 7 : 1;
+  const sma200 = sma(closes, Math.max(2, Math.round(200 / daysPerCandle)));
   const sma111 = sma(closes, Math.max(2, Math.round(111 / daysPerCandle)));
   const sma350 = sma(closes, Math.max(2, Math.round(350 / daysPerCandle)));
   const sma200w = sma(closes, Math.max(2, Math.round(1400 / daysPerCandle)));
