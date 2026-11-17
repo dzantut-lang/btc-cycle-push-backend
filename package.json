@@ -6,7 +6,7 @@
   "main": "server.js",
   "scripts": {
     "start": "node server.js",
-    "test": "node --check server.js && node --check trader-radar.js && node --check public/trader-radar-panel.js && node --test"
+    "test": "node --check server.js && node --check trader-radar.js && node --check public/trader-radar-panel.js && node --check meneghelli-radar/engine.js && node --test"
   },
   "engines": {
     "node": ">=20"
