@@ -188,15 +188,71 @@ app.get('/api/onchain-metrics', async (req,res) => {
     catch (error) { return res.status(502).json({ ok:false, error:'onchain_metrics_unavailable', message:'Fonte on-chain indisponível no momento.', details:String(error.message || error) }); }
   }
   onchainMetricsPending = (async () => {
-    const metrics = 'CapMVRVCur,IssTotUSD,CapMrktCurUSD,CapRealUSD';
-    const url = 'https://community-api.coinmetrics.io/v4/timeseries/asset-metrics?assets=btc&metrics=' + metrics + '&frequency=1d&page_size=400&sort=time';
-    const response = await fetch(url,{headers:{accept:'application/json'},signal:AbortSignal.timeout(18000)});
-    if (!response.ok) throw new Error('Coin Metrics HTTP ' + response.status);
-    const json = await response.json();
-    if (!json || !Array.isArray(json.data)) throw new Error('Formato Coin Metrics inválido');
-    const rows = json.data.filter(row => row && row.time).sort((a,b) => String(a.time).localeCompare(String(b.time)));
-    if (!rows.length) throw new Error('Coin Metrics retornou série vazia');
-    return { ok:true, fetchedAt:Date.now(), data:rows, source:'Coin Metrics Community API', cache:'refreshed', stale:false };
+    // Request metrics independently: Community API entitlements can differ by metric.
+    // A single restricted metric must not discard the other valid BTC series.
+    const metrics = ['CapMVRVCur','IssTotUSD','CapMrktCurUSD','CapRealUSD'];
+    const metricErrors = {};
+    const seriesByTime = new Map();
+    const results = await Promise.all(metrics.map(async metric => {
+      const params = new URLSearchParams({
+        assets:'btc', metrics:metric, frequency:'1d', page_size:'400', sort:'time'
+      });
+      const url = 'https://community-api.coinmetrics.io/v4/timeseries/asset-metrics?' + params.toString();
+      try {
+        const response = await fetch(url,{
+          headers:{accept:'application/json','user-agent':'BTC-Cycle-Desk/1.0'},
+          signal:AbortSignal.timeout(18000)
+        });
+        if (!response.ok) throw new Error('HTTP ' + response.status);
+        const json = await response.json();
+        if (!json || !Array.isArray(json.data)) throw new Error('formato de resposta inválido');
+        if (!json.data.length) throw new Error('série vazia');
+        return {metric, rows:json.data};
+      } catch (error) {
+        metricErrors[metric] = String(error.message || error);
+        return {metric, rows:[]};
+      }
+    }));
+    for (const result of results) {
+      for (const row of result.rows) {
+        if (!row || !row.time) continue;
+        if (!seriesByTime.has(row.time)) seriesByTime.set(row.time,{time:row.time,asset:'btc'});
+        const target = seriesByTime.get(row.time);
+        if (row[result.metric] !== undefined && row[result.metric] !== null) {
+          target[result.metric] = row[result.metric];
+        }
+      }
+    }
+    const rows = Array.from(seriesByTime.values()).sort((a,b) => String(a.time).localeCompare(String(b.time)));
+    const availableMetrics = metrics.filter(metric => rows.some(row => row[metric] !== undefined && row[metric] !== null));
+    if (!availableMetrics.length) {
+      throw new Error('Nenhuma métrica on-chain disponível na Community API: ' +
+        metrics.map(metric => metric + '=' + (metricErrors[metric] || 'sem dados')).join('; '));
+    }
+    // Realized Cap = Market Cap / MVRV. Derive only when both source values exist.
+    let derivedRealizedCap = false;
+    for (const row of rows) {
+      const marketCap = Number(row.CapMrktCurUSD);
+      const mvrv = Number(row.CapMVRVCur);
+      if ((row.CapRealUSD === undefined || row.CapRealUSD === null) &&
+          Number.isFinite(marketCap) && marketCap > 0 &&
+          Number.isFinite(mvrv) && mvrv > 0) {
+        row.CapRealUSD = String(marketCap / mvrv);
+        row.CapRealUSDDerived = true;
+        derivedRealizedCap = true;
+      }
+    }
+    return {
+      ok:true,
+      fetchedAt:Date.now(),
+      data:rows,
+      source:'Coin Metrics Community API',
+      availableMetrics,
+      unavailableMetrics:metricErrors,
+      derivedMetrics:derivedRealizedCap ? ['CapRealUSD'] : [],
+      cache:'refreshed',
+      stale:false
+    };
   })().then(result => {
     onchainMetricsCache = { fetchedAt:result.fetchedAt, data:result.data, source:result.source };
     return result;
