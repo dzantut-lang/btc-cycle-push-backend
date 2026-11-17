@@ -97,8 +97,10 @@ function computeRadar(input, options = {}) {
 
   const closes = candles.map(c => c.close);
   const volumes = candles.map(c => c.volume);
-  const timeframes = String(input.timeframe || '1d').toLowerCase();
+  const timeframes = String(input.timeframe || '3d').toLowerCase();
+  if (!['1d', '3d', '1w'].includes(timeframes)) throw new Error('unsupported_timeframe');
   const daysPerCandle = timeframes === '3d' ? 3 : timeframes === '1w' ? 7 : 1;
+  const percentileLookbackBars = Math.max(90, Math.round(1095 / daysPerCandle));
   const sma200 = sma(closes, Math.max(2, Math.round(200 / daysPerCandle)));
   const sma111 = sma(closes, Math.max(2, Math.round(111 / daysPerCandle)));
   const sma350 = sma(closes, Math.max(2, Math.round(350 / daysPerCandle)));
@@ -125,23 +127,23 @@ function computeRadar(input, options = {}) {
   const puell = series('puell');
   const cvdd = series('cvdd');
   const align = values => values.length === candles.length ? values : Array(candles.length).fill(null);
-  const mvrvPct = rollingPercentile(align(mvrv));
-  const nuplPct = rollingPercentile(align(nupl));
-  const rhodlPct = rollingPercentile(align(rhodl));
-  const puellPct = rollingPercentile(align(puell));
+  const mvrvPct = rollingPercentile(align(mvrv), percentileLookbackBars);
+  const nuplPct = rollingPercentile(align(nupl), percentileLookbackBars);
+  const rhodlPct = rollingPercentile(align(rhodl), percentileLookbackBars);
+  const puellPct = rollingPercentile(align(puell), percentileLookbackBars);
   const mayer = closes.map((p, i) => finite(sma200[i]) && sma200[i] > 0 ? p / sma200[i] : null);
-  const mayerPct = rollingPercentile(mayer);
+  const mayerPct = rollingPercentile(mayer, percentileLookbackBars);
   const twoYearMultiple = closes.map((p, i) => finite(sma730[i]) && sma730[i] > 0 ? p / sma730[i] : null);
-  const twoYearPct = rollingPercentile(twoYearMultiple);
+  const twoYearPct = rollingPercentile(twoYearMultiple, percentileLookbackBars);
   const piRatio = closes.map((_, i) => finite(sma111[i]) && finite(sma350[i]) && sma350[i] > 0 ? sma111[i] / (2 * sma350[i]) : null);
-  const piPct = rollingPercentile(piRatio);
+  const piPct = rollingPercentile(piRatio, percentileLookbackBars);
   const priceTo200w = closes.map((p, i) => finite(sma200w[i]) && sma200w[i] > 0 ? p / sma200w[i] : null);
-  const priceTo200wPct = rollingPercentile(priceTo200w);
+  const priceTo200wPct = rollingPercentile(priceTo200w, percentileLookbackBars);
   const priceToCvdd = closes.map((p, i) => finite(cvdd[i]) && Number(cvdd[i]) > 0 ? p / Number(cvdd[i]) : null);
-  const priceToCvddPct = rollingPercentile(priceToCvdd);
-  const rsiPct = rollingPercentile(rsi14);
-  const macdHistPct = rollingPercentile(macdHist);
-  const volumeRatioPct = rollingPercentile(volumeRatio);
+  const priceToCvddPct = rollingPercentile(priceToCvdd, percentileLookbackBars);
+  const rsiPct = rollingPercentile(rsi14, percentileLookbackBars);
+  const macdHistPct = rollingPercentile(macdHist, percentileLookbackBars);
+  const volumeRatioPct = rollingPercentile(volumeRatio, percentileLookbackBars);
 
   const last = candles.length - 1;
   const currentPrice = closes[last];
@@ -149,7 +151,7 @@ function computeRadar(input, options = {}) {
   const topComponents = [
     component('MVRV Z-Score', 25, current(mvrvPct), 'onchain.mvrvZ', current(mvrv)),
     component('NUPL', 15, current(nuplPct), 'onchain.nupl', current(nupl)),
-    component('Pi Cycle proximity', 15, finite(current(piPct)) ? current(piPct) : null, 'price.sma111_sma350', current(piRatio)),
+    component('Pi Cycle proximity', 15, finite(current(piRatio)) ? clamp((current(piRatio) - 0.90) * 1000) : null, 'price.sma111_sma350', current(piRatio)),
     component('Mayer Multiple', 15, current(mayerPct), 'price.sma200', current(mayer)),
     component('2-Year MA Multiple', 10, current(twoYearPct), 'price.sma730', current(twoYearMultiple)),
     component('RHODL Ratio', 10, current(rhodlPct), 'onchain.rhodl', current(rhodl)),
@@ -162,7 +164,7 @@ function computeRadar(input, options = {}) {
     component('200-week MA proximity', 15, finite(current(priceTo200wPct)) ? 100 - current(priceTo200wPct) : null, 'price.sma200w', current(priceTo200w)),
     component('2-Year MA undervaluation', 10, finite(current(twoYearPct)) ? 100 - current(twoYearPct) : null, 'price.sma730', current(twoYearMultiple)),
     component('RSI capitulation', 10, finite(current(rsi14)) ? 100 - current(rsiPct) : null, 'price.rsi14', current(rsi14)),
-    component('Volume stress', 10, finite(current(volumeRatioPct)) ? current(volumeRatioPct) : null, 'price.volumeRatio', current(volumeRatio))
+    component('Volume capitulation', 10, finite(current(volumeRatio)) ? (closes[last] < closes[last - 1] ? clamp(50 + (current(volumeRatio) - 1) * 25) : 0) : null, 'price.volumeRatio_and_direction', current(volumeRatio))
   ];
 
   const top = weightedScore(topComponents, 3);
