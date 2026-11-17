@@ -116,6 +116,55 @@ async function monitorOnce() {
   };
 }
 
+
+/* Historical Bitcoin halving cycles proxy: server-side fetch avoids browser CORS restrictions. */
+app.get('/api/halving-history', async (req,res) => {
+  const cycle = Number(req.query.cycle);
+  const ranges = {
+    1: { start: Date.UTC(2012,10,28), end: Date.UTC(2016,6,9) },
+    2: { start: Date.UTC(2016,6,9), end: Date.UTC(2020,4,11) }
+  };
+  const range = ranges[cycle];
+  if (!range) return res.status(400).json({ ok:false, error:'invalid_cycle', message:'Use cycle=1 ou cycle=2.' });
+  const expectedDays = Math.round((range.end-range.start)/86400000);
+  const validate = (points, source) => {
+    const clean = points.filter(p => Number.isFinite(p.t) && Number.isFinite(p.p) && p.p > 0 && p.t >= range.start-172800000 && p.t <= range.end+172800000).sort((a,b)=>a.t-b.t);
+    const unique = clean.filter((p,i)=>i===0 || p.t-clean[i-1].t >= 43200000);
+    const coverage = unique.length / Math.max(1,expectedDays);
+    const startGap = unique.length ? Math.abs(unique[0].t-range.start)/86400000 : Infinity;
+    const endGap = unique.length ? Math.abs(unique[unique.length-1].t-range.end)/86400000 : Infinity;
+    if (unique.length < expectedDays*.70 || startGap > 14 || endGap > 14) throw new Error(source+' incompleto: '+unique.length+' pontos; cobertura '+Math.round(coverage*100)+'%; início '+Math.round(startGap)+'d; fim '+Math.round(endGap)+'d');
+    return { ok:true, cycle, source, count:unique.length, points:unique };
+  };
+  const errors = [];
+  try {
+    const url = 'https://min-api.cryptocompare.com/data/v2/histoday?fsym=BTC&tsym=USD&limit=2000&toTs='+Math.floor(range.end/1000);
+    const response = await fetch(url,{headers:{accept:'application/json'},signal:AbortSignal.timeout(15000)});
+    if (!response.ok) throw new Error('HTTP '+response.status);
+    const json = await response.json();
+    if (json && json.Response === 'Error') throw new Error(json.Message || 'resposta de erro');
+    const rows = json && json.Data && json.Data.Data;
+    if (!Array.isArray(rows)) throw new Error('formato de dados inválido');
+    const result = validate(rows.map(x=>({t:Number(x.time)*1000,p:Number(x.close)})).filter(x=>x.t>=range.start&&x.t<=range.end),'CryptoCompare');
+    res.set('Cache-Control','public, max-age=21600, stale-while-revalidate=86400').json(result);
+    return;
+  } catch (error) { errors.push('CryptoCompare: '+String(error.message||error)); }
+  try {
+    const startISO = new Date(range.start).toISOString().slice(0,10);
+    const endISO = new Date(range.end).toISOString().slice(0,10);
+    const url = 'https://community-api.coinmetrics.io/v4/timeseries/asset-metrics?assets=btc&metrics=PriceUSD&frequency=1d&start_time='+startISO+'&end_time='+endISO+'&page_size=10000';
+    const response = await fetch(url,{headers:{accept:'application/json'},signal:AbortSignal.timeout(20000)});
+    if (!response.ok) throw new Error('HTTP '+response.status);
+    const json = await response.json();
+    if (!json || !Array.isArray(json.data)) throw new Error('formato de dados inválido');
+    const result = validate(json.data.map(x=>({t:Date.parse(x.time),p:Number(x.PriceUSD)})),'Coin Metrics');
+    res.set('Cache-Control','public, max-age=21600, stale-while-revalidate=86400').json(result);
+    return;
+  } catch (error) { errors.push('Coin Metrics: '+String(error.message||error)); }
+  console.error('Halving historical series unavailable, cycle '+cycle+': '+errors.join(' | '));
+  res.status(502).set('Cache-Control','no-store').json({ok:false,error:'halving_history_unavailable',cycle,message:'Fontes históricas indisponíveis no momento.',details:errors});
+});
+
 app.get('/api/etf-flow', async (req,res) => {
   try {
     const result = await getEtfFlowAnalysis(String(req.query.refresh || '') === '1');
