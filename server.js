@@ -162,7 +162,8 @@ app.get('/api/halving-history', async (req,res) => {
     return;
   } catch (error) { errors.push('Coin Metrics: '+String(error.message||error)); }
   try {
-    const url = 'https://api.blockchain.info/charts/market-price?format=json&timespan=all&sampled=false';
+    const startISO = new Date(range.start).toISOString().slice(0,10);
+    const url = 'https://api.blockchain.info/charts/market-price?format=json&timespan=all&start='+startISO+'&sampled=false';
     const response = await fetch(url,{headers:{accept:'application/json'},signal:AbortSignal.timeout(20000)});
     if (!response.ok) throw new Error('HTTP '+response.status);
     const json = await response.json();
