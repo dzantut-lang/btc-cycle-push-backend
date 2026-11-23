@@ -1,0 +1,268 @@
+CycleTimeIntelligence .bct-cycle-label b{display:block;color:#e7f0fc;font-size:11px}
+#btcCycleTimeIntelligence .bct-cycle-label small{display:block;color:#8198b2;font-size:9px;margin-top:3px}
+#btcCycleTimeIntelligence .bct-bars{display:flex;min-width:0;height:27px;overflow:hidden;border-radius:6px;background:#172438}
+#btcCycleTimeIntelligence .bct-bar-up,#btcCycleTimeIntelligence .bct-bar-down{display:flex;align-items:center;justify-content:center;min-width:0;color:#fff;font-size:9px;font-weight:800;white-space:nowrap;overflow:hidden}
+#btcCycleTimeIntelligence .bct-bar-up{background:linear-gradient(90deg,#11784d,#20ad70)}
+#btcCycleTimeIntelligence .bct-bar-down{background:linear-gradient(90deg,#a72f43,#e05a65)}
+#btcCycleTimeIntelligence .bct-bar-current{background:linear-gradient(90deg,#236d9d,#59bce7)}
+#btcCycleTimeIntelligence .bct-comparison{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin-top:12px}
+#btcCycleTimeIntelligence .bct-comparison>div{padding:13px;border:1px solid #2b405a;border-radius:11px;background:rgba(17,31,48,.8);min-width:0}
+#btcCycleTimeIntelligence .bct-comparison strong{display:block;margin:7px 0 4px;color:#edf5ff;font-size:14px;overflow-wrap:anywhere}
+#btcCycleTimeIntelligence .bct-comparison small{display:block;color:#91a7be;font-size:10px;line-height:1.5}
+#btcCycleTimeIntelligence .bct-disclaimer{margin:13px 2px 0;color:#839ab3;font-size:10px;line-height:1.55}
+.art-cycle-time{display:flex!important;align-items:center;justify-content:center;gap:4px;color:#7ce0b0;font-weight:900;font-size:22px;letter-spacing:-.06em}
+.art-cycle-time i{font-size:11px;color:#ff8990;font-style:normal;align-self:flex-end;margin-bottom:10px}
+.indicator-cycle-time{border-color:rgba(77,176,143,.38)!important}
+@media(max-width:650px){#btcCycleTimeIntelligence .bct-hero-grid{grid-template-columns:1fr 1fr}#btcCycleTimeIntelligence .bct-hero-metric.bct-live{grid-column:1/-1}#btcCycleTimeIntelligence .bct-cycle-row{grid-template-columns:1fr;gap:6px}#btcCycleTimeIntelligence .bct-comparison{grid-template-columns:1fr}#btcCycleTimeIntelligence .bct-timeline-card{padding:11px}}
+
+/* BTC-CYCLE-TIME-UX-V2 */
+#btcCycleTimeIntelligence{position:relative;isolation:isolate;padding:clamp(18px,2.2vw,28px)!important;border:1px solid rgba(93,145,190,.32)!important;background:radial-gradient(ellipse at 92% 0%,rgba(36,105,151,.16),transparent 38%),linear-gradient(145deg,rgba(13,27,44,.98),rgba(7,16,29,.98))!important;box-shadow:0 18px 46px rgba(0,0,0,.22),inset 0 1px rgba(255,255,255,.035)!important}
+#btcCycleTimeIntelligence .cardhead{align-items:center!important;margin-bottom:5px}
+#btcCycleTimeIntelligence .bct-kicker{color:#7ed8ed;font-size:10px;letter-spacing:.19em}
+#btcCycleTimeIntelligence .cardhead h2{font-size:clamp(17px,1.65vw,22px);font-weight:850;letter-spacing:.035em}
+#btcCycleTimeIntelligence .bct-subtitle{font-size:12px;color:#a8bad0}
+#btcCycleTimeIntelligence .bct-status{padding:7px 10px;border:1px solid rgba(104,191,222,.25);background:rgba(49,111,148,.13);color:#9adcf0;font-size:9px;letter-spacing:.07em}
+#btcCycleTimeIntelligence .bct-hero-grid{gap:12px;margin:18px 0}
+#btcCycleTimeIntelligence .bct-hero-metric{padding:17px;border-radius:15px;box-shadow:inset 0 1px rgba(255,255,255,.035);transition:transform .2s ease,border-color .2s ease}
+#btcCycleTimeIntelligence .bct-hero-metric:hover{transform:translateY(-2px);border-color:rgba(112,211,190,.55)}
+#btcCycleTimeIntelligence .bct-hero-metric>span{font-size:9px;letter-spacing:.12em}
+#btcCycleTimeIntelligence .bct-hero-metric strong{font-size:clamp(27px,3.2vw,38px);letter-spacing:-.035em}
+#btcCycleTimeIntelligence .bct-hero-metric em{font-size:11px}
+#btcCycleTimeIntelligence .bct-live{position:relative}
+#btcCycleTimeIntelligence .bct-live:after{content:"";position:absolute;right:15px;top:15px;width:7px;height:7px;border-radius:50%;background:#63d6ef;box-shadow:0 0 0 4px rgba(99,214,239,.12),0 0 14px rgba(99,214,239,.8);animation:bctLivePulse 2s infinite}
+#btcCycleTimeIntelligence .bct-timeline-card{padding:17px;border-color:rgba(91,126,164,.4);background:linear-gradient(145deg,rgba(6,16,29,.78),rgba(12,25,42,.72));box-shadow:inset 0 1px rgba(255,255,255,.025)}
+#btcCycleTimeIntelligence .bct-chart-heading b{font-size:13px;letter-spacing:.025em}
+#btcCycleTimeIntelligence .bct-chart-heading small{font-size:11px}
+#btcCycleTimeIntelligence .bct-legend{gap:16px;margin:15px 0;color:#b1c1d3;font-size:10px}
+#btcCycleTimeIntelligence .bct-cycle-rows{gap:16px}
+#btcCycleTimeIntelligence .bct-cycle-row{grid-template-columns:minmax(125px,165px) minmax(0,1fr);gap:14px}
+#btcCycleTimeIntelligence .bct-cycle-label b{font-size:12px}
+#btcCycleTimeIntelligence .bct-cycle-label small{font-size:10px}
+#btcCycleTimeIntelligence .bct-bars{height:32px;border-radius:8px;background:rgba(37,54,76,.8);box-shadow:inset 0 1px 3px rgba(0,0,0,.3)}
+#btcCycleTimeIntelligence .bct-bar-up,#btcCycleTimeIntelligence .bct-bar-down{font-size:10px}
+#btcCycleTimeIntelligence .bct-bar-current{background:linear-gradient(100deg,#226d9e,#63c7ed);box-shadow:inset 0 1px rgba(255,255,255,.2)}
+#btcCycleTimeIntelligence .bct-comparison{gap:12px;margin-top:14px}
+#btcCycleTimeIntelligence .bct-comparison>div{padding:16px;border-radius:13px;background:linear-gradient(145deg,rgba(20,39,61,.9),rgba(10,22,37,.9));border-color:rgba(91,126,164,.38)}
+#btcCycleTimeIntelligence .bct-comparison strong{font-size:clamp(15px,1.5vw,19px)}
+#btcCycleTimeIntelligence .bct-comparison small{font-size:11px}
+#btcCycleTimeIntelligence .bct-disclaimer{margin:15px 2px 0;font-size:10px;line-height:1.65}
+#btcCycleTimeIntelligence .bct-live-meta{display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap;margin-top:9px;color:#8ea8c2;font-size:10px}
+#btcCycleTimeIntelligence .bct-live-meta strong{color:#75d8ed;font-size:9px;letter-spacing:.08em}
+#btcCycleTimeIntelligence .bct-live-meta span{font-variant-numeric:tabular-nums}
+@keyframes bctLivePulse{0%,100%{opacity:1;box-shadow:0 0 0 4px rgba(99,214,239,.12),0 0 14px rgba(99,214,239,.8)}50%{opacity:.55;box-shadow:0 0 0 7px rgba(99,214,239,.04),0 0 7px rgba(99,214,239,.35)}}
+@media(max-width:760px){
+ #btcCycleTimeIntelligence{padding:15px!important;margin-bottom:22px!important}
+ #btcCycleTimeIntelligence .bct-hero-grid{grid-template-columns:1fr 1fr;gap:9px;margin:13px 0}
+ #btcCycleTimeIntelligence .bct-hero-metric{padding:13px}
+ #btcCycleTimeIntelligence .bct-hero-metric.bct-live{grid-column:1/-1}
+ #btcCycleTimeIntelligence .bct-timeline-card{padding:13px}
+ #btcCycleTimeIntelligence .bct-cycle-row{grid-template-columns:1fr;gap:7px}
+ #btcCycleTimeIntelligence .bct-bars{height:30px}
+ #btcCycleTimeIntelligence .bct-comparison{grid-template-columns:1fr}
+ #btcCycleTimeIntelligence .bct-comparison>div{padding:13px}
+ #btcCycleTimeIntelligence .bct-disclaimer{padding-bottom:72px}
+}
+@media(max-width:390px){
+ #btcCycleTimeIntelligence .bct-hero-metric strong{font-size:25px}
+ #btcCycleTimeIntelligence .bct-chart-heading{flex-direction:column;gap:5px}
+ #btcCycleTimeIntelligence .bct-legend{gap:9px;font-size:9px}
+}
+@media(prefers-reduced-motion:reduce){#btcCycleTimeIntelligence .bct-hero-metric,#btcCycleTimeIntelligence .bct-live:after{transition:none;animation:none}}
+
+/* BTC-CYCLE-TIME-MOBILE-FIX-V3 */
+#btcCycleTimeIntelligence .bct-bar-current{font-size:10px;letter-spacing:0;white-space:nowrap}
+#btcCycleTimeIntelligence .bct-legend{align-items:center}
+@media(max-width:760px){
+ #btcCycleTimeIntelligence .bct-legend{display:grid;grid-template-columns:1fr 1fr;column-gap:10px;row-gap:10px}
+ #btcCycleTimeIntelligence .bct-legend span{min-width:0;white-space:nowrap;font-size:9px}
+ #btcCycleTimeIntelligence .bct-legend span:last-child{grid-column:1/-1}
+ #btcCycleTimeIntelligence .bct-cycle-rows{gap:18px}
+ #btcCycleTimeIntelligence .bct-bar-current{font-size:10px}
+ .wallet-floating-access{min-width:48px!important;width:48px!important;height:48px!important;padding:7px!important;gap:0!important;right:12px!important;bottom:calc(env(safe-area-inset-bottom,0px) + 78px)!important}
+ .wallet-floating-access span{display:none!important}
+ .wallet-floating-access svg{width:28px!important;height:28px!important;flex:0 0 28px!important}
+ .wallet-floating-access i{right:5px!important;top:5px!important}
+}
+
+/* BTC-CYCLE-VISUAL-MAP-V1 */
+#btcCycleTimeIntelligence .bct-visual-map{position:relative;margin:18px 0;padding:17px;border:1px solid rgba(83,126,169,.43);border-radius:15px;overflow:hidden;background:linear-gradient(180deg,rgba(4,12,23,.94),rgba(9,23,39,.96));box-shadow:inset 0 1px rgba(255,255,255,.035)}
+#btcCycleTimeIntelligence .bct-visual-map:before{content:"";position:absolute;inset:0;pointer-events:none;background:repeating-linear-gradient(90deg,transparent 0,transparent calc(25% - 1px),rgba(117,153,188,.07) calc(25% - 1px),rgba(117,153,188,.07) 25%)}
+#btcCycleTimeIntelligence .bct-visual-head{position:relative;display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:14px}
+#btcCycleTimeIntelligence .bct-visual-head>div>span{display:block;color:#72d8ed;font-size:9px;font-weight:900;letter-spacing:.16em}
+#btcCycleTimeIntelligence .bct-visual-head strong{display:block;margin-top:5px;color:#f0f6ff;font-size:15px}
+#btcCycleTimeIntelligence .bct-visual-head small{display:block;margin-top:4px;color:#91a9c2;font-size:10px}
+#btcCycleTimeIntelligence .bct-visual-live{display:flex;align-items:center;gap:6px;padding:6px 9px;border:1px solid rgba(90,197,229,.28);border-radius:20px;color:#92def1;font-size:8px;font-weight:900;letter-spacing:.08em}
+#btcCycleTimeIntelligence .bct-visual-live i{width:6px;height:6px;border-radius:50%;background:#5bd3ed;box-shadow:0 0 9px #5bd3ed}
+#btcCycleTimeIntelligence .bct-visual-legend{position:relative;display:flex;gap:15px;flex-wrap:wrap;margin:0 0 16px;color:#a8bad0;font-size:9px;font-weight:800;letter-spacing:.06em}
+#btcCycleTimeIntelligence .bct-visual-legend span{display:flex;align-items:center;gap:6px}
+#btcCycleTimeIntelligence .bct-visual-legend i{width:9px;height:9px;border-radius:3px}
+#btcCycleTimeIntelligence .bct-up-swatch{background:#1cac70}#btcCycleTimeIntelligence .bct-down-swatch{background:#d84d5b}#btcCycleTimeIntelligence .bct-now-swatch{background:#62bce9}
+#btcCycleTimeIntelligence .bct-visual-rows{position:relative;display:grid;gap:18px}
+#btcCycleTimeIntelligence .bct-visual-row{min-width:0}
+#btcCycleTimeIntelligence .bct-visual-row-head{display:flex;justify-content:space-between;align-items:baseline;gap:8px;margin-bottom:7px}
+#btcCycleTimeIntelligence .bct-visual-row-head strong{color:#f0f6ff;font-size:12px}
+#btcCycleTimeIntelligence .bct-visual-row-head span{color:#92a8c0;font-size:9px;font-variant-numeric:tabular-nums;text-align:right}
+#btcCycleTimeIntelligence .bct-visual-track{display:flex;width:100%;height:66px;overflow:hidden;border-radius:9px;background:#14243a;box-shadow:inset 0 2px 5px rgba(0,0,0,.42);outline:1px solid rgba(143,173,206,.12)}
+#btcCycleTimeIntelligence .bct-visual-phase{position:relative;display:flex;flex-direction:column;align-items:center;justify-content:center;min-width:0;overflow:hidden;text-align:center;color:#fff}
+#btcCycleTimeIntelligence .bct-visual-phase b{font-size:8px;letter-spacing:.12em;opacity:.9}
+#btcCycleTimeIntelligence .bct-visual-phase strong{display:block;margin-top:4px;font-size:clamp(10px,1.2vw,13px);font-weight:900;white-space:nowrap;font-variant-numeric:tabular-nums}
+#btcCycleTimeIntelligence .bct-visual-up{background:linear-gradient(100deg,rgba(13,116,75,.96),rgba(29,180,111,.94));border-right:1px solid rgba(255,255,255,.2)}
+#btcCycleTimeIntelligence .bct-visual-down{background:linear-gradient(100deg,rgba(157,42,58,.96),rgba(223,76,91,.96))}
+#btcCycleTimeIntelligence .bct-visual-now{background:linear-gradient(100deg,rgba(31,103,151,.98),rgba(83,190,230,.98));box-shadow:inset 0 0 18px rgba(255,255,255,.09)}
+#btcCycleTimeIntelligence .bct-visual-dates{display:flex;justify-content:space-between;gap:5px;margin-top:6px;color:#829bb5;font-size:8px;font-weight:800;letter-spacing:.04em}
+#btcCycleTimeIntelligence .bct-axis{position:relative;display:flex;justify-content:space-between;gap:6px;margin-top:17px;padding-top:8px;border-top:1px solid rgba(116,151,186,.2);color:#6f8aa6;font-size:8px;font-weight:800;letter-spacing:.06em}
+#btcCycleTimeIntelligence .bct-axis span:nth-child(2){text-align:center}
+#btcCycleTimeIntelligence .bct-axis span:last-child{text-align:right}
+@media(max-width:760px){
+ #btcCycleTimeIntelligence .bct-visual-map{padding:13px;margin:14px 0}
+ #btcCycleTimeIntelligence .bct-visual-head strong{font-size:13px}
+ #btcCycleTimeIntelligence .bct-visual-track{height:61px}
+ #btcCycleTimeIntelligence .bct-visual-phase b{font-size:7px}
+ #btcCycleTimeIntelligence .bct-visual-phase strong{font-size:10px}
+ #btcCycleTimeIntelligence .bct-visual-row-head{align-items:flex-start;flex-direction:column;gap:3px}
+ #btcCycleTimeIntelligence .bct-visual-row-head span{text-align:left}
+ #btcCycleTimeIntelligence .bct-visual-dates{font-size:7px}
+ #btcCycleTimeIntelligence .bct-axis{font-size:7px}
+}
+@media(max-width:380px){
+ #btcCycleTimeIntelligence .bct-visual-phase b{font-size:6px}
+ #btcCycleTimeIntelligence .bct-visual-phase strong{font-size:9px}
+ #btcCycleTimeIntelligence .bct-visual-dates{font-size:6px}
+}
+
+/* BTC-CYCLE-DESKTOP-PRESENTATION-V2 */
+#btcCycleTimeIntelligence .bct-visual-map{padding:24px;margin:22px 0 18px}
+#btcCycleTimeIntelligence .bct-visual-head strong{font-size:18px}
+#btcCycleTimeIntelligence .bct-visual-head small{font-size:12px}
+#btcCycleTimeIntelligence .bct-visual-legend{font-size:11px;gap:22px;margin-bottom:20px}
+#btcCycleTimeIntelligence .bct-visual-rows{gap:24px}
+#btcCycleTimeIntelligence .bct-visual-row-head strong{font-size:14px}
+#btcCycleTimeIntelligence .bct-visual-row-head span{font-size:11px}
+#btcCycleTimeIntelligence .bct-visual-track{height:78px;border-radius:11px}
+#btcCycleTimeIntelligence .bct-visual-phase b{font-size:10px}
+#btcCycleTimeIntelligence .bct-visual-phase strong{font-size:15px}
+#btcCycleTimeIntelligence .bct-visual-dates{font-size:10px;margin-top:8px}
+#btcCycleTimeIntelligence .bct-axis{font-size:10px;margin-top:20px}
+@media(max-width:760px){
+ #btcCycleTimeIntelligence .bct-visual-map{padding:13px;margin:14px 0}
+ #btcCycleTimeIntelligence .bct-visual-head strong{font-size:13px}
+ #btcCycleTimeIntelligence .bct-visual-head small{font-size:10px}
+ #btcCycleTimeIntelligence .bct-visual-legend{font-size:9px;gap:12px;margin-bottom:15px}
+ #btcCycleTimeIntelligence .bct-visual-rows{gap:18px}
+ #btcCycleTimeIntelligence .bct-visual-row-head strong{font-size:12px}
+ #btcCycleTimeIntelligence .bct-visual-row-head span{font-size:9px}
+ #btcCycleTimeIntelligence .bct-visual-track{height:61px}
+ #btcCycleTimeIntelligence .bct-visual-phase b{font-size:7px}
+ #btcCycleTimeIntelligence .bct-visual-phase strong{font-size:10px}
+ #btcCycleTimeIntelligence .bct-visual-dates{font-size:7px}
+ #btcCycleTimeIntelligence .bct-axis{font-size:7px}
+}
+/* BTC-CYCLE-MAP-UX-V3 */
+#btcCycleTimeIntelligence .bct-visual-row{position:relative;padding:5px 0 8px;border-radius:10px;transition:background .2s ease,transform .2s ease}
+#btcCycleTimeIntelligence .bct-visual-row:hover{background:rgba(70,119,164,.07);transform:translateY(-1px)}
+#btcCycleTimeIntelligence .bct-visual-row-head{margin-bottom:10px}
+#btcCycleTimeIntelligence .bct-visual-row-head strong{letter-spacing:.035em}
+#btcCycleTimeIntelligence .bct-visual-row-head span{font-variant-numeric:tabular-nums;letter-spacing:.025em}
+#btcCycleTimeIntelligence .bct-visual-track{position:relative;box-shadow:inset 0 2px 5px rgba(0,0,0,.42),0 0 0 1px rgba(142,184,220,.12)}
+#btcCycleTimeIntelligence .bct-visual-phase{transition:filter .2s ease,opacity .2s ease}
+#btcCycleTimeIntelligence .bct-visual-phase:hover{filter:brightness(1.15)}
+#btcCycleTimeIntelligence .bct-visual-phase b{font-size:10px;letter-spacing:.09em}
+#btcCycleTimeIntelligence .bct-visual-phase strong{font-size:16px;text-shadow:0 1px 4px rgba(0,0,0,.2)}
+#btcCycleTimeIntelligence .bct-visual-up{border-right:2px solid rgba(255,255,255,.55)}
+#btcCycleTimeIntelligence .bct-visual-row:last-child .bct-visual-now{background:linear-gradient(105deg,#1c6597,#4eb8e4,#287fae);background-size:200% 100%;animation:bctCurrentFlow 6s ease-in-out infinite}
+#btcCycleTimeIntelligence .bct-visual-dates{padding:0 2px;align-items:center}
+#btcCycleTimeIntelligence .bct-visual-dates span{display:flex;align-items:center;gap:5px}
+#btcCycleTimeIntelligence .bct-visual-dates span:nth-child(2){color:#d8e8f8}
+#btcCycleTimeIntelligence .bct-visual-dates span:nth-child(2):before{display:inline-block;width:7px;height:7px;border-radius:50%;background:#ffd27b;box-shadow:0 0 8px rgba(255,210,123,.65)}
+#btcCycleTimeIntelligence .bct-visual-row:last-child .bct-visual-row-head strong{color:#8cdef2}
+#btcCycleTimeIntelligence .bct-visual-live{box-shadow:0 0 18px rgba(86,202,232,.08)}
+@keyframes bctCurrentFlow{0%,100%{background-position:0% 50%}50%{background-position:100% 50%}}
+@media(max-width:760px){#btcCycleTimeIntelligence .bct-visual-phase b{font-size:7px;letter-spacing:0}#btcCycleTimeIntelligence .bct-visual-phase strong{font-size:10px}}
+@media(prefers-reduced-motion:reduce){#btcCycleTimeIntelligence .bct-visual-row:last-child .bct-visual-now{animation:none}#btcCycleTimeIntelligence .bct-visual-row{transition:none}}
+/* BTC-CYCLE-YEAR-RULER-AND-LINE-CHART-CTA-V1 */
+#btcCycleTimeIntelligence .bct-year-ruler-card{margin:18px 0 14px;padding:15px 17px 12px;border:1px solid rgba(83,126,169,.34);border-radius:13px;background:linear-gradient(180deg,rgba(8,19,33,.9),rgba(11,27,45,.88));overflow:hidden}
+#btcCycleTimeIntelligence .bct-year-ruler-head{display:flex;justify-content:space-between;gap:10px;color:#a9bfd5;font-size:9px;letter-spacing:.1em;font-weight:850}
+#btcCycleTimeIntelligence .bct-year-ruler-head span{color:#6f8da9}
+#btcCycleTimeIntelligence .bct-year-ruler{position:relative;height:80px;margin:16px 4px 4px;display:block}
+#btcCycleTimeIntelligence .bct-ruler-line{position:absolute;left:0;right:0;top:34px;height:2px;background:linear-gradient(90deg,#236c9a,#4f94b9,#347c9e)}
+#btcCycleTimeIntelligence .bct-year-ruler>span{position:absolute;top:42px;transform:translateX(-50%);font-size:8px;color:#8199b3;white-space:nowrap}
+#btcCycleTimeIntelligence .bct-year-ruler>span:first-of-type{transform:none}
+#btcCycleTimeIntelligence .bct-halving-pin,#btcCycleTimeIntelligence .bct-now-pin{position:absolute;top:8px;height:28px;width:2px;background:#e8bd62;box-shadow:0 0 8px rgba(232,189,98,.65)}
+#btcCycleTimeIntelligence .bct-halving-pin b,#btcCycleTimeIntelligence .bct-now-pin b{position:absolute;top:-8px;left:5px;padding:2px 5px;border-radius:5px;background:#3b3020;color:#f0d28e;font-size:7px;white-space:nowrap;font-style:normal}
+#btcCycleTimeIntelligence .bct-now-pin{background:#64d8ef;box-shadow:0 0 9px #64d8ef}
+#btcCycleTimeIntelligence .bct-now-pin b{left:auto;right:5px;transform:translateX(-100%);background:#123a50;color:#a9efff}
+#btcCycleTimeIntelligence .bct-year-ruler-legend{display:flex;gap:15px;color:#8da5bd;font-size:8px;font-weight:800}
+#btcCycleTimeIntelligence .bct-year-ruler-legend i,#btcCycleTimeIntelligence .bct-year-ruler-legend b{display:inline-block;width:7px;height:7px;border-radius:2px;background:#e8bd62}
+#btcCycleTimeIntelligence .bct-year-ruler-legend b{background:#64d8ef}
+#btcCycleTimeIntelligence .bct-line-chart-cta{display:flex;align-items:center;gap:13px;margin:16px 0 18px;padding:15px 17px;border:1px solid rgba(91,174,211,.38);border-radius:13px;background:linear-gradient(105deg,rgba(13,37,59,.96),rgba(12,28,45,.96))}
+#btcCycleTimeIntelligence .bct-line-chart-icon{width:38px;height:38px;flex:0 0 38px;display:grid;place-items:center;border-radius:11px;background:rgba(81,182,220,.13);color:#80d9f2;font-size:27px}
+#btcCycleTimeIntelligence .bct-line-chart-copy{flex:1;min-width:0}
+#btcCycleTimeIntelligence .bct-line-chart-copy strong{display:block;color:#e8f4ff;font-size:11px;letter-spacing:.06em}
+#btcCycleTimeIntelligence .bct-line-chart-copy span{display:block;margin-top:4px;color:#91a9c2;font-size:10px;line-height:1.45}
+#btcCycleTimeIntelligence #bctOpenCycleChart{flex:0 0 auto;border:1px solid rgba(99,202,235,.55);border-radius:9px;padding:10px 13px;background:linear-gradient(110deg,#164a6b,#17658c);color:#e6f8ff;font-size:9px;font-weight:900;letter-spacing:.06em;text-decoration:none}
+#btcCycleTimeIntelligence #bctOpenCycleChart:hover{filter:brightness(1.15)}
+@media(max-width:760px){#btcCycleTimeIntelligence .bct-year-ruler-card{padding:12px 10px}#btcCycleTimeIntelligence .bct-year-ruler>span{font-size:6px}#btcCycleTimeIntelligence .bct-halving-pin b,#btcCycleTimeIntelligence .bct-now-pin b{font-size:6px}#btcCycleTimeIntelligence .bct-line-chart-cta{align-items:flex-start;flex-wrap:wrap;padding:12px}#btcCycleTimeIntelligence .bct-line-chart-copy{flex:1 1 calc(100% - 55px)}#btcCycleTimeIntelligence #bctOpenCycleChart{width:100%;text-align:center}}
+</style>
+<style id="btc-wallet-overflow-fix-v1">.wallet-floating-access{width:205px!important;min-width:205px!important;max-width:calc(100vw - 24px)!important;box-sizing:border-box!important;grid-template-columns:34px minmax(0,1fr)!important;grid-template-rows:20px 19px!important;column-gap:8px!important;padding-left:9px!important;padding-right:14px!important;overflow:visible!important}.wallet-floating-access .wallet-access-label,.wallet-floating-access .wallet-access-balance{min-width:0!important;max-width:100%!important;overflow:visible!important}.wallet-floating-access .wallet-access-balance{font-size:12px!important;letter-spacing:0!important;white-space:nowrap!important;font-variant-numeric:tabular-nums!important}@media(max-width:650px){.wallet-floating-access{width:196px!important;min-width:196px!important;max-width:calc(100vw - 24px)!important;right:12px!important;grid-template-columns:31px minmax(0,1fr)!important;padding-left:8px!important;padding-right:12px!important}.wallet-floating-access svg{width:31px!important;height:31px!important}.wallet-floating-access .wallet-access-balance{font-size:11px!important}}@media(max-width:360px){.wallet-floating-access{width:184px!important;min-width:184px!important}.wallet-floating-access .wallet-access-balance{font-size:10px!important}}</style><style id="btc-wallet-card-restore-v3">
+body:has(#btcGenesisIntro) .wallet-floating-access{display:none!important;visibility:hidden!important;pointer-events:none!important}
+.wallet-floating-access{position:fixed!important;top:auto!important;right:22px!important;bottom:calc(env(safe-area-inset-bottom,0px) + 112px)!important;z-index:2147483000!important;width:218px!important;min-width:218px!important;max-width:calc(100vw - 28px)!important;height:62px!important;min-height:62px!important;box-sizing:border-box!important;display:grid!important;grid-template-columns:38px minmax(0,1fr)!important;grid-template-rows:20px 20px!important;align-content:center!important;align-items:center!important;justify-items:start!important;column-gap:9px!important;row-gap:0!important;padding:8px 15px 8px 10px!important;overflow:hidden!important;border:1px solid rgba(255,211,139,.88)!important;border-radius:32px!important;background:linear-gradient(125deg,#071625 0%,#17263d 55%,#101b30 100%)!important;color:#fff!important;text-decoration:none!important;box-shadow:0 8px 28px rgba(0,0,0,.48),0 0 18px rgba(247,147,26,.22),inset 0 1px rgba(255,255,255,.1)!important;opacity:1!important;visibility:visible!important;pointer-events:auto!important;animation:walletAccessFloat 3.1s ease-in-out infinite!important}
+.wallet-floating-access svg{grid-column:1!important;grid-row:1/3!important;width:35px!important;height:35px!important;flex:0 0 35px!important;align-self:center!important;filter:drop-shadow(0 0 7px rgba(247,147,26,.45))!important;animation:none!important}
+.wallet-floating-access .wallet-access-label{grid-column:2!important;grid-row:1!important;display:block!important;min-width:0!important;max-width:100%!important;align-self:end!important;color:#f7c879!important;font:900 9px/1 Inter,system-ui,Arial,sans-serif!important;letter-spacing:1.25px!important;white-space:nowrap!important}
+.wallet-floating-access .wallet-access-balance{grid-column:2!important;grid-row:2!important;display:block!important;min-width:0!important;max-width:100%!important;align-self:start!important;color:#fff!important;font:900 12px/1.25 Inter,system-ui,Arial,sans-serif!important;letter-spacing:0!important;white-space:nowrap!important;font-variant-numeric:tabular-nums!important;text-shadow:0 0 10px rgba(255,205,125,.22)!important}
+.wallet-floating-access i{position:absolute!important;right:9px!important;top:7px!important;width:5px!important;height:5px!important;border-radius:50%!important;background:#70e5e8!important;box-shadow:0 0 8px #70e5e8!important}
+.wallet-floating-access:hover{border-color:#fff0c8!important;filter:brightness(1.08)!important}
+.wallet-floating-access:active{transform:scale(.96)!important}
+@media(max-width:650px){.wallet-floating-access{right:12px!important;bottom:calc(env(safe-area-inset-bottom,0px) + 104px)!important;width:196px!important;min-width:196px!important;max-width:calc(100vw - 24px)!important;height:58px!important;min-height:58px!important;grid-template-columns:34px minmax(0,1fr)!important;grid-template-rows:18px 19px!important;column-gap:8px!important;padding:7px 12px 7px 9px!important;border-radius:30px!important}.wallet-floating-access svg{width:32px!important;height:32px!important;flex-basis:32px!important}.wallet-floating-access .wallet-access-label{font-size:8px!important}.wallet-floating-access .wallet-access-balance{font-size:11px!important}}
+@media(max-width:360px){.wallet-floating-access{width:184px!important;min-width:184px!important;right:10px!important;bottom:calc(env(safe-area-inset-bottom,0px) + 100px)!important}.wallet-floating-access .wallet-access-balance{font-size:10px!important}}
+@media(prefers-reduced-motion:reduce){.wallet-floating-access{animation:none!important}}
+@keyframes walletAccessFloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-3px)}}
+</style>
+<style id="btc-halving-bottom-markers-v1">#btcCycleTimeIntelligence .bct-halving-track{position:relative!important;overflow:visible!important}#btcCycleTimeIntelligence .bct-bear-bottom-marker{position:absolute;z-index:4;top:50%;left:0;width:11px;height:11px;border:2px solid #fff2cf;border-radius:50%;background:#ffb547;box-shadow:0 0 0 3px rgba(255,181,71,.2),0 0 13px rgba(255,181,71,.95);transform:translate(-50%,-50%)}#btcCycleTimeIntelligence .bct-bear-bottom-marker.is-provisional{width:13px;height:13px;border:2px dashed #fff;background:#ff9f43;box-shadow:0 0 0 4px rgba(255,159,67,.18),0 0 17px rgba(255,159,67,.95)}#btcCycleTimeIntelligence .bct-bear-bottom-info{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-top:5px;font-size:8px;line-height:1.4;color:#a9bbce}#btcCycleTimeIntelligence .bct-bear-bottom-info span{font-size:8px;font-weight:850;letter-spacing:.06em;color:#ffc66d}#btcCycleTimeIntelligence .bct-bear-bottom-info b{font-size:9px;color:#f0d9b0;font-variant-numeric:tabular-nums}#btcCycleTimeIntelligence .bct-bottom-legend{display:inline-block;width:8px;height:8px;border-radius:50%;background:#ffb547;box-shadow:0 0 8px rgba(255,181,71,.8);margin-right:5px}#btcCycleTimeIntelligence .bct-bottom-legend.provisional{border:1px dashed #fff;background:#ff9f43}#btcCycleTimeIntelligence .bct-bottom-method-note{margin:8px 2px 0;color:#8fa4ba;font-size:9px;line-height:1.55}@media(max-width:650px){#btcCycleTimeIntelligence .bct-bear-bottom-info{align-items:flex-start;flex-direction:column;gap:2px}#btcCycleTimeIntelligence .bct-bear-bottom-info b{font-size:9px}}</style>
+<style id="btc-halving-bottom-visual-polish-v2">
+#btcCycleTimeIntelligence .bct-halving-row{position:relative;padding:9px 8px;border:1px solid transparent;border-radius:12px;transition:background .22s ease,border-color .22s ease,transform .22s ease}
+#btcCycleTimeIntelligence .bct-halving-row:hover{background:rgba(34,57,82,.26);border-color:rgba(103,151,190,.22);transform:translateY(-1px)}
+#btcCycleTimeIntelligence .bct-halving-row.is-current{background:linear-gradient(105deg,rgba(29,112,145,.14),rgba(16,37,59,.32));border-color:rgba(88,205,230,.42);box-shadow:inset 0 0 24px rgba(43,157,191,.06),0 5px 18px rgba(0,0,0,.12)}
+#btcCycleTimeIntelligence .bct-halving-row-head{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:8px}
+#btcCycleTimeIntelligence .bct-halving-row-head strong{color:#f0f6ff;font-size:11px;font-weight:900;letter-spacing:.07em}
+#btcCycleTimeIntelligence .bct-halving-row-head span{color:#9db2c9;font-size:9px;font-weight:650;text-align:right}
+#btcCycleTimeIntelligence .bct-halving-track{height:18px!important;border-radius:999px!important;background:linear-gradient(90deg,rgba(31,49,70,.95),rgba(13,25,41,.96))!important;border:1px solid rgba(117,154,190,.22)!important;box-shadow:inset 0 2px 5px rgba(0,0,0,.38),0 1px 0 rgba(255,255,255,.035);isolation:isolate}
+#btcCycleTimeIntelligence .bct-halving-fill{height:100%;border-radius:999px;filter:saturate(1.12);opacity:.95}
+#btcCycleTimeIntelligence .bct-bear-bottom-marker{width:13px!important;height:13px!important;background:radial-gradient(circle at 35% 30%,#ffb0b0 0%,#ff424f 34%,#c9152b 78%,#7e0b20 100%)!important;border:2px solid #ffe0e2!important;box-shadow:0 0 0 3px rgba(255,51,69,.22),0 0 11px rgba(255,42,61,.95),0 0 22px rgba(220,22,48,.48)!important;z-index:6;transition:transform .2s ease,box-shadow .2s ease}
+#btcCycleTimeIntelligence .bct-bear-bottom-marker:hover{transform:translate(-50%,-50%) scale(1.28);box-shadow:0 0 0 5px rgba(255,51,69,.2),0 0 18px rgba(255,42,61,1),0 0 28px rgba(220,22,48,.65)!important}
+#btcCycleTimeIntelligence .bct-bear-bottom-marker.is-provisional{width:15px!important;height:15px!important;background:radial-gradient(circle at 35% 30%,#ffc4c4 0%,#ff5360 38%,#a80d28 100%)!important;border:2px dashed #fff!important;box-shadow:0 0 0 4px rgba(255,66,82,.22),0 0 16px rgba(255,42,61,1),0 0 27px rgba(220,22,48,.55)!important}
+#btcCycleTimeIntelligence .bct-bear-bottom-info{display:flex;align-items:center;justify-content:space-between;gap:10px;margin:7px 2px 2px;padding:5px 9px;border-left:2px solid rgba(255,65,82,.72);border-radius:0 7px 7px 0;background:linear-gradient(90deg,rgba(177,26,47,.105),rgba(177,26,47,0))}
+#btcCycleTimeIntelligence .bct-bear-bottom-info span{color:#ff777f;font-size:8px;font-weight:900;letter-spacing:.075em}
+#btcCycleTimeIntelligence .bct-bear-bottom-info b{color:#f4c5c8;font-size:9px;font-weight:800;font-variant-numeric:tabular-nums}
+#btcCycleTimeIntelligence .bct-halving-row-foot{display:flex;justify-content:space-between;gap:10px;margin-top:6px;color:#8299b2;font-size:9px}
+#btcCycleTimeIntelligence .bct-halving-row-foot b{color:#c6d5e5;font-size:9px;font-weight:750;text-align:right}
+#btcCycleTimeIntelligence .bct-halving-today{z-index:7;filter:drop-shadow(0 0 5px rgba(76,222,245,.85))}
+#btcCycleTimeIntelligence .bct-cycle-compare-foot{display:flex;align-items:center;gap:12px;flex-wrap:wrap;padding:9px 2px 3px;color:#a9bbce;font-size:9px}
+#btcCycleTimeIntelligence .bct-bottom-legend{width:9px;height:9px;background:#ed293d;box-shadow:0 0 8px rgba(255,45,66,.9);vertical-align:middle}
+#btcCycleTimeIntelligence .bct-bottom-legend.provisional{background:#ed293d;border:1px dashed #fff;box-shadow:0 0 9px rgba(255,45,66,.95)}
+#btcCycleTimeIntelligence .bct-bottom-method-note{margin:9px 2px 0;padding:9px 11px;border:1px solid rgba(100,139,174,.17);border-radius:9px;background:rgba(12,26,42,.55);color:#91a8bf;font-size:9px;line-height:1.6}
+#btcCycleTimeIntelligence .bct-cycle-compare-head strong{display:block;margin:4px 0;color:#f1f6ff;font-size:clamp(14px,1.3vw,17px);line-height:1.35}
+#btcCycleTimeIntelligence .bct-cycle-compare-head small{display:block;color:#9cb2ca;font-size:10px;line-height:1.5}
+@media(max-width:650px){
+ #btcCycleTimeIntelligence .bct-halving-row{padding:9px 7px}
+ #btcCycleTimeIntelligence .bct-halving-row-head{align-items:flex-start;flex-direction:column;gap:3px}
+ #btcCycleTimeIntelligence .bct-halving-row-head span{text-align:left;font-size:9px}
+ #btcCycleTimeIntelligence .bct-halving-track{height:16px!important}
+ #btcCycleTimeIntelligence .bct-bear-bottom-info{align-items:flex-start;flex-direction:column;gap:3px;padding:6px 8px}
+ #btcCycleTimeIntelligence .bct-halving-row-foot{align-items:flex-start;flex-direction:column;gap:3px}
+ #btcCycleTimeIntelligence .bct-halving-row-foot b{text-align:left}
+ #btcCycleTimeIntelligence .bct-cycle-compare-foot{gap:8px}
+}
+@media(prefers-reduced-motion:reduce){#btcCycleTimeIntelligence .bct-halving-row,#btcCycleTimeIntelligence .bct-bear-bottom-marker{transition:none!important}}
+</style>
+<style id="btc-market-top-markers-v1">
+#btcCycleTimeIntelligence .bct-market-top-marker{position:absolute;z-index:8;top:50%;left:0;width:13px;height:13px;border:2px solid #d9ffe8;border-radius:50%;background:radial-gradient(circle at 35% 30%,#b9ffd0 0%,#39df78 38%,#079447 78%,#05632f 100%);box-shadow:0 0 0 3px rgba(38,220,111,.2),0 0 12px rgba(39,230,116,.95),0 0 22px rgba(11,160,76,.48);transform:translate(-50%,-50%);transition:transform .2s ease,box-shadow .2s ease}
+#btcCycleTimeIntelligence .bct-market-top-marker:hover{transform:translate(-50%,-50%) scale(1.28);box-shadow:0 0 0 5px rgba(38,220,111,.2),0 0 18px rgba(39,230,116,1),0 0 28px rgba(11,160,76,.65)}
+#btcCycleTimeIntelligence .bct-market-top-marker.is-current-top{width:15px;height:15px;border:2px solid #effff4;box-shadow:0 0 0 4px rgba(38,220,111,.22),0 0 16px rgba(39,230,116,1),0 0 27px rgba(11,160,76,.6)}
+#btcCycleTimeIntelligence .bct-market-top-info{display:flex;align-items:center;justify-content:space-between;gap:10px;margin:7px 2px 2px;padding:5px 9px;border-left:2px solid rgba(44,221,119,.78);border-radius:0 7px 7px 0;background:linear-gradient(90deg,rgba(18,145,76,.12),rgba(18,145,76,0))}
+#btcCycleTimeIntelligence .bct-market-top-info span{color:#63e69a;font-size:8px;font-weight:900;letter-spacing:.075em}
+#btcCycleTimeIntelligence .bct-market-top-info b{color:#c4f4d7;font-size:9px;font-weight:800;font-variant-numeric:tabular-nums}
+#btcCycleTimeIntelligence .bct-top-legend{display:inline-block;width:9px;height:9px;border-radius:50%;background:#25d66f;box-shadow:0 0 8px rgba(37,214,111,.9);margin-right:5px;vertical-align:middle}
+#btcCycleTimeIntelligence .bct-market-top-info+.bct-bear-bottom-info{margin-top:3px}
+@media(max-width:650px){#btcCycleTimeIntelligence .bct-market-top-info{align-items:flex-start;flex-direction:column;gap:3px;padding:6px 8px}}
+</style>
+<style id="bch-integrity-monitor-v1">#btcCycleHistory .bch-integrity{margin:14px 0;padding:14px;border:1px solid rgba(87,190,218,.25);border-radius:16px;background:linear-gradient(145deg,rgba(18,43,63,.94),rgba(8,22,38,.96));box-shadow:inset 0 1px rgba(255,255,255,.035)}#btcCycleHistory .bch-integrity-head{display:flex;justify-content:space-between;gap:10px;align-items:center;font-size:10px;letter-spacing:1.6px;font-weight:800;color:#9fc9dc}#btcCycleHistory .bch-integrity-head span:last-child{padding:5px 9px;border:1px solid currentColor;border-radius:20px;color:#a9bdd0}#btcCycleHistory .bch-integrity-head [data-state="live"]{color:#4ce0ae!important}#btcCycleHistory .bch-integrity-head [data-state="stale"],#btcCycleHistory .bch-integrity-head [data-state="error"]{color:#ffb56e!important}#btcCycleHistory .bch-integrity-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:9px;margin-top:12px}#btcCycleHistory .bch-integrity-grid>div{position:relative;min-width:0;padding:11px 10px;border-radius:12px;background:rgba(255,255,255,.035);border:1px solid rgba(126,164,195,.16)}#btcCycleHistory .bch-integrity-grid i{display:inline-block;width:7px;height:7px;border-radius:50%;background:#8195a9;margin-right:6px}#btcCycleHistory .bch-integrity-grid i[data-state="live"]{background:#45dfad;box-shadow:0 0 10px #45dfad}#btcCycleHistory .bch-integrity-grid i[data-state="stale"],#btcCycleHistory .bch-integrity-grid i[data-state="error"]{background:#ffad65;box-shadow:0 0 8px rgba(255,173,101,.5)}#btcCycleHistory .bch-integrity-grid span{font-size:9px;letter-spacing:1px;color:#8faac2;font-weight:800}#btcCycleHistory .bch-integrity-grid strong{display:block;margin-top:7px;font-size:13px;color:#edf6ff;overflow-wrap:anywhere}#btcCycleHistory .bch-integrity-grid small{display:block;margin-top:4px;font-size:10px;line-height:1.4;color:#8fa4ba}#btcCycleHistory .bch-integrity>p{margin:10px 2px 0;color:#91a9bf;font-size:10px;line-height:1.5}@media(max-width:560px){#btcCycleHistory .bch-integrity{padding:11px}#btcCycleHistory .bch-integrity-grid{grid-template-columns:1fr;gap:7px}#btcCycleHistory .bch-integrity-grid>div{display:grid;grid-template-columns:1fr auto;align-items:center;column-gap:8px;padding:9px 10px}#btcCycleHistory .bch-integrity-grid strong{grid-column:1;grid-row:2;margin-top:3px}#btcCycleHistory .bch-integrity-grid small{grid-column:2;grid-row:2;text-align:right;margin-top:0}}@media(max-width:560px){#btcCycleHistory .bch-integrity-grid>div{display:block;position:relative;min-width:0;padding:12px 12px 12px 30px!important}#btcCycleHistory .bch-integrity-grid>div>i{position:absolute;left:12px;top:16px;margin:0}#btcCycleHistory .bch-integrity-grid>div>span{display:block;width:100%;max-width:100%;white-space:normal;overflow-wrap:break-word;word-break:normal;line-height:1.45}#btcCycleHistory .bch-integrity-grid>div>strong{display:block;width:100%;max-width:100%;margin-top:5px;white-space:normal;overflow-wrap:anywhere;word-break:normal}#btcCycleHistory .bch-integrity-grid>div>small{display:block;width:100%;max-width:100%;margin-top:4px;text-align:left;white-space:normal;overflow-wrap:anywhere;word-break:normal}}</style><style id="btc-pulse-desktop-motion-layout-v28">@keyframes btcPulseSpinWrapperV28{0%{transform:perspective(1100px) rotateY(0deg) rotateX(5deg) rotateZ(0deg) scale(1)}25%{transform:perspective(1100px) rotateY(90deg) rotateX(2deg) rotateZ(90deg) scale(1.025)}50%{transform:perspective(1100px) rotateY(180deg) rotateX(-5deg) rotateZ(180deg) scale(1.04)}75%{transform:perspective(1100px) rotateY(270deg) rotateX(2deg) rotateZ(270deg) scale(1.025)}100%{transform:perspective(1100px) rotateY(360deg) rotateX(5deg) rotateZ(360deg) scale(1)}}@keyframes btcPulseGlowWrapperV28{0%,100%{filter:brightness(1) drop-shadow(0 0 14px rgba(255,205,116,.28))}50%{filter:brightness(1.2) drop-shadow(0 0 32px rgba(255,207,112,.62))}}#btc-market-overview-v1 #bitcoin-pulse-character{position:relative!important;overflow:hidden!important;isolation:isolate!important}#btc-market-overview-v1 #bitcoin-pulse-character>.btc-pulse-coin-spin{position:absolute!important;left:50%!important;top:50%!important;width:230px!important;height:230px!important;margin-left:-115px!important;margin-top:-115px!important;display:block!important;z-index:30!important;pointer-events:auto!important;cursor:pointer!important;touch-action:manipulation!important;transform-origin:50% 50%!important;transform-style:preserve-3d!important;animation:btcPulseSpinWrapperV28 9s linear infinite,btcPulseGlowWrapperV28 3.2s ease-in-out infinite!important;will-change:transform,filter!important}#btc-market-overview-v1 #bitcoin-pulse-character>.btc-pulse-coin-spin>.btc-pulse-coin{position:relative!important;left:auto!important;top:auto!important;right:auto!important;bottom:auto!important;width:100%!important;height:100%!important;min-width:0!important;min-height:0!important;max-width:none!important;max-height:none!important;margin:0!important;padding:0!important;transform:none!important;translate:none!important;animation:none!important;pointer-events:auto!important;cursor:pointer!important}#btc-market-overview-v1 #bitcoin-pulse-character>.btc-pulse-coin-spin>.btc-pulse-coin span{pointer-events:none!important}@media(min-width:761px){#btc-market-overview-v1 #bitcoin-pulse-character{width:min(100%,860px)!important;max-width:860px!important;height:440px!important;min-height:440px!important;margin:24px auto 12px!important;align-self:center!important}#btc-market-overview-v1 #bitcoin-pulse-character .btc-pulse-aura{left:50%!important;top:50%!important}}@media(max-width:760px){#btc-market-overview-v1 #bitcoin-pulse-character>.btc-pulse-coin-spin{width:174px!important;height:174px!important;margin-left:-87px!important;margin-top:-87px!important}#btc-market-overview-v1 #bitcoin-pulse-character{height:clamp(350px,92vw,420px)!important;min-height:350px!important;max-width:none!important;width:100%!important;margin:22px 0 8px!important;align-self:stretch!important}}@media(prefers-reduced-motion:reduce){#btc-market-overview-v1 #bitcoin-pulse-character>.btc-pulse-coin-spin{animation:btcPulseSpinWrapperV28 9s linear infinite,btcPulseGlowWrapperV28 3.2s ease-in-out infinite!important}}</style><script id="btc-pulse-state-motion-v28">(function(){function start(){var root=document.getElementById("bitcoin-pulse-character");if(!root)return;var spin=root.querySelector(":scope > [data-btc-spin-v28]");if(!spin||spin.dataset.stateWatchV28==="1")return;spin.dataset.stateWatchV28="1";var last=root.getAttribute("data-pulse-state")||"wait";new MutationObserver(function(){var next=root.getAttribute("data-pulse-state")||"neutral";if(next===last)return;last=next;if(typeof spin.animate==="function")spin.animate([{scale:"1"},{scale:"1.12",offset:.3},{scale:".98",offset:.65},{scale:"1"}],{duration:850,easing:"cubic-bezier(.2,.8,.2,1)"});}).observe(root,{attributes:true,attributeFilter:["data-pulse-state"]});}if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",start,{once:true});else start();})();</script><style id="btc-pulse-clean-coin-desktop-v29">@keyframes btcPulseCoinOnlySpinV29{0%{transform:perspective(1000px) rotateX(4deg) rotateY(0deg) scale(1)}25%{transform:perspective(1000px) rotateX(2deg) rotateY(90deg) scale(1.015)}50%{transform:perspective(1000px) rotateX(-3deg) rotateY(180deg) scale(1.025)}75%{transform:perspective(1000px) rotateX(2deg) rotateY(270deg) scale(1.015)}100%{transform:perspective(1000px) rotateX(4deg) rotateY(360deg) scale(1)}}@keyframes btcPulseCoinOnlyGlowV29{0%,100%{filter:brightness(1) drop-shadow(0 0 10px rgba(255,205,116,.24))}50%{filter:brightness(1.12) drop-shadow(0 0 22px rgba(255,207,112,.42))}}#btc-market-overview-v1 #bitcoin-pulse-character .btc-pulse-aura,#btc-market-overview-v1 #bitcoin-pulse-character .btc-pulse-orbit{display:none!important;visibility:hidden!important;animation:none!important;opacity:0!important}#btc-market-overview-v1 #bitcoin-pulse-character:before{content:none!important;display:none!important;animation:none!important}#btc-market-overview-v1 #bitcoin-pulse-character>.btc-pulse-coin-spin{animation:btcPulseCoinOnlySpinV29 10s linear infinite,btcPulseCoinOnlyGlowV29 3.5s ease-in-out infinite!important;filter:none!important}#btc-market-overview-v1 #bitcoin-pulse-character>.btc-pulse-coin-spin>.btc-pulse-coin{box-shadow:inherit!important}#btc-market-overview-v1 #bitcoin-pulse-character>.btc-pulse-coin-spin>.btc-pulse-coin span{pointer-events:none!important}@media(min-width:761px){#btc-market-overview-v1 #bitcoin-pulse-character{width:min(100%,860px)!important;max-width:860px!important;height:360px!important;min-height:360px!important;margin:24px auto 12px!important;align-self:center!important}#btc-market-overview-v1 #bitcoin-pulse-character>.btc-pulse-coin-spin{left:50%!important;top:43%!important;width:184px!important;height:184px!important;margin-left:-92px!important;margin-top:-92px!important}#btc-market-overview-v1 #bitcoin-pulse-character>.btc-pulse-coin-spin>.btc-pulse-coin{width:184px!important;height:184px!important}#btc-market-overview-v1 #bitcoin-pulse-character .btc-pulse-caption{position:absolute!important;left:50%!important;top:auto!important;bottom:18px!important;transform:translateX(-50%)!important;width:min(360px,70%)!important;max-width:360px!important;margin:0!important;z-index:12!important}}@media(max-width:760px){#btc-market-overview-v1 #bitcoin-pulse-character>.btc-pulse-coin-spin{width:174px!important;height:174px!important;margin-left:-87px!important;margin-top:-87px!important;animation:btcPulseCoinOnlySpinV29 10s linear infinite,btcPulseCoinOnlyGlowV29 3.5s ease-in-out infinite!important}#btc-market-overview-v1 #bitcoin-pulse-character{height:clamp(350px,92vw,420px)!important;min-height:350px!important;max-width:none!important;width:100%!important;margin:22px 0 8px!important;align-self:stretch!important}}</style><style id="btc-pulse-coin-only-state-colors-v30">#btc-market-overview-v1 #bitcoin-pulse-character:before{content:none!important;display:none!important;background:none!important;animation:none!important}#btc-market-overview-v1 #bitcoin-pulse-character .btc-pulse-aura,#btc-market-overview-v1 #bitcoin-pulse-character .btc-pulse-orbit,#btc-market-overview-v1 #bitcoin-pulse-character .btc-pulse-burst,#btc-market-overview-v1 #bitcoin-pulse-character .btc-market-mascot-side{display:none!important;visibility:hidden!important;opacity:0!important;animation:none!important;background:none!important;filter:none!important}#btc-market-overview-v1 #bitcoin-pulse-character .btc-pulse-coin-spin{background:none!important;box-shadow:none!important}#btc-market-overview-v1 #bitcoin-pulse-character .btc-pulse-coin-spin>.btc-pulse-coin{transition:background .55s ease,border-color .55s ease,box-shadow .55s ease,filter .55s ease!important}#btc-market-overview-v1 #bitcoin-pulse-character .btc-pulse-coin-spin>.btc-pulse-coin span:after{display:none!important;animation:none!important}#btc-market-overview-v1 #bitcoin-pulse-character[data-pulse-state="wait"] .btc-pulse-coin-spin>.btc-pulse-coin{background:radial-gradient(circle at 32% 24%,#fff4d4 0%,#e6c77f 18%,#aa8645 42%,#70532b 70%,#3d321f 88%,#d7bd82 100%)!important;border-color:#f0d18c!important;box-shadow:inset 0 0 0 3px rgba(255,245,205,.58),inset 0 -12px 20px rgba(73,40,8,.42),0 0 22px rgba(255,208,104,.34),0 0 48px rgba(255,193,80,.14)!important;filter:brightness(1.04) saturate(1.04)!important}#btc-market-overview-v1 #bitcoin-pulse-character[data-pulse-state="buy"] .btc-pulse-coin-spin>.btc-pulse-coin{background:radial-gradient(circle at 32% 24%,#eafff4 0%,#a3ffd4 12%,#42dc9b 28%,#0b9b67 49%,#056447 70%,#023d2e 88%,#9effd0 100%)!important;border-color:#a6ffd8!important;box-shadow:inset 0 0 0 3px rgba(231,255,244,.72),inset 0 -12px 20px rgba(0,48,32,.5),0 0 24px rgba(55,255,157,.62),0 0 48px rgba(55,255,157,.24)!important;filter:brightness(1.08) saturate(1.14)!important}#btc-market-overview-v1 #bitcoin-pulse-character[data-pulse-state="sell"] .btc-pulse-coin-spin>.btc-pulse-coin{background:radial-gradient(circle at 32% 24%,#fff0f2 0%,#ffb7c2 12%,#f05c76 28%,#b62c4b 49%,#76162f 70%,#460d22 88%,#ffc4ce 100%)!important;border-color:#ffb5c1!important;box-shadow:inset 0 0 0 3px rgba(255,240,243,.72),inset 0 -12px 20px rgba(55,0,17,.5),0 0 24px rgba(255,65,100,.62),0 0 48px rgba(255,65,100,.24)!important;filter:brightness(1.08) saturate(1.14)!important}#btc-market-overview-v1 #bitcoin-pulse-character[data-pulse-state="neutral"] .btc-pulse-coin-spin>.btc-pulse-coin{filter:grayscale(.18) brightness(.88)!important;box-shadow:inset 0 0 0 3px rgba(220,230,240,.3),0 0 16px rgba(170,190,210,.14)!important}</style><style id="fear-greed-desktop-compact-layout-v32">@media(min-width:761px){#fearGreedPanel .fg-layout{display:grid!important;grid-template-columns:minmax(190px,240px) minmax(0,1fr)!important;gap:22px!important;align-items:start!important}#fearGreedPanel .fg-score-block{display:flex!important;flex-direction:column!important;align-items:flex-start!important;justify-content:center!important;align-self:start!important;width:100%!important;min-width:0!important;min-height:220px!important;height:auto!important;padding:24px 20px!important;box-sizing:border-box!important;border:1px solid rgba(102,174,211,.22)!important;border-rad
