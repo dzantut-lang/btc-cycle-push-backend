@@ -1,0 +1,380 @@
+ansform,filter!important;transform-origin:50% 50%!important}header.top .brand .btcBrandLogo:before{content:""!important;display:block!important;position:absolute!important;z-index:3!important;inset:-6px!important;border-radius:28px!important;border:2px solid transparent!important;background:conic-gradient(from 0deg,rgba(255,211,132,.05),rgba(89,224,255,.95),rgba(93,140,255,.16),rgba(255,207,112,.98),rgba(255,211,132,.05)) border-box!important;-webkit-mask:linear-gradient(#000 0 0) padding-box,linear-gradient(#000 0 0)!important;-webkit-mask-composite:xor!important;mask-composite:exclude!important;pointer-events:none!important;animation:btcDeskRingV3 5.5s linear infinite!important;filter:drop-shadow(0 0 7px rgba(80,210,255,.55))}header.top .brand .btcBrandLogo:after{inset:0!important;animation:btcLogoSweepVisible 3.7s ease-in-out infinite!important;opacity:1!important}header.top .brand .brand-copy h1{animation:btcDeskTitleV3 4.8s ease-in-out infinite!important}@keyframes btcDeskHaloV3{0%,100%{transform:translateY(0) scale(1);box-shadow:0 0 0 1px rgba(94,222,255,.48),0 0 18px rgba(58,197,255,.48),0 0 34px rgba(242,185,83,.28),inset 0 0 16px rgba(80,190,255,.2)}50%{transform:translateY(-2px) scale(1.035);box-shadow:0 0 0 2px rgba(94,222,255,.85),0 0 30px rgba(58,197,255,.8),0 0 52px rgba(242,185,83,.48),inset 0 0 22px rgba(80,190,255,.35)}}@keyframes btcDeskLogoV3{0%,100%{transform:scale(1) rotate(0deg);filter:brightness(1.05) saturate(1.1) drop-shadow(0 0 5px rgba(95,214,255,.45))}30%{transform:scale(1.075) rotate(1.8deg);filter:brightness(1.24) saturate(1.28) drop-shadow(0 0 12px rgba(95,214,255,.85))}65%{transform:scale(1.035) rotate(-1.2deg);filter:brightness(1.12) saturate(1.18) drop-shadow(0 0 8px rgba(255,205,120,.65))}}@keyframes btcDeskRingV3{to{transform:rotate(360deg)}}@keyframes btcDeskTitleV3{0%,100%{filter:drop-shadow(0 0 2px rgba(105,207,255,.12))}50%{filter:drop-shadow(0 0 14px rgba(105,207,255,.48))}}}</style><a class="wallet-floating-access" href="#portfolioAltcoins" aria-label="Abrir minha carteira cripto" title="Abrir minha carteira"><svg viewBox="0 0 48 48" aria-hidden="true"><path d="M8 13.5A5.5 5.5 0 0 1 13.5 8H36a4 4 0 0 1 4 4v4H13a5 5 0 0 0-5 5z" fill="#263b57" stroke="#86baff" stroke-width="1.7"/><path d="M8 18h30a4 4 0 0 1 4 4v13a5 5 0 0 1-5 5H13a5 5 0 0 1-5-5z" fill="#f7931a" stroke="#ffd58a" stroke-width="1.7"/><path d="M31 23h11v10H31a5 5 0 0 1 0-10z" fill="#101b2b" stroke="#ffe1a8" stroke-width="1.5"/><circle cx="33" cy="28" r="1.7" fill="#ffd58a"/><g data-floating-wallet-bitcoin="v1" fill="none" stroke="#111111" stroke-width="2.15" stroke-linecap="round" stroke-linejoin="round"><path d="M17 22v16M19.8 22v16"/><path d="M18.8 23.2h5.5c2.8 0 4.3 1.2 4.3 3s-1.5 3-4.3 3h-5.5m0 0h6c3 0 4.5 1.2 4.5 3s-1.5 3-4.5 3h-6"/></g></svg><span class="wallet-access-label">CARTEIRA</span><strong class="wallet-access-balance" data-wallet-balance>0 BTC</strong><i aria-hidden="true"></i></a>
+
+<script id="btc-wallet-coin-burst-v1">
+(function(){
+ var btn=document.querySelector('.wallet-floating-access');
+ if(!btn||btn.dataset.coinBurstReady==='1')return;
+ btn.dataset.coinBurstReady='1';
+ var reduced=window.matchMedia&&window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+ btn.addEventListener('click',function(ev){
+   ev.preventDefault();
+   var rect=btn.getBoundingClientRect();
+   if(!reduced){
+     var cx=rect.left+rect.width/2,cy=rect.top+rect.height/2;
+     for(var i=0;i<14;i++){
+       var coin=document.createElement('span');
+       coin.className='wallet-coin-burst';
+       coin.textContent='₿';
+       var angle=(Math.PI*2*i/14)+(Math.random()-.5)*.18;
+       var distance=72+Math.random()*105;
+       coin.style.left=(cx-13)+'px';coin.style.top=(cy-13)+'px';
+       coin.style.setProperty('--wallet-dx',(Math.cos(angle)*distance)+'px');
+       coin.style.setProperty('--wallet-dy',(Math.sin(angle)*distance)+'px');
+       coin.style.setProperty('--wallet-rot',(Math.random()*540-270)+'deg');
+       coin.style.animationDelay=(Math.random()*90)+'ms';
+       document.body.appendChild(coin);
+       setTimeout(function(node){if(node.parentNode)node.parentNode.removeChild(node)},1050,coin);
+     }
+   }
+   window.setTimeout(function(){
+     var target=document.getElementById('portfolioAltcoins');
+     if(target)target.scrollIntoView({behavior:reduced?'auto':'smooth',block:'start'});
+   },reduced?0:260);
+ },{passive:false});
+})();
+</script>
+
+<script id="btc-dominance-module-v1">(function(){const $=id=>document.getElementById(id);let busy=false;const money=v=>{if(!Number.isFinite(v))return "—";const n=v/1e12;return n>=1?"US$ "+n.toLocaleString("pt-BR",{maximumFractionDigits:2})+" tri":"US$ "+(v/1e9).toLocaleString("pt-BR",{maximumFractionDigits:1})+" bi"};function set(id,value){const e=$(id);if(e)e.textContent=value}async function update(){if(busy)return;busy=true;try{const r=await fetch("https://api.coingecko.com/api/v3/global",{cache:"no-store"});if(!r.ok)throw new Error("HTTP "+r.status);const j=await r.json(),d=j&&j.data,dom=Number(d&&d.market_cap_percentage&&d.market_cap_percentage.btc),total=Number(d&&d.total_market_cap&&d.total_market_cap.usd),updated=Number(d&&d.updated_at)*1000;if(!Number.isFinite(dom)||dom<=0||dom>=100||!Number.isFinite(total)||total<=0)throw new Error("Resposta global inválida");set("btcDomValue",dom.toFixed(2).replace(".",",")+"%");set("btcDomBtcCap",money(total*dom/100));set("btcDomTotalCap",money(total));set("btcDomUpdated",new Date(Number.isFinite(updated)&&updated>0?updated:Date.now()).toLocaleTimeString("pt-BR"));set("btcDomChange","Histórico ao vivo no TradingView");set("btcDomReading",dom>=60?"Dominância elevada: o Bitcoin concentra parcela expressiva da capitalização. Observe a direção da BTC.D e sua relação com o preço do BTC.":dom>=55?"Bitcoin com forte participação no mercado. A direção da BTC.D ajuda a identificar concentração ou rotação de capital.":dom>=50?"Bitcoin representa mais da metade do mercado. Compare a direção da dominância com o preço do BTC.":"Dominância abaixo de 50%: os demais criptoativos somam a maior parcela da capitalização.");set("btcDomHistoryNote","Histórico completo do TradingView · CRYPTOCAP:BTC.D · selecione 1D, 5D, 1M, 3M, 6M, YTD, 1A, 5A ou Todos; use zoom, cursor, indicadores e ferramentas do gráfico.");const s=$("btcDomStatus");if(s){s.textContent="ATUALIZADO · "+new Date().toLocaleTimeString("pt-BR");s.className="pill"}set("btcDomHubValue","BTC.D · "+dom.toFixed(2).replace(".",",")+"%")}catch(e){const s=$("btcDomStatus");if(s){s.textContent="DADOS INDISPONÍVEIS";s.className="pill warn"}set("btcDomValue","—");console.warn("BTC Dominance:",e)}finally{busy=false}}function init(){if(!$("btcDominancePanel")||$("btcDominancePanel").dataset.domEnhanced==="tv")return;$("btcDominancePanel").dataset.domEnhanced="tv";const target=$("btcDomTradingViewChart");if(target){const config={autosize:true,symbol:"CRYPTOCAP:BTC.D",interval:"D",timezone:"America/Sao_Paulo",theme:"dark",style:"1",locale:"br",allow_symbol_change:false,calendar:false,hide_side_toolbar:false,hide_top_toolbar:false,withdateranges:true,range:"5Y",details:true,hotlist:false,show_popup_button:true,save_image:false,studies:[],support_host:"https://www.tradingview.com"};const script=document.createElement("script");script.type="text/javascript";script.src="https://s3.tradingview.com/external-embedding/embed-widget-advanced-chart.js";script.async=true;script.text=JSON.stringify(config);target.appendChild(script)}update();setInterval(update,5*60*1000)}if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",init,{once:true});else init()})();</script><script id="btc-dominance-visual-v2">;(function(){function syncBtcDomHub(){var a=document.getElementById("btcDomValue"),b=document.getElementById("btcDomHubValue");if(a&&b){var v=a.textContent.trim();b.textContent=v&&v!=="—"?"BTC.D · "+v:"BTC.D · aguardando dados";}}document.addEventListener("DOMContentLoaded",function(){syncBtcDomHub();var n=document.getElementById("btcDominancePanel");if(n&&window.MutationObserver)new MutationObserver(syncBtcDomHub).observe(n,{subtree:true,childList:true,characterData:true});});})();</script>
+<script id="btc-dominance-card-jump-fix-v1">
+(function(){
+  function bindDominanceJump(){
+    if(document.documentElement.dataset.btcDomJumpBound==="1") return;
+    document.documentElement.dataset.btcDomJumpBound="1";
+    document.addEventListener("click",function(event){
+      var button=event.target.closest('.indicator-hub-grid button[data-jump="btcDominancePanel"]');
+      if(!button) return;
+      if(document.body && document.body.getAttribute("data-ce4-mode")==="essential"){event.preventDefault();event.stopImmediatePropagation();return;}
+      var target=document.getElementById("btcDominancePanel");
+      if(!target) return;
+      event.preventDefault();
+      event.stopImmediatePropagation();
+      target.scrollIntoView({behavior:window.matchMedia("(prefers-reduced-motion: reduce)").matches?"auto":"smooth",block:"start"});
+      target.setAttribute("tabindex","-1");
+      try{target.focus({preventScroll:true});}catch(error){}
+      document.querySelectorAll('.indicator-hub-grid button[data-jump]').forEach(function(item){
+        item.classList.toggle("nav-active",item===button);
+      });
+    },true);
+  }
+  if(document.readyState==="loading") document.addEventListener("DOMContentLoaded",bindDominanceJump,{once:true});
+  else bindDominanceJump();
+})();
+</script>
+
+<style id="btc-dominance-tradingview-history-style-v1">
+#btcDomTradingViewChart{background:#071321;border:1px solid rgba(91,167,204,.18);box-shadow:inset 0 0 36px rgba(27,105,153,.08)}
+@media(max-width:600px){#btcDomTradingViewChart{height:370px!important;min-height:330px}}
+</style>
+
+<style id="btc-dominance-essential-availability-v1">
+/* BTC Dominance: módulo avançado, oculto no Essencial e sinalizado em vermelho no hub. */
+body.mode-essential #btcDominancePanel,
+body[data-ce4-mode="essential"] #btcDominancePanel{display:none!important}
+body.mode-advanced #btcDominancePanel,
+body[data-ce4-mode="advanced"] #btcDominancePanel{display:block!important}
+body[data-ce4-mode="essential"] .indicator-hub-grid [data-jump="btcDominancePanel"]{
+  background:linear-gradient(145deg,rgba(105,25,39,.94),rgba(42,13,23,.98))!important;
+  border:1px solid rgba(255,104,122,.72)!important;
+  box-shadow:inset 0 0 0 1px rgba(255,132,145,.13),0 8px 24px rgba(110,18,35,.18)!important;
+  color:#fff0f2!important;cursor:default!important;opacity:1!important
+}
+body[data-ce4-mode="essential"] .indicator-hub-grid [data-jump="btcDominancePanel"] strong{color:#fff4f5!important}
+body[data-ce4-mode="essential"] .indicator-hub-grid [data-jump="btcDominancePanel"] small{color:#f0cbd0!important}
+body[data-ce4-mode="essential"] .indicator-hub-grid [data-jump="btcDominancePanel"] .indicator-number{color:#ff9ba7!important}
+body[data-ce4-mode="essential"] .indicator-hub-grid [data-jump="btcDominancePanel"] .indicator-art{background:rgba(255,91,111,.12)!important;border-color:rgba(255,120,136,.28)!important}
+body[data-ce4-mode="essential"] .indicator-hub-grid [data-jump="btcDominancePanel"] .indicator-action{display:none!important}
+body[data-ce4-mode="essential"] .indicator-hub-grid [data-jump="btcDominancePanel"]:after{
+  content:"INDISPONÍVEL NO ESSENCIAL · DISPONÍVEL NO AVANÇADO";
+  display:block;margin-top:auto;padding-top:9px;color:#ff9eaa;font-size:9px;font-weight:900;letter-spacing:.045em;line-height:1.4
+}
+body[data-ce4-mode="essential"] .indicator-hub-grid [data-jump="btcDominancePanel"]:hover{
+  transform:none!important;background:linear-gradient(145deg,rgba(105,25,39,.94),rgba(42,13,23,.98))!important;border-color:rgba(255,104,122,.72)!important
+}
+/* BTC-CYCLE-MOBILE-UX-FIX-V2 */
+#btcCycleTimeIntelligence .bct-year-ruler{height:98px!important}
+#btcCycleTimeIntelligence .bct-now-pin b{top:48px!important;right:0!important;left:auto!important;transform:none!important;z-index:4;background:#123a50!important;border:1px solid rgba(100,216,239,.55);box-shadow:0 2px 8px rgba(0,0,0,.28)}
+#btcCycleTimeIntelligence .bct-now-pin{z-index:4}
+#btcCycleTimeIntelligence .bct-year-ruler>span{z-index:1}
+#btcCycleTimeIntelligence .bct-halving-pin{z-index:2}
+#btcCycleTimeIntelligence .bct-year-ruler-card{padding-bottom:15px}
+#btcCycleTimeIntelligence .bct-visual-map{isolation:isolate}
+#btcCycleTimeIntelligence .bct-visual-rows{gap:20px}
+#btcCycleTimeIntelligence .bct-visual-row-head{margin-bottom:9px}
+#btcCycleTimeIntelligence .bct-visual-track{height:62px}
+#btcCycleTimeIntelligence .bct-line-chart-cta{position:relative;z-index:1}
+@media(max-width:650px){
+ .wallet-floating-access{width:52px!important;min-width:52px!important;max-width:52px!important;height:52px!important;min-height:52px!important;right:12px!important;bottom:calc(env(safe-area-inset-bottom,0px) + 16px)!important;display:flex!important;flex-direction:row!important;align-items:center!important;justify-content:center!important;gap:0!important;padding:7px!important;border-radius:50%!important;overflow:hidden!important;box-shadow:0 5px 20px rgba(0,0,0,.48),0 0 14px rgba(247,147,26,.25)!important}
+ .wallet-floating-access .wallet-access-label,.wallet-floating-access .wallet-access-balance{display:none!important}
+ .wallet-floating-access svg{width:31px!important;height:31px!important;flex:0 0 31px!important}
+ .wallet-floating-access i{right:5px!important;top:5px!important}
+ #btcCycleTimeIntelligence .bct-year-ruler{height:102px!important;margin-left:3px!important;margin-right:3px!important}
+ #btcCycleTimeIntelligence .bct-year-ruler>span{font-size:7px!important}
+ #btcCycleTimeIntelligence .bct-halving-pin b{font-size:6px!important;padding:2px 3px!important}
+ #btcCycleTimeIntelligence .bct-now-pin b{top:49px!important;font-size:7px!important;padding:3px 6px!important}
+ #btcCycleTimeIntelligence .bct-visual-map{padding:14px 12px!important}
+ #btcCycleTimeIntelligence .bct-visual-track{height:58px!important}
+ #btcCycleTimeIntelligence .bct-visual-phase b{font-size:7px!important}
+ #btcCycleTimeIntelligence .bct-visual-phase strong{font-size:10px!important}
+ #btcCycleTimeIntelligence .bct-visual-row-head strong{font-size:12px!important}
+ #btcCycleTimeIntelligence .bct-visual-row-head span{font-size:8px!important}
+ #btcCycleTimeIntelligence .bct-visual-legend{gap:10px!important;margin-bottom:14px!important}
+ #btcCycleTimeIntelligence .bct-visual-rows{gap:18px!important}
+ #btcCycleTimeIntelligence .bct-line-chart-cta{margin-bottom:14px!important}
+}
+@media(prefers-reduced-motion:reduce){.wallet-floating-access{animation:none!important}}
+</style>
+<style id="btc-wallet-mobile-cascade-final-v4">
+/* Última regra intencional: prevalece sobre estilos mobile legados */
+body:has(#btcGenesisIntro) .wallet-floating-access{display:none!important}
+.wallet-floating-access{position:fixed!important;top:auto!important;right:18px!important;bottom:calc(env(safe-area-inset-bottom,0px) + 158px)!important;z-index:2147483000!important;width:218px!important;min-width:218px!important;max-width:calc(100vw - 28px)!important;height:62px!important;min-height:62px!important;box-sizing:border-box!important;display:grid!important;grid-template-columns:38px minmax(0,1fr)!important;grid-template-rows:20px 20px!important;align-content:center!important;align-items:center!important;justify-items:start!important;column-gap:9px!important;row-gap:0!important;padding:8px 15px 8px 10px!important;overflow:hidden!important;border:1px solid rgba(255,211,139,.9)!important;border-radius:32px!important;background:linear-gradient(125deg,#071625 0%,#17263d 55%,#101b30 100%)!important;color:#fff!important;text-decoration:none!important;box-shadow:0 8px 28px rgba(0,0,0,.48),0 0 18px rgba(247,147,26,.22),inset 0 1px rgba(255,255,255,.1)!important;opacity:1!important;visibility:visible!important;pointer-events:auto!important;animation:walletAccessFloat 3.1s ease-in-out infinite!important}
+.wallet-floating-access svg{grid-column:1!important;grid-row:1/3!important;width:35px!important;height:35px!important;flex:0 0 35px!important;align-self:center!important;display:block!important;filter:drop-shadow(0 0 7px rgba(247,147,26,.45))!important;animation:none!important}
+.wallet-floating-access .wallet-access-label{grid-column:2!important;grid-row:1!important;display:block!important;min-width:0!important;max-width:100%!important;align-self:end!important;color:#f7c879!important;font:900 9px/1 Inter,system-ui,Arial,sans-serif!important;letter-spacing:1.25px!important;white-space:nowrap!important}
+.wallet-floating-access .wallet-access-balance{grid-column:2!important;grid-row:2!important;display:block!important;min-width:0!important;max-width:100%!important;align-self:start!important;color:#fff!important;font:900 12px/1.25 Inter,system-ui,Arial,sans-serif!important;letter-spacing:0!important;white-space:nowrap!important;font-variant-numeric:tabular-nums!important;text-shadow:0 0 10px rgba(255,205,125,.22)!important}
+.wallet-floating-access i{position:absolute!important;right:9px!important;top:7px!important;width:5px!important;height:5px!important;border-radius:50%!important;background:#70e5e8!important;box-shadow:0 0 8px #70e5e8!important}
+@media(max-width:650px){.wallet-floating-access{right:12px!important;bottom:calc(env(safe-area-inset-bottom,0px) + 158px)!important;width:196px!important;min-width:196px!important;max-width:calc(100vw - 24px)!important;height:58px!important;min-height:58px!important;display:grid!important;grid-template-columns:34px minmax(0,1fr)!important;grid-template-rows:18px 19px!important;column-gap:8px!important;padding:7px 12px 7px 9px!important;border-radius:30px!important;overflow:hidden!important}.wallet-floating-access svg{width:32px!important;height:32px!important;flex-basis:32px!important}.wallet-floating-access .wallet-access-label{display:block!important;font-size:8px!important}.wallet-floating-access .wallet-access-balance{display:block!important;font-size:11px!important}}
+@media(max-width:360px){.wallet-floating-access{width:184px!important;min-width:184px!important;right:10px!important}.wallet-floating-access .wallet-access-balance{font-size:10px!important}}
+@media(prefers-reduced-motion:reduce){.wallet-floating-access{animation:none!important}}
+@keyframes walletAccessFloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-3px)}}
+</style>
+
+
+<script id="btc-cycle-time-intelligence-script-v1">
+(function(){
+ const root=document.getElementById('btcCycleTimeIntelligence');
+ if(!root||root.dataset.initialized==='1')return;
+ root.dataset.initialized='1';
+ const cycles=[
+  {name:'Ciclo 2015–2018',low:'2015-01-14',peak:'2017-12-17',up:1068,down:363},
+  {name:'Ciclo 2018–2022',low:'2018-12-15',peak:'2021-11-10',up:1061,down:376},
+  {name:'Ciclo 2022–atual',low:'2022-11-21',peak:'2025-10-06',up:1050,down:null}
+ ];
+ const peakDate='2025-10-06';
+ const dayMs=86400000;
+ const dateKey=(date)=>{
+  const y=date.getFullYear();
+  const m=String(date.getMonth()+1).padStart(2,'0');
+  const d=String(date.getDate()).padStart(2,'0');
+  return y+'-'+m+'-'+d;
+ };
+ const daysBetween=(start,end)=>{
+  const a=Date.parse(start+'T00:00:00Z');
+  const b=Date.parse(end+'T00:00:00Z');
+  return Math.max(0,Math.floor((b-a)/dayMs));
+ };
+ const formatTime=(date)=>new Intl.DateTimeFormat('pt-BR',{
+  hour:'2-digit',minute:'2-digit',second:'2-digit',hour12:false
+ }).format(date);
+ const formatDate=(date)=>new Intl.DateTimeFormat('pt-BR',{
+  day:'2-digit',month:'short',year:'numeric'
+ }).format(date);
+ const rowsNode=document.getElementById('bctCycleRows');
+ const visualRows=document.getElementById('bctVisualRows');
+ const daysNode=document.getElementById('bctCurrentDays');
+ const phase=document.getElementById('bctCurrentPhase');
+ const delta=document.getElementById('bctCurrentDelta');
+ const note=document.getElementById('bctCurrentNote');
+ const updated=document.getElementById('bctLastUpdated');
+ const liveStatus=document.getElementById('bctLiveStatus');
+ const max=1500;
+ function render(){
+  const now=new Date();
+  const today=dateKey(now);
+  const current=daysBetween(peakDate,today);
+  const rows=cycles.map(c=>{
+   const down=c.down===null?current:c.down;
+   const upW=Math.min(100,c.up/max*100).toFixed(2);
+   const downW=Math.min(100,down/max*100).toFixed(2);
+   const downClass=c.down===null?'bct-bar-current':'bct-bar-down';
+   const downText=c.down===null?down+' d':down+' d';
+   return '<div class="bct-cycle-row" role="listitem"><div class="bct-cycle-label"><b>'+c.name+'</b><small>'+c.low+' → '+c.peak+'</small></div><div class="bct-bars" aria-label="Alta '+c.up+' dias; baixa '+down+' dias"><span class="bct-bar-up" style="width:'+upW+'%">'+c.up+' d</span><span class="'+downClass+'" style="width:'+downW+'%">'+downText+'</span></div></div>';
+  }).join('');
+  if(rowsNode)rowsNode.innerHTML=rows;
+  if(visualRows){
+   const visualData=[
+    {name:'2015—2018',start:'14 JAN 2015',peak:'17 DEZ 2017',end:'15 DEZ 2018',up:1068,down:363,open:false},
+    {name:'2018—2022',start:'15 DEZ 2018',peak:'10 NOV 2021',end:'21 NOV 2022',up:1061,down:376,open:false},
+    {name:'2022—ATUAL',start:'21 NOV 2022',peak:'06 OUT 2025',end:'HOJE',up:1050,down:current,open:true}
+   ];
+   visualRows.innerHTML=visualData.map(c=>{
+    const total=c.up+c.down;
+    const upPct=(c.up/total*100).toFixed(2);
+    const downPct=(c.down/total*100).toFixed(2);
+    const endLabel=c.open?c.down+' DIAS · ATUAL':c.down+' DIAS';
+    return '<div class="bct-visual-row" role="listitem"><div class="bct-visual-row-head"><strong>'+c.name+'</strong><span>'+c.start+' → '+c.end+'</span></div><div class="bct-visual-track"><div class="bct-visual-phase bct-visual-up" style="width:'+upPct+'%"><b>ALTA</b><strong>'+c.up.toLocaleString('pt-BR')+' DIAS</strong></div><div class="bct-visual-phase '+(c.open?'bct-visual-now':'bct-visual-down')+'" style="width:'+downPct+'%"><b>'+(c.open?'EM CURSO':'BAIXA')+'</b><strong>'+endLabel+'</strong></div></div><div class="bct-visual-dates"><span>FUNDO</span><span>TOPO · '+c.peak+'</span><span>'+(c.open?'CONTAGEM ABERTA':'FUNDO')+'</span></div></div>';
+   }).join('');
+  }
+
+  const halvingRows=document.getElementById('bctHalvingRows');
+  if(halvingRows){
+   const halvingCycles=[
+    {name:'HALVING 2012',date:'2012-11-28',end:'2016-07-09',label:'Ciclo 1',top:'2013-12-04',bottom:'2015-01-14',bottomPrice:166.45,bottomState:'confirmado'},
+    {name:'HALVING 2016',date:'2016-07-09',end:'2020-05-11',label:'Ciclo 2',top:'2017-12-17',bottom:'2018-12-15',bottomPrice:3125,bottomState:'confirmado'},
+    {name:'HALVING 2020',date:'2020-05-11',end:'2024-04-20',label:'Ciclo 3',top:'2021-11-10',bottom:'2022-11-21',bottomPrice:15474,bottomState:'confirmado'},
+    {name:'HALVING 2024',date:'2024-04-20',end:null,label:'Ciclo atual',current:true,top:'2025-10-06',bottom:'2026-07-01',bottomPrice:57748,bottomState:'provisório'}
+   ];
+   const scale=1500;
+   const completedDurations=halvingCycles.filter(c=>c.end).map(c=>daysBetween(c.date,c.end)).sort((a,b)=>a-b);
+   const medianDuration=completedDurations[Math.floor(completedDurations.length/2)];
+   const moneyUSD=(value)=>'USD '+Number(value).toLocaleString('en-US',{maximumFractionDigits:0});
+   halvingRows.innerHTML=halvingCycles.map(c=>{
+    const liveLow=window.__btcHalvingLiveLowData;
+    if(c.current&&liveLow&&Number.isFinite(Number(liveLow.t))&&Number.isFinite(Number(liveLow.p))&&Number(liveLow.p)>0){c.bottom=new Date(Number(liveLow.t)).toISOString().slice(0,10);c.bottomPrice=Number(liveLow.p);c.bottomState='ao vivo';}
+    const elapsed=daysBetween(c.date,today);
+    const duration=c.end?daysBetween(c.date,c.end):elapsed;
+    const pct=Math.min(100,elapsed/scale*100);
+    const full=Math.min(100,duration/scale*100);
+    const topDay=daysBetween(c.date,c.top);
+    const topPct=Math.min(100,topDay/scale*100);
+    const bottomDay=daysBetween(c.date,c.bottom);
+    const bottomDisplayDay=c.current&&liveLow?daysBetween(peakDate,c.bottom):bottomDay;
+    const bottomPct=Math.min(100,bottomDay/scale*100);
+    const currentVsMedian=(elapsed/medianDuration*100).toLocaleString('pt-BR',{minimumFractionDigits:1,maximumFractionDigits:1});
+    const endText=c.end?duration.toLocaleString('pt-BR')+' dias entre halvings':elapsed.toLocaleString('pt-BR')+' dias decorridos · '+currentVsMedian+'% da mediana histórica ('+medianDuration.toLocaleString('pt-BR')+' dias)';
+    const footText=c.end?duration.toLocaleString('pt-BR')+' dias entre halvings':elapsed.toLocaleString('pt-BR')+' dias desde o halving · ciclo em andamento';
+    const topDate=new Date(c.top+'T00:00:00Z').toLocaleDateString('pt-BR',{day:'2-digit',month:'short',year:'numeric',timeZone:'UTC'});
+    const bottomDate=new Date(c.bottom+'T00:00:00Z').toLocaleDateString('pt-BR',{day:'2-digit',month:'short',year:'numeric',timeZone:'UTC'});
+    const topLabel=c.current?'TOPO ATUAL · REFERÊNCIA':'TOPO DO MERCADO';
+    const topMarker='<i class="bct-market-top-marker '+(c.current?'is-current-top':'')+'" role="img" aria-label="'+topLabel+' em '+topDate+'" title="'+topLabel+' · '+topDate+' · dia '+topDay+' após o halving" style="left:'+topPct.toFixed(2)+'%"></i>';
+    const bottomLabel=c.current?'MENOR MÍNIMA DESDE O TOPO · BINANCE':(c.bottomState==='provisório'?'FUNDO PROVISÓRIO · MENOR OBSERVADO':'FUNDO DO BEAR MARKET');
+    const bottomMarker='<i class="bct-bear-bottom-marker '+(c.current?'is-provisional':'')+'" role="img" aria-label="'+bottomLabel+' em '+bottomDate+'" title="'+bottomLabel+' · '+bottomDate+' · D+'+bottomDay+' desde o halving · '+(c.current?'D+'+bottomDisplayDay+' desde o topo · ':'')+moneyUSD(c.bottomPrice)+'" style="left:'+bottomPct.toFixed(2)+'%;'+(c.current?'top:26%;':'')+'"></i>';
+    const topInfo='<div class="bct-market-top-info"><span>'+topLabel+'</span><b>'+topDate+' · D+'+topDay+'</b></div>';
+    const bottomInfo='<div class="bct-bear-bottom-info"><span>'+bottomLabel+'</span><b>'+bottomDate+' · D+'+(c.current?bottomDisplayDay+' desde o topo':bottomDay)+' · '+moneyUSD(c.bottomPrice)+'</b></div>';
+    const todayMarker=c.current?'<i class="bct-halving-today" role="img" aria-label="Posição atual no ciclo do halving" title="Hoje · dia '+elapsed.toLocaleString('pt-BR')+' desde o halving" style="left:'+pct.toFixed(2)+'%;top:74%;"></i>':'';
+    return '<div class="bct-halving-row '+(c.current?'is-current':'')+'" role="listitem"><div class="bct-halving-row-head"><strong>'+c.name+'</strong><span>'+c.label+' · '+endText+'</span></div><div class="bct-halving-track"><span class="bct-halving-fill '+(c.current?'current':'history')+'" style="width:'+full.toFixed(2)+'%"></span>'+topMarker+bottomMarker+todayMarker+'</div>'+topInfo+bottomInfo+'<div class="bct-halving-row-foot"><span>'+new Date(c.date+'T00:00:00Z').toLocaleDateString('pt-BR',{day:'2-digit',month:'short',year:'numeric',timeZone:'UTC'})+'</span><b>'+footText+'</b></div></div>';
+   }).join('');
+   const legend=halvingRows.parentElement.querySelector('.bct-cycle-compare-foot');
+   if(legend){
+    if(!legend.querySelector('.bct-top-legend'))legend.insertAdjacentHTML('beforeend','<span><i class="bct-top-legend"></i> Topo de mercado</span>');
+    if(!legend.dataset.bottomLegend){legend.dataset.bottomLegend='1';legend.insertAdjacentHTML('beforeend','<span><i class="bct-bottom-legend"></i> Fundo bear market</span><span><i class="bct-bottom-legend provisional"></i> Menor mínima desde o topo · Binance</span>');}
+   }
+   if(!halvingRows.parentElement.querySelector('.bct-bottom-method-note'))halvingRows.insertAdjacentHTML('afterend','<p class="bct-bottom-method-note">Marcadores verdes: topos de mercado históricos e topo de referência atual. Marcadores vermelhos nos ciclos concluídos: fundos dos bear markets. No ciclo 2024, o vermelho indica a menor mínima diária observada na Binance desde 06/10/2025; o dourado indica a posição temporal atual. Preços em USD; não são sinais de compra ou venda.</p>');
+  }
+  const openLines=document.getElementById('bctOpenHistoricalLines');
+  if(openLines&&!openLines.dataset.ready){
+   openLines.dataset.ready='1';
+   openLines.addEventListener('click',()=>{const target=document.getElementById('btcCycleHistory');if(!target)return;target.scrollIntoView({behavior:'smooth',block:'start'});const canvas=document.getElementById('bchOverlayChart');if(canvas)setTimeout(()=>canvas.scrollIntoView({behavior:'smooth',block:'center'}),700);});
+  }
+  const progressDays=document.getElementById('bctProgressDays');
+  const progressPercent=document.getElementById('bctProgressPercent');
+  const progressFill=document.getElementById('bctProgressFill');
+  const progressExcess=document.getElementById('bctProgressExcess');
+  const progress=Math.min(200,current/365*100);
+  if(progressDays)progressDays.textContent=current.toLocaleString('pt-BR')+' / 365 dias';
+  if(progressPercent)progressPercent.textContent=(current/365*100).toLocaleString('pt-BR',{minimumFractionDigits:1,maximumFractionDigits:1})+'% da referência';
+  if(progressFill)progressFill.style.width=Math.min(100,progress)+'%';
+  if(progressExcess)progressExcess.textContent=current>365?'+'+(current-365).toLocaleString('pt-BR')+' dias além da referência':(365-current).toLocaleString('pt-BR')+' dias até a referência';
+  const ruler=root.querySelector('.bct-now-pin');
+  if(ruler){const start=Date.UTC(2015,0,1),finish=Date.UTC(2027,0,1);const position=Math.max(0,Math.min(100,(now.getTime()-start)/(finish-start)*100));ruler.style.left=position.toFixed(3)+'%';}
+
+  const positionChip=document.getElementById('bctPositionChip');
+  const positionTitle=document.getElementById('bctPositionTitle');
+  const positionText=document.getElementById('bctPositionText');
+  const positionMarker=document.getElementById('bctPositionMarker');
+  const positionElapsed=document.getElementById('bctPositionElapsed');
+  const positionVsRef=document.getElementById('bctPositionVsRef');
+  const positionPct=Math.min(100,current/365*100);
+  if(positionChip)positionChip.textContent='PÓS-TOPO · EM ACOMPANHAMENTO';
+  if(positionTitle)positionTitle.textContent=current>365?'Já ultrapassamos a referência temporal de baixa':'Estamos dentro da referência temporal histórica após o topo';
+  if(positionText)positionText.textContent='Passaram-se '+current.toLocaleString('pt-BR')+' dias desde o topo de 06/10/2025. A régua compara esse tempo com a referência histórica de 365 dias — não determina sozinha a fase de preço.';
+  if(positionMarker)positionMarker.style.left=positionPct.toFixed(2)+'%';
+  if(positionElapsed)positionElapsed.textContent=current.toLocaleString('pt-BR')+' dias desde o topo';
+  if(positionVsRef)positionVsRef.textContent=current>365?(current-365).toLocaleString('pt-BR')+' dias além da referência':(365-current).toLocaleString('pt-BR')+' dias até a referência';
+
+  if(daysNode)daysNode.innerHTML=current+' <small>DIAS</small>';
+  if(phase)phase.textContent='Desde o topo de 06/10/2025 · '+formatDate(now);
+  const difference=current-365;
+  if(delta)delta.textContent=(difference>=0?'+':'')+difference+' dias vs. referência de baixa';
+  if(note)note.textContent=current>365
+   ?'A duração ultrapassou a referência histórica de 365 dias. Isso não confirma que o fundo ocorreu.'
+   :'A fase atual ainda está dentro da referência histórica de 365 dias.';
+  if(updated)updated.textContent='Atualizado às '+formatTime(now)+' · horário local';
+  if(liveStatus)liveStatus.textContent='CONTADOR AUTOMÁTICO · AO VIVO';
+  root.dataset.lastUpdated=now.toISOString();
+ }
+ render();
+ const timer=setInterval(render,30000);
+ root.addEventListener('DOMNodeRemoved',function(){
+  if(!document.body.contains(root))clearInterval(timer);
+ },{once:true});
+})();
+</script>
+
+<style id="btc-wallet-premium-ux-v5">
+/* Cartão premium: separado do selo Wix e do botão voltar ao topo */
+body:has(#btcGenesisIntro) .wallet-floating-access{display:none!important}
+.wallet-floating-access{position:fixed!important;top:auto!important;left:22px!important;right:auto!important;bottom:calc(env(safe-area-inset-bottom,0px) + 24px)!important;z-index:2147483000!important;width:224px!important;min-width:224px!important;max-width:calc(100vw - 28px)!important;height:66px!important;min-height:66px!important;box-sizing:border-box!important;display:grid!important;grid-template-columns:40px minmax(0,1fr)!important;grid-template-rows:21px 22px!important;align-content:center!important;align-items:center!important;justify-items:start!important;column-gap:10px!important;row-gap:1px!important;padding:9px 15px 9px 11px!important;overflow:hidden!important;border:1px solid rgba(255,211,139,.88)!important;border-radius:19px!important;background:linear-gradient(112deg,rgba(10,24,39,.98),rgba(20,35,55,.98) 56%,rgba(10,20,35,.99))!important;color:#fff!important;text-decoration:none!important;box-shadow:0 9px 28px rgba(0,0,0,.43),0 0 20px rgba(247,147,26,.16),inset 0 1px rgba(255,255,255,.12)!important;opacity:1!important;visibility:visible!important;pointer-events:auto!important;animation:walletPremiumFloat 4.5s ease-in-out infinite!important}
+.wallet-floating-access:before{content:"";position:absolute;left:0;right:0;top:0;height:2px;background:linear-gradient(90deg,#f7931a,#ffe0a2 45%,#62d7ef);opacity:.95}
+.wallet-floating-access:after{content:"";position:absolute;inset:0;pointer-events:none;background:linear-gradient(115deg,transparent 20%,rgba(255,255,255,.055) 48%,transparent 72%);transform:translateX(-110%);animation:walletPremiumSheen 7s ease-in-out infinite}
+.wallet-floating-access svg{grid-column:1!important;grid-row:1/3!important;width:37px!important;height:37px!important;flex:0 0 37px!important;align-self:center!important;display:block!important;filter:drop-shadow(0 0 8px rgba(247,147,26,.42))!important;animation:none!important}
+.wallet-floating-access .wallet-access-label{grid-column:2!important;grid-row:1!important;display:block!important;min-width:0!important;max-width:100%!important;align-self:end!important;color:#f4c879!important;font:900 8px/1 Inter,system-ui,Arial,sans-serif!important;letter-spacing:1.5px!important;white-space:nowrap!important}
+.wallet-floating-access .wallet-access-balance{grid-column:2!important;grid-row:2!important;display:block!important;min-width:0!important;max-width:100%!important;align-self:start!important;color:#f7fbff!important;font:900 13px/1.25 Inter,system-ui,Arial,sans-serif!important;letter-spacing:.1px!important;white-space:nowrap!important;font-variant-numeric:tabular-nums!important;text-shadow:0 0 10px rgba(255,205,125,.18)!important}
+.wallet-floating-access i{position:absolute!important;right:9px!important;top:8px!important;width:5px!important;height:5px!important;border-radius:50%!important;background:#70e5e8!important;box-shadow:0 0 8px #70e5e8!important}
+.wallet-floating-access:hover{border-color:#fff0c8!important;box-shadow:0 12px 32px rgba(0,0,0,.5),0 0 25px rgba(247,147,26,.28),inset 0 1px rgba(255,255,255,.16)!important;filter:brightness(1.08)!important}
+.wallet-floating-access:active{transform:translateY(1px) scale(.98)!important}
+#portfolioAltcoins{scroll-margin-top:82px}
+@media(max-width:650px){.wallet-floating-access{left:12px!important;right:auto!important;bottom:calc(env(safe-area-inset-bottom,0px) + 18px)!important;width:194px!important;min-width:194px!important;max-width:calc(100vw - 24px)!important;height:60px!important;min-height:60px!important;grid-template-columns:35px minmax(0,1fr)!important;grid-template-rows:19px 20px!important;column-gap:8px!important;row-gap:1px!important;padding:8px 12px 8px 9px!important;border-radius:17px!important}.wallet-floating-access svg{width:33px!important;height:33px!important;flex-basis:33px!important}.wallet-floating-access .wallet-access-label{font-size:7.5px!important;letter-spacing:1.25px!important}.wallet-floating-access .wallet-access-balance{font-size:11.5px!important}}
+@media(max-width:360px){.wallet-floating-access{left:10px!important;width:184px!important;min-width:184px!important}.wallet-floating-access .wallet-access-balance{font-size:10.5px!important}}
+@media(prefers-reduced-motion:reduce){.wallet-floating-access{animation:none!important}.wallet-floating-access:after{animation:none!important}}
+@keyframes walletPremiumFloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-2px)}}
+@keyframes walletPremiumSheen{0%,72%,100%{transform:translateX(-110%)}88%{transform:translateX(110%)}}
+</style>
+<style id="btc-cycle-time-ux-v4">
+#btcCycleTimeIntelligence .bct-phase-progress{margin:0 0 18px;padding:15px 17px 13px;border:1px solid rgba(95,169,211,.3);border-radius:14px;background:linear-gradient(115deg,rgba(15,37,58,.94),rgba(10,25,42,.92));box-shadow:inset 0 1px rgba(255,255,255,.035)}
+#btcCycleTimeIntelligence .bct-phase-progress-head{display:flex;align-items:flex-end;justify-content:space-between;gap:12px}
+#btcCycleTimeIntelligence .bct-phase-progress-head span{display:block;color:#9db5cb;font-size:9px;font-weight:900;letter-spacing:.13em}
+#btcCycleTimeIntelligence .bct-phase-progress-head strong{display:block;margin-top:6px;color:#f0f6ff;font-size:clamp(17px,2vw,22px);font-variant-numeric:tabular-nums}
+#btcCycleTimeIntelligence .bct-phase-progress-head>b{color:#8edcf2;font-size:14px;font-weight:900;font-variant-numeric:tabular-nums}
+#btcCycleTimeIntelligence .bct-phase-progress-track{position:relative;height:10px;margin:12px 0 9px;overflow:visible;border-radius:20px;background:rgba(67,91,117,.38);box-shadow:inset 0 2px 4px rgba(0,0,0,.35)}
+#btcCycleTimeIntelligence .bct-phase-progress-track>span{position:absolute;left:0;top:0;height:100%;max-width:100%;border-radius:20px;background:linear-gradient(90deg,#2879aa,#65d0e8);box-shadow:0 0 12px rgba(91,198,228,.28);transition:width .7s ease}
+#btcCycleTimeIntelligence .bct-phase-progress-track>i{position:absolute;right:0;top:-4px;width:2px;height:18px;border-radius:2px;background:#f4c879;box-shadow:0 0 8px rgba(244,200,121,.5)}
+#btcCycleTimeIntelligence .bct-phase-progress-foot{display:flex;justify-content:space-between;align-items:center;gap:10px;color:#7f9ab4;font-size:8px;font-weight:850;letter-spacing:.06em}
+#btcCycleTimeIntelligence .bct-phase-progress-foot strong{color:#f0c879;font-size:9px;text-align:right;letter-spacing:0}
+#btcCycleTimeIntelligence .bct-year-ruler-head span{font-variant-numeric:tabular-nums}
+#btcCycleTimeIntelligence .bct-year-ruler-card{box-shadow:inset 0 1px rgba(255,255,255,.025)}
+#btcCycleTimeIntelligence .bct-visual-map{border-color:rgba(96,154,196,.48);box-shadow:0 12px 30px rgba(0,0,0,.15),inset 0 1px rgba(255,255,255,.04)}
+#btcCycleTimeIntelligence .bct-visual-row:last-child .bct-visual-track{outline:1px solid rgba(99,208,235,.38);box-shadow:inset 0 2px 5px rgba(0,0,0,.4),0 0 16px rgba(56,167,211,.09)}
+#btcCycleTimeIntelligence .bct-line-chart-cta{border-color:rgba(100,190,222,.42);box-shadow:inset 0 1px rgba(255,255,255,.04)}
+#btcCycleTimeIntelligence .bct-line-chart-icon{font-size:0}
+#btcCycleTimeIntelligence .bct-line-chart-icon:before{content:"";width:23px;height:16px;border-left:2px solid #80d9f2;border-bottom:2px solid #80d9f2;transform:skewY(-25deg);background:linear-gradient(145deg,transparent 46%,rgba(128,217,242,.18) 47%)}
+@media(max-width:650px){#btcCycleTimeIntelligence .bct-phase-progress{padding:13px 12px;margin-bottom:14px}#btcCycleTimeIntelligence .bct-phase-progress-head span{font-size:8px}#btcCycleTimeIntelligence .bct-phase-progress-head>b{font-size:12px}#btcCycleTimeIntelligence .bct-phase-progress-foot{font-size:7px;align-items:flex-start}#btcCycleTimeIntelligence .bct-phase-progress-foot strong{font-size:8px}#btcCycleTimeIntelligence .bct-year-ruler-head{font-size:8px}#btcCycleTimeIntelligence .bct-line-chart-copy strong{font-size:10px}}
+@media(prefers-reduced-motion:reduce){#btcCycleTimeIntelligence .bct-phase-progress-track>span{transition:none}}
+</style>
+<style id="btc-cycle-time-comparison-v5">#btcCycleTimeIntelligence .bct-cycle-compare{margin:18px 0;padding:18px;border:1px solid rgba(93,158,197,.4);border-radius:16px;background:linear-gradient(145deg,rgba(9,23,39,.98),rgba(13,31,49,.96));box-shadow:inset 0 1px rgba(255,255,255,.035),0 12px 30px rgba(0,0,0,.14)}#btcCycleTimeIntelligence .bct-cycle-compare-head{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;flex-wrap:wrap;margin-bottom:17px}#btcCycleTimeIntelligence .bct-cycle-compare-head>div>span{display:block;color:#78d5e9;font-size:9px;font-weight:900;letter-spacing:.16em}#btcCycleTimeIntelligence .bct-cycle-compare-head strong{display:block;margin-top:6px;color:#f0f6ff;font-size:15px;line-height:1.35}#btcCycleTimeIntelligence .bct-cycle-compare-head small{display:block;margin-top:5px;color:#96adc4;font-size:10px;line-height:1.5}#btcCycleTimeIntelligence .bct-compare-scale{padding:6px 9px;border:1px solid rgba(104,183,218,.25);border-radius:20px;color:#9bcfe0;background:rgba(40,104,139,.13);font-size:8px;font-weight:900;letter-spacing:.08em;white-space:nowrap}#btcCycleTimeIntelligence .bct-halving-rows{display:grid;gap:17px}#btcCycleTimeIntelligence .bct-halving-row-head{display:flex;justify-content:space-between;align-items:baseline;gap:10px;margin-bottom:7px}#btcCycleTimeIntelligence .bct-halving-row-head strong{color:#dce9f8;font-size:10px;letter-spacing:.07em}#btcCycleTimeIntelligence .bct-halving-row-head span{color:#829db7;font-size:9px;text-align:right}#btcCycleTimeIntelligence .bct-halving-track{position:relative;height:13px;border-radius:20px;background:rgba(69,91,116,.35);box-shadow:inset 0 2px 4px rgba(0,0,0,.4);overflow:visible}#btcCycleTimeIntelligence .bct-halving-fill{position:absolute;left:0;top:0;height:100%;border-radius:20px}#btcCycleTimeIntelligence .bct-halving-fill.history{background:linear-gradient(90deg,#315f85,#6997bd);opacity:.75}#btcCycleTimeIntelligence .bct-halving-fill.current{background:linear-gradient(90deg,#147b8e,#58cce4);box-shadow:0 0 13px rgba(83,207,230,.24)}#btcCycleTimeIntelligence .bct-halving-today{position:absolute;top:-5px;width:3px;height:23px;border-radius:3px;background:#e9c477;box-shadow:0 0 0 3px rgba(233,196,119,.12),0 0 10px rgba(233,196,119,.75);transform:translateX(-50%)}#btcCycleTimeIntelligence .bct-halving-row-foot{display:flex;justify-content:space-between;gap:8px;margin-top:6px;color:#7892ad;font-size:8px}#btcCycleTimeIntelligence .bct-halving-row-foot b{color:#a9c2d8;font-size:9px;font-weight:750;text-align:right}#btcCycleTimeIntelligence .bct-halving-row.is-current .bct-halving-row-head strong,#btcCycleTimeIntelligence .bct-halving-row.is-current .bct-halving-row-foot b{color:#8fe3f1}#btcCycleTimeIntelligence .bct-cycle-compare-foot{display:flex;flex-wrap:wrap;gap:14px;margin:15px 0 13px;color:#8da5bc;font-size:8px;font-weight:800;letter-spacing:.04em}#btcCycleTimeIntelligence .bct-cycle-compare-foot span{display:flex;align-items:center;gap:6px}#btcCycleTimeIntelligence .bct-cycle-compare-foot i{width:8px;height:8px;border-radius:50%;display:inline-block}#btcCycleTimeIntelligence .bct-dot-history{background:#6997bd}#btcCycleTimeIntelligence .bct-dot-current{background:#58cce4;box-shadow:0 0 8px rgba(88,204,228,.65)}#btcCycleTimeIntelligence .bct-open-lines{display:flex;align-items:center;justify-content:center;gap:9px;width:100%;min-height:43px;padding:11px 14px;border:1px solid rgba(91,198,229,.52);border-radius:10px;background:linear-gradient(105deg,rgba(22,83,117,.85),rgba(22,111,146,.85));color:#e4f8ff;font-size:9px;font-weight:900;letter-spacing:.07em;cursor:pointer}#btcCycleTimeIntelligence .bct-open-lines span{font-size:15px;color:#83e0f3}@media(max-width:650px){#btcCycleTimeIntelligence .bct-cycle-compare{padding:14px 12px;margin:15px 0}#btcCycleTimeIntelligence .bct-cycle-compare-head strong{font-size:13px}#btcCycleTimeIntelligence .bct-halving-row-head{align-items:flex-start;flex-direction:column;gap:3px}#btcCycleTimeIntelligence .bct-halving-row-head span{text-align:left}#btcCycleTimeIntelligence .bct-halving-row-foot{font-size:7px}#btcCycleTimeIntelligence .bct-halving-row-foot b{font-size:8px}#btcCycleTimeIntelligence .bct-open-lines{font-size:8px;line-height:1.4}}</style>
+<style id="btc-cycle-time-ux-v6">
+#btcCycleTimeIntelligence{scroll-margin-top:22px}
+#btcCycleTimeIntelligence .cardhead{padding-bottom:13px;border-bottom:1px solid rgba(107,151,190,.18)}
+#btcCycleTimeIntelligence .bct-hero-grid{align-items:stretch}
+#btcCycleTimeIntelligence .bct-hero-metric{display:flex;flex-direction:column;justify-content:flex-start;min-height:130px}
+#btcCycleTimeIntelligence .bct-hero-metric em{min-height:30px}
+#btcCycleTimeIntelligence .bct-live-meta{display:flex;flex-wrap:wrap;align-items:center;gap:6px 10px;margin-top:auto;padding-top:12px}
+#btcCycleTimeIntelligence .bct-live-meta strong{color:#7fd9ee;font-size:8px;letter-spacing:.1em}
+#btcCycleTimeIntelligence .bct-live-meta span{color:#829bb5;font-size:9px}
+#btcCycleTimeIntelligence .bct-phase-progress{position:relative;overflow:hidden}
+#btcCycleTimeIntelligence .bct-phase-progress:before{content:"";position:absolute;inset:0 auto 0 0;width:3px;background:linear-gradient(#5dd3e8,#e8bf75)}
+#btcCycleTimeIntelligence .bct-cycle-compare{padding:clamp(14px,1.8vw,21px);border-color:rgba(100,177,213,.42);background:radial-gradient(ellipse at 95% 0%,rgba(55,143,180,.15),transparent 44%),linear-gradient(145deg,#0b1c30,#0d2035)}
+#btcCycleTimeIntelligence .bct-cycle-compare-head{align-items:center}
+#btcCycleTimeIntelligence .bct-cycle-compare-head strong{max-width:620px;font-size:clamp(14px,1.3vw,17px)}
+#btcCycleTimeIntelligence .bct-halving-rows{gap:19px}
+#btcCycleTimeIntelligence .bct-halving-row{padding:0 1px}
+#btcCycleTimeIntelligence .bct-halving-track{height:15px;background:linear-gradient(90deg,rgba(67,91,116,.42),rgba(67,91,116,.2));border:1px solid rgba(132,164,193,.12)}
+#btcCycleTimeIntelligence .bct-halving-row.is-current{padding:11px 12px;border:1px solid rgba(83,202,226,.24);border-radius:11px;background:rgba(48,139,166,.075)}
+#btcCycleTimeIntelligence .bct-halving-row.is-current .bct-halving-track{height:17px}
+#btcCycleTimeIntelligence .bct-halving-row-head strong{font-size:10px}
+#btcCycleTimeIntelligence .bct-halving-row-head span{line-height:1.45}
+#btcCycleTimeIntelligence .bct-halving-row-foot{font-size:9px}
+#btcCycleTimeIntelligence .bct-halving-row-foot b{font-size:10px}
+#btcCycleTimeIntelligence .bct-cycle-compare-foot{font-size:9px}
+#btcCycleTimeIntelligence .bct-open-lines{min-height:47px;font-size:10px;letter-spacing:.09em;box-shadow:0 6px 16px rgba(16,108,145,.15);transition:transform .18s ease,filter .18s ease,box-shadow .18s ease}
+#btcCycleTimeIntelligence .bct-open-lines:hover{transform:translateY(-1px);filter:brightness(1.12);box-shadow:0 9px 20px rgba(16,108,145,.24)}
+#btcCycleTimeIntelligence .bct-open-lines:focus-visible{outline:3px solid rgba(111,216,239,.65);outline-offset:3px}
+#btcCycleTimeIntelligence .bct-year-ruler-card{margin-top:16px;padding:15px 15px 13px;border:1px solid rgba(96,151,190,.32);border-radius:14px;background:linear-gradient(145deg,rgba(12,27,44,.94),rgba(8,19,32,.94))}
+#btcCycleTimeIntelligence .bct-year-ruler-head{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:12px}
+#btcCycleTimeIntelligence .bct-year-ruler-head strong{color:#e5effb;font-size:10px;letter-spacing:.1em}
+#btcCycleTimeIntelligence .bct-year-ruler-head span{color:#8eb4d0;font-size:9px;font-weight:800}
+#btcCycleTimeIntelligence .bct-year-ruler{min-height:52px}
+#btcCycleTimeIntelligence .bct-year-ruler>span{font-size:8px;color:#8299b2}
+#btcCycleTimeIntelligence .bct-halving-pin b,#btcCycleTimeIntelligence .bct-now-pin b{font-size:8px;letter-spacing:.04em}
+#btcCycleTimeIntelligence .bct-now-pin b{color:#ffe1a1}
+#btcCycleTimeIntelligence .bct-visual-map{margin-top:16px;padding:clamp(14px,1.8vw,20px);border-radius:15px;background:linear-gradient(145deg,rgba(11,25,42,.96),rgba(8,18,31,.96))}
+#btcCycleTimeIntelligence .bct-visual-head{align-items:center}
+#btcCycleTimeIntelligence .bct-visual-row{padding:11
