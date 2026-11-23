@@ -1,0 +1,505 @@
+padding:13px!important}.wrap .cardhead{align-items:flex-start;flex-wrap:wrap}.wrap table{font-size:11px}}
+@media(prefers-reduced-motion:reduce){.wrap button,.wrap .indicator-tile,.wrap .btc-overview-card,.wrap .btc-cockpit-metric,.wrap .tbr-card,.wrap .halving-compare-card{transition:none!important}.wrap .indicator-tile:hover,.wrap .btc-overview-card:hover,.wrap .btc-cockpit-metric:hover,.wrap .tbr-card:hover,.wrap .halving-compare-card:hover{transform:none!important}}
+</style>
+<style id="btc-institutional-terminal-finish-v1-20261116">
+/* Institutional terminal finish — presentation only. No JavaScript, data, engine rules or interactions changed. */
+:root{--btc-terminal-bg:#071321;--btc-terminal-panel:#0d1c2e;--btc-terminal-panel-hi:#132943;--btc-terminal-line:rgba(112,164,207,.25);--btc-terminal-cyan:#70d9e7;--btc-terminal-blue:#87aaff;--btc-terminal-gold:#e7c77e;--btc-terminal-text:#f2f7ff;--btc-terminal-muted:#9bb0c7}
+.wrap{max-width:1580px;margin-inline:auto;font-family:Inter,ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif;letter-spacing:.002em}
+#btcFrontTicker{position:relative;isolation:isolate;overflow:hidden;margin:15px 0 20px;padding:clamp(17px,2.2vw,24px);border:1px solid rgba(100,203,224,.35);border-radius:18px;background:radial-gradient(ellipse at 88% 0%,rgba(73,127,204,.20),transparent 43%),linear-gradient(112deg,#0d2638 0%,#0b192a 56%,#111d35 100%);box-shadow:0 16px 38px rgba(0,0,0,.23),inset 0 1px 0 rgba(255,255,255,.07)}
+#btcFrontTicker:before{content:"";position:absolute;inset:0 0 auto;height:2px;background:linear-gradient(90deg,#5ce0df,#7ba9ff,#e7c77e,transparent 92%);pointer-events:none}
+#btcFrontTicker .btc-front-top{color:#a9c1d8;font-size:10px;letter-spacing:.13em}
+#btcFrontTicker .btc-front-top span:first-child{color:#b9dce9}
+#btcFrontTicker>strong{display:block;margin:3px 0 2px;font-size:clamp(34px,5.2vw,52px);line-height:1.04;letter-spacing:-.055em;color:#f5f9ff;text-shadow:0 0 28px rgba(96,195,231,.12)}
+#btcFrontTicker .btc-front-bottom{padding-top:9px;border-top:1px solid rgba(134,177,212,.13);color:#a5b9cf;font-size:11px}
+#btcFrontTicker .btc-front-bottom span:first-child{color:#8de4bd}
+#btc-market-overview-v1{border-color:rgba(99,194,222,.34);background:radial-gradient(ellipse at 96% 0%,rgba(76,121,210,.18),transparent 40%),linear-gradient(145deg,#10243a 0%,#0b1728 58%,#101d33 100%);box-shadow:0 18px 44px rgba(0,0,0,.23),inset 0 1px 0 rgba(255,255,255,.065)}
+#btc-market-overview-v1 .btc-overview-head{align-items:center;padding-bottom:13px;border-bottom:1px solid rgba(126,170,207,.15)}
+#btc-market-overview-v1 .btc-overview-kicker{color:#83d7e8;letter-spacing:.2em}
+#btc-market-overview-v1 .btc-overview-live{box-shadow:inset 0 1px 0 rgba(255,255,255,.06)}
+#btc-market-overview-v1 .btc-overview-price{border-color:rgba(103,207,225,.3);background:linear-gradient(110deg,rgba(15,51,70,.92),rgba(15,29,53,.94));box-shadow:inset 0 1px 0 rgba(255,255,255,.05)}
+#btc-market-overview-v1 .btc-overview-card{border-color:rgba(124,169,207,.23);background:linear-gradient(145deg,rgba(25,45,69,.94),rgba(10,23,40,.97));transition:transform .22s ease,border-color .22s ease,box-shadow .22s ease}
+#btc-market-overview-v1 .btc-overview-signal{border-color:rgba(91,216,231,.45);background:radial-gradient(ellipse at 100% 0%,rgba(48,139,186,.2),transparent 54%),linear-gradient(145deg,#183b58,#10243b)}
+#btc-market-overview-v1 .btc-overview-footer{border-color:rgba(126,163,201,.2)}
+#decisionCenterV1{position:relative;isolation:isolate;overflow:hidden;border-color:rgba(105,184,218,.31);background:radial-gradient(ellipse at 100% 0%,rgba(42,105,159,.13),transparent 42%),linear-gradient(145deg,#101f32,#0a1524);box-shadow:0 16px 38px rgba(0,0,0,.22),inset 0 1px 0 rgba(255,255,255,.055)}
+#decisionCenterV1:before{content:"";position:absolute;inset:0 0 auto;height:2px;background:linear-gradient(90deg,#64dce5,#7ea8ff,#e5c77d,transparent 90%);pointer-events:none}
+#decisionCenterV1 .decision-center-head{padding-bottom:12px;border-bottom:1px solid rgba(127,170,207,.15)}
+#decisionCenterV1 .decision-center-title{font-size:14px;letter-spacing:.12em;color:#eaf5ff}
+#decisionCenterV1 .dc-live{border-color:rgba(103,190,218,.24);background:rgba(16,48,69,.42)}
+#decisionCenterV1 .dc-tile{position:relative;overflow:hidden;padding:15px;border-color:rgba(120,165,205,.22);border-radius:13px;background:linear-gradient(145deg,rgba(19,39,61,.88),rgba(7,17,30,.88));box-shadow:inset 0 1px 0 rgba(255,255,255,.045)}
+#decisionCenterV1 .dc-tile:after{content:"";position:absolute;right:-28px;top:-35px;width:90px;height:90px;border-radius:50%;background:radial-gradient(circle,rgba(91,197,224,.10),transparent 70%);pointer-events:none}
+#decisionCenterV1 .dc-label{color:#9db5ce;letter-spacing:.1em}
+#decisionCenterV1 .dc-value{font-size:clamp(17px,1.8vw,23px);letter-spacing:-.025em}
+#decisionCenterV1 .decision-center-bottom{border-color:rgba(113,162,204,.2);background:rgba(17,35,55,.82);color:#d6e5f4}
+#priceChartCard{overflow:hidden;border-color:rgba(104,172,213,.3)!important;border-radius:19px!important;background:radial-gradient(ellipse at 100% 0%,rgba(39,93,151,.13),transparent 40%),linear-gradient(150deg,#0e1d30,#091524)!important;box-shadow:0 18px 42px rgba(0,0,0,.23),inset 0 1px 0 rgba(255,255,255,.055)!important}
+#priceChartCard>.cardhead{min-height:42px;padding-bottom:12px;border-bottom:1px solid rgba(126,170,207,.16)}
+#priceChartCard>.cardhead h2{font-size:16px;font-weight:850;letter-spacing:-.02em;color:#f0f6ff}
+#priceChartCard .chartbox{border-radius:13px;background:linear-gradient(180deg,rgba(6,15,27,.32),rgba(6,15,27,.08))}
+#btcLiveQuoteBar{border-color:rgba(104,188,218,.24)!important;border-radius:13px!important;background:linear-gradient(110deg,rgba(15,42,62,.9),rgba(12,26,43,.92))!important}
+#btc-intelligence-cockpit-v1{border-color:rgba(99,194,222,.3);background:radial-gradient(ellipse at 92% 0%,rgba(37,117,162,.18),transparent 39%),linear-gradient(145deg,#0c1929,#0a1422 58%,#101d30);box-shadow:0 18px 44px rgba(0,0,0,.23),inset 0 1px 0 rgba(255,255,255,.055)}
+#btc-intelligence-cockpit-v1 .btc-cockpit-head{padding-bottom:13px;border-bottom:1px solid rgba(123,169,205,.15)}
+#btc-intelligence-cockpit-v1 .btc-cockpit-kicker{color:#7bd7e7;letter-spacing:.2em}
+#btc-intelligence-cockpit-v1 .btc-cockpit-hero{border-color:rgba(106,194,221,.28);background:linear-gradient(105deg,rgba(18,52,73,.88),rgba(15,29,47,.9));box-shadow:inset 0 1px 0 rgba(255,255,255,.06)}
+#btc-intelligence-cockpit-v1 .btc-cockpit-metric{border-color:rgba(116,163,201,.22);background:linear-gradient(145deg,rgba(22,42,64,.94),rgba(10,22,37,.96));box-shadow:inset 0 1px 0 rgba(255,255,255,.045)}
+#btc-intelligence-cockpit-v1 .btc-cockpit-metric>small{color:#8eabc3}
+#btc-intelligence-cockpit-v1 .btc-cockpit-metric em{color:#91a8bd}
+#btc-intelligence-cockpit-v1 .btc-cockpit-footer{padding-top:12px;border-top:1px solid rgba(123,169,205,.15)}
+.wrap .quick-nav{border-color:rgba(113,167,208,.23);background:rgba(8,20,34,.94);box-shadow:0 10px 28px rgba(0,0,0,.2)}
+.wrap .quick-nav button{border-color:rgba(113,170,208,.2);background:rgba(20,42,64,.78);color:#c8d9ea}
+.wrap .quick-nav button[aria-current="page"],.wrap .quick-nav button.active{border-color:rgba(101,211,226,.5);background:rgba(39,112,139,.32);color:#e8faff}
+.wrap .grid.stats>.card,.wrap .grid.main>.card,.wrap .grid.bottom>.card{border-color:rgba(115,164,206,.23)!important;background:linear-gradient(150deg,rgba(18,36,57,.98),rgba(9,20,34,.98))!important}
+.wrap .cardhead h2{color:#eff6ff}
+.wrap .pill{border:1px solid rgba(124,164,201,.15)}
+.wrap :focus-visible{outline:2px solid rgba(112,217,231,.85);outline-offset:3px}
+@media(hover:hover) and (pointer:fine){#btc-market-overview-v1 .btc-overview-card:hover,#decisionCenterV1 .dc-tile:hover,#btc-intelligence-cockpit-v1 .btc-cockpit-metric:hover{transform:translateY(-2px);border-color:rgba(105,211,229,.42);box-shadow:0 10px 24px rgba(0,0,0,.16),inset 0 1px 0 rgba(255,255,255,.06)}}
+@media(max-width:760px){#btcFrontTicker{margin:10px 0 14px;padding:15px;border-radius:15px}#btcFrontTicker>strong{font-size:clamp(29px,8vw,39px)}#btc-market-overview-v1{border-radius:17px}#btc-market-overview-v1 .btc-overview-head{align-items:flex-start;flex-direction:column}#decisionCenterV1{padding:14px;border-radius:15px}#decisionCenterV1 .dc-tile{padding:11px}#decisionCenterV1 .dc-value{font-size:16px}#priceChartCard{border-radius:15px!important}#priceChartCard>.cardhead{align-items:flex-start;flex-wrap:wrap}#btc-intelligence-cockpit-v1{border-radius:17px}#btc-intelligence-cockpit-v1 .btc-cockpit-hero{align-items:flex-start;flex-wrap:wrap}}
+@media(max-width:420px){#btcFrontTicker .btc-front-bottom{gap:6px}#btcFrontTicker .btc-front-bottom span{font-size:10px}#decisionCenterV1 .dc-label{font-size:9px}#decisionCenterV1 .dc-detail{font-size:10px}}
+@media(prefers-reduced-motion:reduce){#btc-market-overview-v1 .btc-overview-card,#decisionCenterV1 .dc-tile,#btc-intelligence-cockpit-v1 .btc-cockpit-metric{transition:none!important}#btc-market-overview-v1 .btc-overview-card:hover,#decisionCenterV1 .dc-tile:hover,#btc-intelligence-cockpit-v1 .btc-cockpit-metric:hover{transform:none!important}}
+</style>
+<style id="btc-logo-motion-brand-experience-v1-20261116">
+/* BTC Cycle Desk — logo motion identity. Original logo asset and app behavior preserved. */
+.btcBrandLogo{isolation:isolate;overflow:visible!important;transform:translateZ(0);border:1px solid rgba(231,199,126,.68)!important;background:radial-gradient(circle at 50% 45%,#15263b 0%,#05080e 72%)!important;box-shadow:0 0 0 1px rgba(112,217,231,.16),0 0 18px rgba(74,177,220,.18),0 0 30px rgba(231,180,85,.13),inset 0 0 16px rgba(81,160,211,.12)!important;animation:btcLogoHalo 5.8s ease-in-out infinite}
+.btcBrandLogo img{z-index:0;transform-origin:50% 50%;backface-visibility:hidden;will-change:transform;animation:btcLogoDrift 12s ease-in-out infinite}
+.btcBrandLogo:before{content:"";position:absolute;z-index:2;inset:-3px;border-radius:inherit;padding:1px;background:conic-gradient(from 0deg,rgba(231,199,126,.12),rgba(112,217,231,.85),rgba(119,157,255,.18),rgba(231,199,126,.9),rgba(112,217,231,.12));-webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);-webkit-mask-composite:xor;mask-composite:exclude;pointer-events:none;opacity:.72;animation:btcLogoRing 10s linear infinite}
+.btcBrandLogo:after{content:"";position:absolute;z-index:3;inset:0;border-radius:inherit;pointer-events:none;background:linear-gradient(118deg,transparent 24%,rgba(255,255,255,0) 38%,rgba(157,235,255,.3) 48%,rgba(255,222,158,.22) 52%,transparent 63%);background-size:240% 100%;mix-blend-mode:screen;opacity:0;animation:btcLogoShine 7.5s ease-in-out infinite}
+.brand-copy h1{position:relative;display:inline-block;color:#f5f8ff;background:linear-gradient(100deg,#f5f8ff 0%,#c7eaff 34%,#fff0c6 53%,#f5f8ff 72%);background-size:220% 100%;background-clip:text;-webkit-background-clip:text;-webkit-text-fill-color:transparent;filter:drop-shadow(0 0 10px rgba(98,190,224,.13));animation:btcBrandTitleGlow 9s ease-in-out infinite}
+.brand-signature{color:#f1d28c!important;text-shadow:0 0 12px rgba(231,199,126,.22);letter-spacing:.075em!important}
+.brand .sub{color:#a9bfd4;letter-spacing:.012em}
+@keyframes btcLogoHalo{0%,100%{box-shadow:0 0 0 1px rgba(112,217,231,.13),0 0 14px rgba(74,177,220,.15),0 0 25px rgba(231,180,85,.10),inset 0 0 13px rgba(81,160,211,.1)}50%{box-shadow:0 0 0 1px rgba(112,217,231,.32),0 0 23px rgba(74,177,220,.27),0 0 38px rgba(231,180,85,.19),inset 0 0 19px rgba(81,160,211,.18)}}
+@keyframes btcLogoDrift{0%,100%{transform:scale(1) translate3d(0,0,0)}50%{transform:scale(1.035) translate3d(0,-1px,0)}}
+@keyframes btcLogoRing{to{transform:rotate(360deg)}}
+@keyframes btcLogoShine{0%,64%,100%{background-position:130% 0;opacity:0}70%{opacity:.8}84%{background-position:-40% 0;opacity:.45}90%{opacity:0}}
+@keyframes btcBrandTitleGlow{0%,100%{background-position:0% 50%}50%{background-position:100% 50%}}
+@media(max-width:600px){.btcBrandLogo{animation-duration:6.5s}.btcBrandLogo:before{inset:-2px}.brand-copy h1{letter-spacing:.035em}}
+@media(prefers-reduced-motion:reduce){.btcBrandLogo,.btcBrandLogo img,.btcBrandLogo:before,.btcBrandLogo:after,.brand-copy h1{animation:none!important;will-change:auto}.btcBrandLogo img{transform:none!important}}
+</style>
+
+<style id="btc-mobile-header-actions-stack-20261116">/* Mobile header actions: one full-width control per row; desktop untouched. */@media(max-width:700px){header.top .actions{display:grid!important;grid-template-columns:minmax(0,1fr)!important;align-items:stretch!important;justify-content:stretch!important;gap:9px!important;width:100%!important;min-width:0!important}header.top .actions>.status{grid-column:1/-1!important;width:100%!important;min-width:0!important;white-space:normal!important;text-align:center!important;justify-content:center!important;box-sizing:border-box!important;padding:11px 12px!important;line-height:1.4!important}header.top .actions>button{grid-column:1/-1!important;display:flex!important;align-items:center!important;justify-content:center!important;width:100%!important;max-width:100%!important;min-width:0!important;min-height:54px!important;box-sizing:border-box!important;padding:12px 14px!important;font-size:clamp(13px,3.6vw,15px)!important;line-height:1.25!important;text-align:center!important;white-space:normal!important}header.top .actions>#refreshBtn{font-weight:850!important}}@media(max-width:380px){header.top .actions{gap:8px!important}header.top .actions>button{min-height:52px!important;padding:11px 10px!important}}
+</style>
+
+<style id="btc-logo-mobile-motion-match-desktop-v1-20261116">/* Mobile logo: mirror the approved desktop animation without changing mobile sizing. */@media(max-width:760px){header.top .brand .btcBrandLogo{position:relative!important;isolation:isolate!important;overflow:visible!important;transform-origin:50% 50%!important;animation:btcDeskHaloV3 2.9s ease-in-out infinite!important;will-change:transform,box-shadow!important}header.top .brand .btcBrandLogo img{inset:0!important;left:0!important;top:0!important;right:auto!important;bottom:auto!important;width:100%!important;height:100%!important;max-width:100%!important;max-height:100%!important;padding:4px!important;object-fit:contain!important;transform-origin:50% 50%!important;animation:btcDeskLogoV3 6.4s ease-in-out infinite!important;will-change:transform,filter!important}header.top .brand .btcBrandLogo:before{content:""!important;display:block!important;position:absolute!important;z-index:3!important;inset:-4px!important;border-radius:21px!important;border:2px solid transparent!important;background:conic-gradient(from 0deg,rgba(255,211,132,.05),rgba(89,224,255,.95),rgba(93,140,255,.16),rgba(255,207,112,.98),rgba(255,211,132,.05)) border-box!important;-webkit-mask:linear-gradient(#000 0 0) padding-box,linear-gradient(#000 0 0)!important;-webkit-mask-composite:xor!important;mask-composite:exclude!important;pointer-events:none!important;animation:btcDeskRingV3 5.5s linear infinite!important;filter:drop-shadow(0 0 7px rgba(80,210,255,.55))}header.top .brand .btcBrandLogo:after{inset:0!important;z-index:2!important;animation:btcLogoSweepVisible 3.7s ease-in-out infinite!important;opacity:1!important}header.top .brand .brand-copy h1{animation:btcDeskTitleV3 4.8s ease-in-out infinite!important}}@keyframes btcDeskHaloV3{0%,100%{transform:translateY(0) scale(1);box-shadow:0 0 0 1px rgba(94,222,255,.48),0 0 18px rgba(58,197,255,.48),0 0 34px rgba(242,185,83,.28),inset 0 0 16px rgba(80,190,255,.2)}50%{transform:translateY(-2px) scale(1.035);box-shadow:0 0 0 2px rgba(94,222,255,.85),0 0 30px rgba(58,197,255,.8),0 0 52px rgba(242,185,83,.48),inset 0 0 22px rgba(80,190,255,.35)}}@keyframes btcDeskLogoV3{0%,100%{transform:scale(1) rotate(0deg);filter:brightness(1.05) saturate(1.1) drop-shadow(0 0 5px rgba(95,214,255,.45))}30%{transform:scale(1.075) rotate(1.8deg);filter:brightness(1.24) saturate(1.28) drop-shadow(0 0 12px rgba(95,214,255,.85))}65%{transform:scale(1.035) rotate(-1.2deg);filter:brightness(1.12) saturate(1.18) drop-shadow(0 0 8px rgba(255,205,120,.65))}}@keyframes btcDeskRingV3{to{transform:rotate(360deg)}}@keyframes btcDeskTitleV3{0%,100%{filter:drop-shadow(0 0 2px rgba(105,207,255,.12))}50%{filter:drop-shadow(0 0 14px rgba(105,207,255,.48))}}@media(prefers-reduced-motion:reduce){header.top .brand .btcBrandLogo,header.top .brand .btcBrandLogo img,header.top .brand .btcBrandLogo:before,header.top .brand .btcBrandLogo:after,header.top .brand .brand-copy h1{animation:none!important;will-change:auto!important}header.top .brand .btcBrandLogo{transform:none!important}header.top .brand .btcBrandLogo img{transform:none!important}}</style>
+
+<style id="btc-logo-premium-finish-v1-20261116">/* Premium logo finish: visual-only refinement; preserve original artwork and dimensions. */header.top .brand .btcBrandLogo{box-sizing:border-box!important;border:1px solid rgba(157,224,255,.72)!important;background:radial-gradient(ellipse at 28% 18%,rgba(93,210,255,.2) 0%,rgba(12,31,52,.92) 43%,rgba(3,8,18,.98) 100%)!important;outline:1px solid rgba(255,205,120,.26)!important;outline-offset:2px!important;filter:drop-shadow(0 0 7px rgba(67,199,255,.24))!important;backface-visibility:hidden!important;-webkit-backface-visibility:hidden!important}header.top .brand .btcBrandLogo img{backface-visibility:hidden!important;-webkit-backface-visibility:hidden!important;image-rendering:auto!important}header.top .brand .btcBrandLogo:before{filter:drop-shadow(0 0 5px rgba(80,210,255,.62)) drop-shadow(0 0 10px rgba(255,195,102,.22))!important}header.top .brand .btcBrandLogo:after{mix-blend-mode:screen!important;opacity:1!important}@keyframes btcDeskHaloV3{0%,100%{transform:translateY(0) scale(1);box-shadow:0 0 0 1px rgba(94,222,255,.55),0 0 17px rgba(58,197,255,.43),0 0 31px rgba(242,185,83,.25),inset 0 0 0 1px rgba(255,213,143,.2),inset 0 0 17px rgba(80,190,255,.22)}50%{transform:translateY(-2px) scale(1.035);box-shadow:0 0 0 2px rgba(94,222,255,.9),0 0 28px rgba(58,197,255,.72),0 0 46px rgba(242,185,83,.4),inset 0 0 0 1px rgba(255,223,161,.4),inset 0 0 23px rgba(80,190,255,.38)}}@keyframes btcDeskLogoV3{0%,100%{transform:scale(1) rotate(0deg);filter:brightness(1.07) saturate(1.12) drop-shadow(0 0 6px rgba(95,214,255,.5))}30%{transform:scale(1.065) rotate(1.2deg);filter:brightness(1.22) saturate(1.25) drop-shadow(0 0 12px rgba(95,214,255,.82))}65%{transform:scale(1.028) rotate(-.8deg);filter:brightness(1.13) saturate(1.17) drop-shadow(0 0 8px rgba(255,205,120,.68))}}@media(prefers-reduced-motion:reduce){header.top .brand .btcBrandLogo,header.top .brand .btcBrandLogo img,header.top .brand .btcBrandLogo:before,header.top .brand .btcBrandLogo:after{animation:none!important;will-change:auto!important}header.top .brand .btcBrandLogo{transform:none!important}header.top .brand .btcBrandLogo img{transform:none!important}}</style>
+<style id="btc-dominance-module-v1">.btc-dominance-panel{margin:0 0 18px;background:linear-gradient(145deg,#12253b,#0b1524);border-color:#36516c;overflow:hidden}.btc-dom-kicker{display:block;color:#78d8ed;font-size:9px;font-weight:900;letter-spacing:.16em;margin-bottom:5px}.btc-dom-main{display:flex;justify-content:space-between;align-items:center;gap:16px;padding:12px 0 15px}.btc-dom-main>div:first-child{display:grid;gap:5px}.btc-dom-main strong{font-size:clamp(38px,7vw,58px);font-weight:950;letter-spacing:-.04em;color:#f2f7ff;line-height:1}.btc-dom-main span,.btc-dom-main small{font-size:10px;color:#a9bad0;letter-spacing:.08em;font-weight:800}.btc-dom-change{display:grid;gap:6px;text-align:right}.btc-dom-change b{font-size:18px;color:#d9e6f6}.btc-dom-stats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:9px}.btc-dom-stats>div{display:grid;gap:5px;min-width:0;padding:11px;border:1px solid #2b4059;border-radius:10px;background:#0b1929}.btc-dom-stats small{font-size:10px;color:#9aacc2}.btc-dom-stats b{font-size:12px;color:#e7f0fc;overflow-wrap:anywhere}.btc-dom-reading{margin:12px 0;padding:11px 13px;border:1px solid #344b65;border-radius:10px;background:rgba(30,55,78,.48);font-size:12px;line-height:1.55;color:#c8d8e9}.btc-dom-chart-wrap{margin-top:12px;padding:12px;border:1px solid #2c4159;border-radius:12px;background:#091523}.btc-dom-chart-head{display:flex;justify-content:space-between;gap:10px;align-items:center;margin-bottom:10px}.btc-dom-chart-head b{font-size:11px;color:#e8f1fb}.btc-dom-chart-head span,.btc-dom-history-note{font-size:9px;color:#92a6bd}.btc-dom-chart-wrap canvas{width:100%!important;height:190px!important}.btc-dom-history-note{line-height:1.5;margin-top:7px}.btc-dom-foot{margin-top:12px;font-size:10px;line-height:1.55;color:#92a6bd}@media(max-width:520px){.btc-dom-stats{grid-template-columns:1fr 1fr}.btc-dom-stats>div:last-child{grid-column:span 2}.btc-dom-main{align-items:flex-start;flex-direction:column}.btc-dom-change{text-align:left}.btc-dom-chart-wrap canvas{height:165px!important}.btc-dom-chart-head{align-items:flex-start;flex-direction:column;gap:4px}}</style><style id="btc-dominance-visual-v2">.btc-dominance-panel{position:relative;margin:18px 0 14px!important;padding:clamp(16px,2.5vw,24px)!important;border:1px solid rgba(82,174,218,.42)!important;border-radius:18px!important;background:radial-gradient(ellipse at 88% 0%,rgba(33,119,166,.2),transparent 42%),linear-gradient(145deg,#10243a 0%,#0b1422 68%,#111d30 100%)!important;box-shadow:0 14px 40px rgba(0,0,0,.22),inset 0 1px rgba(255,255,255,.05)!important}.btc-dominance-panel:before{content:"";position:absolute;left:0;top:22px;bottom:22px;width:3px;border-radius:3px;background:linear-gradient(#67d9ef,#eac16c)}.btc-dom-main{padding:20px 0!important}.btc-dom-main>div:first-child strong{font-size:clamp(48px,8vw,68px)!important;letter-spacing:-.055em!important;background:linear-gradient(110deg,#fff,#9bdff0 65%,#e9c77d);-webkit-background-clip:text;background-clip:text;color:transparent!important}.btc-dom-change{padding:12px 15px;border:1px solid rgba(120,160,190,.2);border-radius:12px;background:rgba(255,255,255,.035)}.btc-dom-stats>div{background:rgba(5,15,27,.5)!important;border-color:rgba(110,157,190,.18)!important}.btc-dom-reading{border-color:rgba(90,177,211,.25)!important;background:linear-gradient(100deg,rgba(34,94,130,.24),rgba(18,35,54,.45))!important}.btc-dom-chart-wrap{border-color:rgba(110,157,190,.2)!important;background:rgba(4,13,24,.55)!important}.indicator-btcdom{position:relative;overflow:hidden;border-color:rgba(76,180,220,.42)!important;background:linear-gradient(145deg,rgba(22,65,91,.8),rgba(11,24,40,.98))!important}.indicator-btcdom:after{content:"";position:absolute;inset:auto -30px -55px auto;width:130px;height:130px;border-radius:50%;background:rgba(71,192,225,.1);filter:blur(10px);pointer-events:none}.art-btcdom{display:flex;align-items:center;justify-content:center;gap:10px;color:#7cdbed}.art-btcdom span{font-size:42px;font-weight:900;text-shadow:0 0 22px rgba(89,208,232,.3)}.art-btcdom i{font-size:24px;color:#e7c276;font-style:normal}.indicator-live-value{display:inline-flex;align-self:flex-start;margin-top:5px;padding:5px 9px;border-radius:20px;border:1px solid rgba(102,207,229,.24);background:rgba(47,151,181,.13);font-size:11px;font-weight:850;color:#9be7f2;letter-spacing:.04em}.indicator-btcdom:hover{transform:translateY(-3px);box-shadow:0 12px 28px rgba(30,145,190,.15)}@media(max-width:600px){.btc-dominance-panel{border-radius:14px!important}.btc-dom-main{gap:12px}.btc-dom-change{width:100%;text-align:left}.btc-dom-chart-wrap{padding:10px}.indicator-btcdom{min-width:0}}@media(prefers-reduced-motion:reduce){.indicator-btcdom:hover{transform:none}}</style><style id="btc-dominance-visual-v3">
+.btc-dominance-panel .btc-dom-chart-wrap{padding:16px!important;border-radius:16px!important;background:radial-gradient(ellipse at 50% 0%,rgba(29,115,158,.16),transparent 60%),rgba(4,13,24,.72)!important}
+.btc-dominance-panel .btc-dom-chart-head{align-items:flex-start!important;flex-wrap:wrap!important}
+.btc-dom-ranges{display:flex;gap:6px;flex-wrap:wrap;margin-left:auto}
+.btc-dom-ranges button{border:1px solid rgba(115,161,190,.25);border-radius:8px;padding:6px 10px;background:rgba(255,255,255,.035);color:#a9bfd3;font-size:10px;font-weight:800;cursor:pointer}
+.btc-dom-ranges button.active{background:linear-gradient(120deg,rgba(39,142,181,.35),rgba(40,91,133,.35));border-color:#55c8ed;color:#e4faff;box-shadow:0 0 14px rgba(75,191,225,.12)}
+.btc-dominance-panel .btc-dom-chart-wrap canvas{height:260px!important}
+.btc-dominance-panel #btcDomHistoryNote{padding-top:9px;border-top:1px solid rgba(110,157,190,.12);margin-top:10px}
+.btc-dominance-panel #btcDomStatus{font-size:9px;letter-spacing:.04em}
+@media(max-width:600px){.btc-dom-ranges{width:100%;margin:4px 0 0}.btc-dom-ranges button{flex:1;padding:8px 5px}.btc-dominance-panel .btc-dom-chart-wrap canvas{height:220px!important}}
+</style>
+
+<style id="btc-dominance-tradingview-restore-v1">.btc-dom-tradingview-wrap{padding:14px!important;background:#080f19!important;border:1px solid #30445c!important;border-radius:13px!important}.btc-dom-tradingview-wrap .tradingview-widget-container{min-height:520px}.btc-dom-tradingview-wrap .tradingview-widget-copyright{font-size:10px;text-align:center;padding-top:4px;color:#8fa7bd}.btc-dom-tradingview-wrap .tradingview-widget-copyright a{color:#62c9e9}@media(max-width:600px){.btc-dom-tradingview-wrap .tradingview-widget-container{height:440px!important}.btc-dom-tradingview-wrap #btcDomTradingViewChart{height:408px!important}}</style><style id="btc-dom-tv-only-v1">/* BTC DOMINANCE: o TradingView é a única leitura visível para evitar divergência entre provedores */#btcDominancePanel .btc-dom-main,#btcDominancePanel .btc-dom-stats,#btcDominancePanel .btc-dom-reading,#btcDominancePanel .btc-dom-foot{display:none!important}#btcDominancePanel .btc-dom-chart-wrap{margin-top:12px!important}#btcDominancePanel .btc-dom-chart-head{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}#btcDominancePanel .btc-dom-chart-head b{font-size:14px;letter-spacing:.04em}#btcDominancePanel .btc-dom-chart-head span{font-size:10px;color:#75d9f4;letter-spacing:.06em}@media(max-width:600px){#btcDominancePanel .btc-dom-tradingview-wrap .tradingview-widget-container{height:440px!important}#btcDominancePanel .btc-dom-tradingview-wrap #btcDomTradingViewChart{height:408px!important}}</style><style id="btcPanelAlignmentResponsiveV1">
+/* BTC-PANEL-ALIGNMENT-RESPONSIVE-V1 — padronização visual sem alterar dados, sinais ou scripts. */
+#btcDominancePanel,
+#threeDayAnalysis{
+  display:block!important;
+  box-sizing:border-box!important;
+  width:100%!important;
+  max-width:100%!important;
+  min-width:0!important;
+  margin:0 0 18px!important;
+  padding:clamp(14px,1.6vw,20px)!important;
+  border-radius:16px!important;
+  overflow:hidden!important;
+  align-self:stretch!important;
+}
+#btcDominancePanel .cardhead,
+#threeDayAnalysis .cardhead{
+  display:flex!important;
+  justify-content:space-between!important;
+  align-items:center!important;
+  flex-wrap:wrap!important;
+  gap:10px!important;
+  margin:0 0 12px!important;
+  min-width:0!important;
+}
+#btcDominancePanel .cardhead h2,
+#threeDayAnalysis .cardhead h2{
+  font-size:clamp(14px,1.25vw,17px)!important;
+  line-height:1.35!important;
+  margin:0!important;
+}
+#btcDominancePanel .btc-dom-main{
+  padding:12px 0!important;
+  gap:12px!important;
+}
+#btcDominancePanel .btc-dom-main>div:first-child strong{
+  font-size:clamp(38px,5vw,54px)!important;
+}
+#btcDominancePanel .btc-dom-stats{
+  grid-template-columns:repeat(3,minmax(0,1fr))!important;
+  gap:10px!important;
+}
+#btcDominancePanel .btc-dom-chart-wrap{
+  width:100%!important;
+  max-width:100%!important;
+  min-width:0!important;
+  margin-top:12px!important;
+  padding:12px!important;
+}
+#btcDominancePanel .btc-dom-chart-head{
+  display:flex!important;
+  align-items:center!important;
+  justify-content:space-between!important;
+  flex-wrap:wrap!important;
+  gap:8px!important;
+}
+#btcDominancePanel .btc-dom-chart-wrap .tradingview-widget-container{
+  width:100%!important;
+  height:410px!important;
+  min-width:0!important;
+  max-width:100%!important;
+}
+#btcDominancePanel #btcDomTradingViewChart{
+  width:100%!important;
+  height:378px!important;
+  min-width:0!important;
+  max-width:100%!important;
+}
+#threeDayAnalysis{
+  background:linear-gradient(150deg,#13243a,#0c1728)!important;
+  border:1px solid var(--btc-stroke,#2b4059)!important;
+  box-shadow:0 12px 30px rgba(0,0,0,.17),inset 0 1px 0 rgba(255,255,255,.045)!important;
+}
+#threeDayAnalysis>.note{
+  margin:0 0 12px!important;
+  font-size:12px!important;
+  line-height:1.6!important;
+  max-width:100%!important;
+}
+#threeDayAnalysis>div[style*="display:grid"]{
+  display:grid!important;
+  grid-template-columns:repeat(4,minmax(0,1fr))!important;
+  gap:10px!important;
+  width:100%!important;
+  min-width:0!important;
+}
+#threeDayAnalysis .metric{
+  display:grid!important;
+  grid-template-columns:minmax(0,1fr)!important;
+  align-content:start!important;
+  gap:7px!important;
+  min-width:0!important;
+  min-height:86px!important;
+  padding:12px!important;
+  border:1px solid rgba(105,151,190,.2)!important;
+  border-radius:11px!important;
+  background:rgba(8,18,31,.48)!important;
+}
+#threeDayAnalysis .metric>span{
+  font-size:10px!important;
+  line-height:1.4!important;
+  min-width:0!important;
+  overflow-wrap:anywhere!important;
+}
+#threeDayAnalysis .metric>strong{
+  text-align:left!important;
+  font-size:clamp(13px,1.2vw,16px)!important;
+  line-height:1.35!important;
+  overflow-wrap:anywhere!important;
+  min-width:0!important;
+}
+@media(max-width:900px){
+  #threeDayAnalysis>div[style*="display:grid"]{grid-template-columns:repeat(2,minmax(0,1fr))!important}
+  #btcDominancePanel .btc-dom-chart-wrap .tradingview-widget-container{height:370px!important}
+  #btcDominancePanel #btcDomTradingViewChart{height:338px!important}
+}
+@media(max-width:600px){
+  #btcDominancePanel,#threeDayAnalysis{
+    width:100%!important;
+    max-width:100%!important;
+    margin:0 0 13px!important;
+    padding:13px!important;
+    border-radius:14px!important;
+  }
+  #btcDominancePanel .btc-dom-main{display:flex!important;flex-direction:row!important;align-items:center!important;justify-content:space-between!important;flex-wrap:wrap!important}
+  #btcDominancePanel .btc-dom-main>div:first-child strong{font-size:clamp(36px,10vw,48px)!important}
+  #btcDominancePanel .btc-dom-stats{grid-template-columns:repeat(2,minmax(0,1fr))!important}
+  #btcDominancePanel .btc-dom-stats>div:last-child{grid-column:1/-1!important}
+  #btcDominancePanel .btc-dom-chart-wrap{padding:9px!important}
+  #btcDominancePanel .btc-dom-chart-wrap .tradingview-widget-container{height:330px!important}
+  #btcDominancePanel #btcDomTradingViewChart{height:298px!important}
+  #btcDominancePanel .btc-dom-chart-head span{font-size:8px!important;line-height:1.45!important}
+  #threeDayAnalysis>div[style*="display:grid"]{grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:8px!important}
+  #threeDayAnalysis .metric{min-height:78px!important;padding:10px!important}
+  #threeDayAnalysis .cardhead{align-items:flex-start!important}
+  #threeDayAnalysis .cardhead .pill{white-space:normal!important;text-align:right!important;max-width:48%!important}
+}
+@media(max-width:380px){
+  #btcDominancePanel .btc-dom-main{align-items:flex-start!important}
+  #btcDominancePanel .btc-dom-change{max-width:100%!important;text-align:left!important}
+  #btcDominancePanel .btc-dom-chart-wrap .tradingview-widget-container{height:300px!important}
+  #btcDominancePanel #btcDomTradingViewChart{height:268px!important}
+  #threeDayAnalysis>div[style*="display:grid"]{grid-template-columns:minmax(0,1fr)!important}
+}
+</style><style id="btc-layout-normalization-v2-20261117">
+/* Normalização real de layout: desktop sem colunas órfãs; mobile fluido. */
+.wrap{width:calc(100% - 40px)!important;max-width:1440px!important;margin-inline:auto!important;min-width:0!important}
+.wrap>.grid,.wrap>section.grid,.wrap>.btc-dominance-panel{width:100%!important;max-width:100%!important;min-width:0!important;box-sizing:border-box!important}
+.wrap section.grid.bottom:not(#portfolioAltcoins){display:grid!important;grid-template-columns:minmax(0,1fr)!important;gap:16px!important;align-items:stretch!important;width:100%!important}
+.wrap section.grid.bottom:not(#portfolioAltcoins)>.card{grid-column:1/-1!important;width:100%!important;max-width:100%!important;min-width:0!important;justify-self:stretch!important;box-sizing:border-box!important}
+#portfolioAltcoins{display:grid!important;grid-template-columns:minmax(0,1.12fr) minmax(0,.88fr)!important;gap:16px!important;width:100%!important;max-width:100%!important;align-items:start!important}
+#portfolioAltcoins>.card{width:100%!important;min-width:0!important;max-width:100%!important}
+.btc-dominance-panel,#btcDominancePanel{display:block!important;width:100%!important;max-width:100%!important;min-width:0!important;box-sizing:border-box!important;margin:16px 0!important;padding:clamp(16px,1.8vw,22px)!important;border-radius:16px!important}
+.btc-dominance-panel .btc-dom-main{padding:12px 0!important;gap:14px!important}
+.btc-dominance-panel .btc-dom-main>div:first-child strong{font-size:clamp(38px,4.5vw,54px)!important}
+.btc-dominance-panel .btc-dom-chart-wrap{width:100%!important;max-width:100%!important;min-width:0!important;box-sizing:border-box!important;margin-top:12px!important;padding:12px!important}
+.btc-dominance-panel .btc-dom-chart-head{display:flex!important;align-items:center!important;justify-content:space-between!important;gap:10px!important;flex-wrap:wrap!important}
+.btc-dominance-panel .btc-dom-tradingview-wrap .tradingview-widget-container{width:100%!important;height:430px!important;min-height:0!important;max-width:100%!important;box-sizing:border-box!important}
+.btc-dominance-panel #btcDomTradingViewChart{width:100%!important;height:398px!important;max-width:100%!important;min-width:0!important}
+#decisionCenterV1,#priceChartCard{width:100%!important;max-width:100%!important;min-width:0!important;box-sizing:border-box!important;margin-inline:0!important}
+#decisionCenterV1{margin-bottom:16px!important}
+#priceChartCard{margin-top:0!important;margin-bottom:16px!important}
+#priceChartCard .chartbox{width:100%!important;max-width:100%!important;min-width:0!important;box-sizing:border-box!important}
+@media(max-width:900px){.wrap{width:calc(100% - 28px)!important}#portfolioAltcoins{grid-template-columns:minmax(0,1fr)!important}.btc-dominance-panel .btc-dom-tradingview-wrap .tradingview-widget-container{height:390px!important}.btc-dominance-panel #btcDomTradingViewChart{height:358px!important}}
+@media(max-width:600px){.wrap{width:calc(100% - 20px)!important;padding-left:0!important;padding-right:0!important}.wrap section.grid.bottom:not(#portfolioAltcoins){gap:12px!important}.btc-dominance-panel,#btcDominancePanel{padding:13px!important;margin:12px 0!important;border-radius:14px!important}.btc-dominance-panel .btc-dom-main{align-items:flex-start!important;flex-direction:column!important;gap:10px!important}.btc-dominance-panel .btc-dom-change{width:100%!important;text-align:left!important}.btc-dominance-panel .btc-dom-stats{grid-template-columns:repeat(2,minmax(0,1fr))!important}.btc-dominance-panel .btc-dom-stats>div:last-child{grid-column:1/-1!important}.btc-dominance-panel .btc-dom-chart-wrap{padding:9px!important}.btc-dominance-panel .btc-dom-tradingview-wrap .tradingview-widget-container{height:350px!important}.btc-dominance-panel #btcDomTradingViewChart{height:318px!important}#decisionCenterV1,#priceChartCard{margin-bottom:12px!important}}
+@media(prefers-reduced-motion:reduce){#decisionCenterV1,#priceChartCard,.btc-dominance-panel{scroll-behavior:auto!important}}
+</style>
+<style id="btc-stack-grid-span-fix-v2">
+/* BTC-STACK-GRID-SPAN-FIX-V2 — corrige a coluna-pai que limitava os painéis no desktop. */
+.wrap{width:calc(100% - 40px)!important;max-width:1580px!important;margin-left:auto!important;margin-right:auto!important;min-width:0!important;box-sizing:border-box!important}
+.wrap>.grid.main,
+.wrap>section.grid.main,
+.wrap .grid.main{display:grid!important;grid-template-columns:minmax(0,1fr) minmax(0,1fr)!important;align-items:start!important;gap:16px!important;width:100%!important;max-width:100%!important;min-width:0!important}
+.wrap .grid.main>#customerIndicatorStackV2,
+.wrap .grid.main>#marketSnapshot,
+.wrap .grid.main>#threeDayAnalysis,
+.wrap .grid.main>#decisionCenterV1,
+.wrap .grid.main>#priceChartCard{grid-column:1/-1!important;justify-self:stretch!important;width:100%!important;max-width:100%!important;min-width:0!important;box-sizing:border-box!important}
+#customerIndicatorStackV2{display:flex!important;flex-direction:column!important;align-items:stretch!important;gap:16px!important;grid-column:1/-1!important;justify-self:stretch!important;width:100%!important;max-width:100%!important;min-width:0!important;box-sizing:border-box!important}
+#customerIndicatorStackV2>*{width:100%!important;max-width:100%!important;min-width:0!important;box-sizing:border-box!important;align-self:stretch!important}
+#marketSnapshot,#threeDayAnalysis,#decisionCenterV1,#priceChartCard,#btcDominancePanel{justify-self:stretch!important;align-self:stretch!important;width:100%!important;max-width:100%!important;min-width:0!important;box-sizing:border-box!important}
+#threeDayAnalysis>div[style*="display:grid"]{grid-template-columns:repeat(4,minmax(0,1fr))!important}
+@media(max-width:900px){
+ .wrap{width:calc(100% - 28px)!important}
+ .wrap>.grid.main,.wrap>section.grid.main,.wrap .grid.main{grid-template-columns:minmax(0,1fr)!important;gap:13px!important}
+ .wrap .grid.main>#customerIndicatorStackV2,.wrap .grid.main>#marketSnapshot,.wrap .grid.main>#threeDayAnalysis,.wrap .grid.main>#decisionCenterV1,.wrap .grid.main>#priceChartCard{grid-column:1!important}
+ #threeDayAnalysis>div[style*="display:grid"]{grid-template-columns:repeat(2,minmax(0,1fr))!important}
+}
+@media(max-width:600px){
+ .wrap{width:calc(100% - 20px)!important;padding-left:0!important;padding-right:0!important}
+ #customerIndicatorStackV2{gap:12px!important}
+ #threeDayAnalysis>div[style*="display:grid"]{grid-template-columns:minmax(0,1fr)!important}
+}
+</style>
+<style>
+/* BTC-DASHBOARD-GRID-UNIFICATION-V2 — alinhamento dos módulos e largura integral da carteira */
+#portfolioAltcoins{
+  display:grid!important;
+  grid-template-columns:minmax(0,1fr)!important;
+  width:100%!important;
+  max-width:100%!important;
+  min-width:0!important;
+  gap:14px!important;
+  margin:18px 0!important;
+  box-sizing:border-box!important;
+}
+#portfolioAltcoins>.card{
+  display:block!important;
+  grid-column:1/-1!important;
+  width:100%!important;
+  max-width:100%!important;
+  min-width:0!important;
+  box-sizing:border-box!important;
+}
+#portfolioAltcoins #tradeForm,
+#portfolioAltcoins #portfolioSummary,
+#portfolioAltcoins #walletEvolutionWrap,
+#portfolioAltcoins #tradeHistory{
+  width:100%!important;
+  max-width:100%!important;
+  min-width:0!important;
+  box-sizing:border-box!important;
+}
+#btcDominancePanel,
+#threeDayAnalysis{
+  display:block!important;
+  position:relative!important;
+  float:none!important;
+  clear:both!important;
+  width:100%!important;
+  max-width:100%!important;
+  min-width:0!important;
+  margin:0 0 18px!important;
+  box-sizing:border-box!important;
+}
+#btcDominancePanel .btc-dom-chart-wrap,
+#btcDominancePanel .tradingview-widget-container,
+#btcDominancePanel #btcDomTradingViewChart{
+  width:100%!important;
+  max-width:100%!important;
+  min-width:0!important;
+  box-sizing:border-box!important;
+}
+#btcDominancePanel .btc-dom-chart-wrap .tradingview-widget-container{height:500px!important}
+#btcDominancePanel #btcDomTradingViewChart{height:468px!important}
+#threeDayAnalysis>div[style*="display:grid"]{
+  grid-template-columns:repeat(4,minmax(0,1fr))!important;
+  width:100%!important;
+}
+@media(max-width:1000px){
+  #portfolioAltcoins{grid-template-columns:minmax(0,1fr)!important}
+  #threeDayAnalysis>div[style*="display:grid"]{grid-template-columns:repeat(2,minmax(0,1fr))!important}
+  #btcDominancePanel .btc-dom-chart-wrap .tradingview-widget-container{height:390px!important}
+  #btcDominancePanel #btcDomTradingViewChart{height:358px!important}
+}
+@media(max-width:600px){
+  #portfolioAltcoins,#portfolioAltcoins>.card,
+  #btcDominancePanel,#threeDayAnalysis{
+    width:100%!important;
+    max-width:100%!important;
+    min-width:0!important;
+    margin-bottom:14px!important;
+  }
+  #portfolioAltcoins>.card{padding:14px!important;overflow:hidden!important}
+  #tradeForm{grid-template-columns:minmax(0,1fr)!important}
+  #tradeForm>button{grid-column:1!important}
+  #btcDominancePanel .btc-dom-chart-wrap .tradingview-widget-container{height:340px!important}
+  #btcDominancePanel #btcDomTradingViewChart{height:308px!important}
+  #threeDayAnalysis>div[style*="display:grid"]{grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:8px!important}
+}
+@media(max-width:380px){
+  #btcDominancePanel .btc-dom-chart-wrap .tradingview-widget-container{height:310px!important}
+  #btcDominancePanel #btcDomTradingViewChart{height:278px!important}
+}
+</style>
+
+<style id="btcWalletDesktopFullWidthV2">
+/* BTC-WALLET-DESKTOP-FULLWIDTH-V2 — somente apresentação; preserva cálculos, histórico e sinais. */
+#portfolioAltcoins,
+#portfolioAltcoins > .card,
+#btcDominancePanel,
+#threeDayAnalysis,
+#marketSnapshot {
+  box-sizing:border-box!important;
+  width:100%!important;
+  max-width:100%!important;
+  min-width:0!important;
+}
+#portfolioAltcoins > .card { display:block!important; }
+#portfolioSummary {
+  display:grid!important;
+  grid-template-columns:repeat(6,minmax(0,1fr))!important;
+  align-items:stretch!important;
+  width:100%!important;
+  max-width:100%!important;
+  min-width:0!important;
+  gap:12px!important;
+}
+#portfolioSummary > .metric {
+  min-width:0!important;
+  width:100%!important;
+  box-sizing:border-box!important;
+}
+#portfolioSummary > .portfolio-visual,
+#portfolioSummary > #portfolioBRLSummary,
+#portfolioSummary > .note {
+  grid-column:1/-1!important;
+  width:100%!important;
+  max-width:100%!important;
+  min-width:0!important;
+  box-sizing:border-box!important;
+}
+#portfolioSummary .portfolio-visual {
+  display:block!important;
+  padding:18px!important;
+  border-radius:15px!important;
+  min-width:0!important;
+  overflow:hidden!important;
+}
+#portfolioSummary .portfolio-visual-grid {
+  display:grid!important;
+  grid-template-columns:repeat(3,minmax(0,1fr))!important;
+  gap:12px!important;
+  width:100%!important;
+  min-width:0!important;
+}
+#portfolioSummary .portfolio-visual-metric {
+  min-width:0!important;
+  width:100%!important;
+  box-sizing:border-box!important;
+  overflow-wrap:anywhere!important;
+}
+#portfolioSummary .portfolio-visual-metric strong {
+  display:block!important;
+  max-width:100%!important;
+  overflow-wrap:anywhere!important;
+  line-height:1.35!important;
+}
+#portfolioSummary .portfolio-visual-head {
+  display:flex!important;
+  align-items:center!important;
+  justify-content:space-between!important;
+  flex-wrap:wrap!important;
+  gap:8px!important;
+  width:100%!important;
+}
+#portfolioSummary > #portfolioBRLSummary { margin-top:0!important; }
+#portfolioAltcoins #walletEvolutionWrap,
+#portfolioAltcoins #tradeHistory {
+  width:100%!important;
+  max-width:100%!important;
+  min-width:0!important;
+  box-sizing:border-box!important;
+}
+#portfolioAltcoins #walletEvolutionCanvasBox,
+#portfolioAltcoins #walletEvolutionCanvas {
+  width:100%!important;
+  max-width:100%!important;
+}
+@media (min-width:1200px) {
+  #portfolioAltcoins { grid-template-columns:minmax(0,1fr)!important; }
+}
+@media (max-width:1100px) {
+  #portfolioSummary { grid-template-columns:repeat(3,minmax(0,1fr))!important; }
+}
+@media (max-width:700px) {
+  #portfolioSummary { grid-template-columns:repeat(2,minmax(0,1fr))!important; }
+  #portfolioSummary .portfolio-visual-grid { grid-template-columns:repeat(2,minmax(0,1fr))!important; }
+  #portfolioSummary > .portfolio-visual,
+  #portfolioSummary > #portfolioBRLSummary,
+  #portfolioSummary > .note { grid-column:1/-1!important; }
+}
+@media (max-width:420px) {
+  #portfolioSummary { grid-template-columns:minmax(0,1fr)!important; }
+  #portfolioSummary .portfolio-visual-grid { grid-template-columns:minmax(0,1fr)!important; }
+}
+</style>
+
+<style id="btc-dom-mobile-match-desktop-v1">
+/* BTC-DOM-MOBILE-MATCH-DESKTOP-V1: no mobile, manter a mesma composição do desktop; TradingView permanece como leitura principal. */
+@media(max-width:600px){#btcDominancePanel .btc-dom-main{display:none!important}}
+</style>
+
+<style id="btc-cycle-time-intelligence-v1">
+#btcCycleTimeIntelligence{width:100%;max-width:100%;box-sizing:border-box;margin:0 0 18px!important;padding:clamp(15px,1.7vw,21px)!important;overflow:hidden}
+#btcCycleTimeIntelligence .bct-kicker{display:block;color:#72d8ed;font-size:9px;font-weight:850;letter-spacing:.16em;margin-bottom:5px}
+#btcCycleTimeIntelligence .cardhead{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;flex-wrap:wrap}
+#btcCycleTimeIntelligence .cardhead h2{margin:0;font-size:clamp(15px,1.4vw,19px);letter-spacing:.02em}
+#btcCycleTimeIntelligence .bct-subtitle{margin:6px 0 0;color:#9eb2c9;font-size:12px}
+#btcCycleTimeIntelligence .bct-status{white-space:nowrap}
+#btcCycleTimeIntelligence .bct-hero-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin:16px 0}
+#btcCycleTimeIntelligence .bct-hero-metric{min-width:0;padding:14px;border:1px solid rgba(60,190,132,.3);border-radius:12px;background:linear-gradient(145deg,rgba(18,91,66,.22),rgba(12,27,37,.88))}
+#btcCycleTimeIntelligence .bct-hero-metric.bct-bear{border-color:rgba(226,82,92,.3);background:linear-gradient(145deg,rgba(112,35,48,.2),rgba(12,27,37,.88))}
+#btcCycleTimeIntelligence .bct-hero-metric.bct-live{border-color:rgba(102,184,231,.35);background:linear-gradient(145deg,rgba(31,77,119,.28),rgba(12,27,37,.88))}
+#btcCycleTimeIntelligence .bct-hero-metric>span,#btcCycleTimeIntelligence .bct-comparison span{display:block;color:#9fb3ca;font-size:9px;font-weight:800;letter-spacing:.09em}
+#btcCycleTimeIntelligence .bct-hero-metric strong{display:block;margin:8px 0 4px;color:#6de0ad;font-size:clamp(23px,3vw,34px);line-height:1.05;font-variant-numeric:tabular-nums}
+#btcCycleTimeIntelligence .bct-bear strong{color:#ff858c}
+#btcCycleTimeIntelligence .bct-live strong{color:#8ddcff}
+#btcCycleTimeIntelligence .bct-hero-metric strong small{font-size:10px;letter-spacing:.08em}
+#btcCycleTimeIntelligence .bct-hero-metric em{display:block;color:#a9bbce;font-size:10px;font-style:normal;line-height:1.4}
+#btcCycleTimeIntelligence .bct-timeline-card{padding:14px;border:1px solid #2b405a;border-radius:13px;background:rgba(5,13,23,.46)}
+#btcCycleTimeIntelligence .bct-chart-heading{display:flex;justify-content:space-between;align-items:flex-start;gap:12px}
+#btcCycleTimeIntelligence .bct-chart-heading b{display:block;font-size:12px;color:#edf5ff}
+#btcCycleTimeIntelligence .bct-chart-heading small{display:block;margin-top:4px;color:#8fa6bf;font-size:10px}
+#btcCycleTimeIntelligence .bct-chart-heading>span{color:#7fa2c3;font-size:9px;letter-spacing:.08em}
+#btcCycleTimeIntelligence .bct-legend{display:flex;gap:14px;flex-wrap:wrap;margin:13px 0;color:#9eb2c9;font-size:10px}
+#btcCycleTimeIntelligence .bct-legend span{display:flex;align-items:center;gap:6px}
+#btcCycleTimeIntelligence .bct-legend i{width:9px;height:9px;border-radius:3px;display:inline-block}
+#btcCycleTimeIntelligence .bct-legend .up{background:#16a765}#btcCycleTimeIntelligence .bct-legend .down{background:#d84d5b}#btcCycleTimeIntelligence .bct-legend .ongoing{background:#62bce9}
+#btcCycleTimeIntelligence .bct-cycle-rows{display:grid;gap:13px}
+#btcCycleTimeIntelligence .bct-cycle-row{display:grid;grid-template-columns:minmax(105px,145px) minmax(0,1fr);gap:12px;align-items:center}
+#btc
