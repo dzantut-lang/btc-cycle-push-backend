@@ -1,0 +1,309 @@
+)?vp.start:Number(chart.scales.x.min),xMax=vp&&Number.isFinite(vp.end)?vp.end:Number(chart.scales.x.max),first=Math.max(0,Math.floor(xMin)-2),last=Math.min(meta.data.length-1,Math.ceil(xMax)+2);for(let j=first;j<=last;j++){const el=meta.data[j],val=ds.data[j];if(!el||val==null)continue;const p=el.getProps(['x','y'],true);if(!Number.isFinite(p.x)||!Number.isFinite(p.y))continue;const dsScale=chart.__timeframe==='1w'?0.82:(chart.__timeframe==='1M'?0.72:(chart.__timeframe==='3d'?0.9:1)),isCurrent=index===7,isStrongCurrent=isCurrent&&currentChartSignal.includes('COMPRA FORTE'),radius=(isStrongCurrent?8.2:(isCurrent?6.5:(index===9?5.8:3.7)))*dsScale*viewportMarkerScale(),halo=radius+spread*(isCurrent?1.28:1);ctx.save();ctx.shadowColor='rgba('+rgb+',0.98)';ctx.shadowBlur=(isStrongCurrent?19:(isCurrent?14:(index===9?10:7)))+phase*(isStrongCurrent?8:5);ctx.beginPath();ctx.arc(p.x,p.y,halo+1,0,Math.PI*2);ctx.strokeStyle='rgba('+rgb+','+alpha+')';ctx.lineWidth=1.1+phase*.8;ctx.stroke();ctx.shadowBlur=0;ctx.beginPath();ctx.arc(p.x,p.y,Math.max(2,radius*.72),0,Math.PI*2);ctx.fillStyle='rgba('+rgb+','+(index===9?.94:.72)+')';ctx.fill();ctx.beginPath();ctx.arc(p.x,p.y,Math.max(1.2,radius*.34),0,Math.PI*2);ctx.fillStyle='rgba(255,255,255,'+(.36+phase*.28)+')';ctx.fill();ctx.restore();}}ctx.restore();};const pulseFrame=(timestamp)=>{if(!chart||!chart.canvas||!chart.ctx||document.hidden){btcPulseCtx.clearRect(0,0,btcPulseOverlay.width,btcPulseOverlay.height);btcPulseOverlay.style.display='none';window.__btcPulseFrame=0;return;}btcDrawPulseOverlay(timestamp);window.__btcPulseFrame=requestAnimationFrame(pulseFrame);};window.__btcPulseStart=()=>{if(!window.__btcPulseFrame&&chart&&chart.canvas&&chart.ctx&&!document.hidden)window.__btcPulseFrame=requestAnimationFrame(pulseFrame);};if(!window.__btcPulseVisibilityBound){window.__btcPulseVisibilityBound=true;document.addEventListener('visibilitychange',()=>{if(document.hidden&&window.__btcPulseFrame){cancelAnimationFrame(window.__btcPulseFrame);window.__btcPulseFrame=0;}else if(window.__btcPulseStart)window.__btcPulseStart();});}window.__btcPulseStart();
+ const btns=document.querySelectorAll('[data-chart-indicator]');btns.forEach(b=>{const i=Number(b.dataset.chartIndicator),ds=chart.data.datasets[i];if(ds){b.setAttribute('aria-pressed',String(chart.isDatasetVisible(i)));b.classList.toggle('indicator-off',!chart.isDatasetVisible(i));}});
+}
+function scoreMacdOnly(m,i){const hist=m&&m.hist,macd=m&&m.macd,signal=m&&m.signal;if(!hist||!macd||!signal||i<1||![hist[i],hist[i-1],macd[i],signal[i],macd[i-1],signal[i-1]].every(Number.isFinite))return 50;const above=macd[i]>signal[i],below=macd[i]<signal[i],rising=hist[i]>hist[i-1],falling=hist[i]<hist[i-1],crossUp=macd[i-1]<=signal[i-1]&&above,crossDown=macd[i-1]>=signal[i-1]&&below;if(crossUp)return 90;if(crossDown)return 10;if(above)return rising?80:falling?65:72;if(below)return falling?20:rising?35:28;return 50;}
+function calcMACDSeries(values){
+ const a=ema(values,12),b=ema(values,26),raw=values.map((_,i)=>a[i]!=null&&b[i]!=null?a[i]-b[i]:null),valid=raw.filter(Number.isFinite),sig=ema(valid,9),signal=Array(values.length).fill(null);let p=0;
+ for(let i=0;i<raw.length;i++)if(Number.isFinite(raw[i])){signal[i]=sig[p]??null;p++;}
+ return {macd:raw,signal,hist:raw.map((v,i)=>Number.isFinite(v)&&Number.isFinite(signal[i])?v-signal[i]:null)};
+}
+function calcKDJSeries(series){
+ const K=Array(series.length).fill(null),D=Array(series.length).fill(null),J=Array(series.length).fill(null);let k=50,d=50;
+ for(let i=8;i<series.length;i++){let hh=-Infinity,ll=Infinity;for(let j=i-8;j<=i;j++){hh=Math.max(hh,Number(series[j].high));ll=Math.min(ll,Number(series[j].low));}
+  const rsv=hh===ll?50:(Number(series[i].close)-ll)/(hh-ll)*100;k=(2*k+rsv)/3;d=(2*d+k)/3;K[i]=k;D[i]=d;J[i]=3*k-2*d;
+ }
+ return {k:K,d:D,j:J};
+}
+function computeReversalAnalysis(raw){
+ const c=(raw||[]).filter(x=>Number.isFinite(x.time)&&Number.isFinite(x.closeTime)&&x.closeTime<Date.now()&&[x.open,x.high,x.low,x.close,x.volume].every(Number.isFinite)).sort((a,b)=>a.time-b.time);
+ const result={ready:false,candles:c,buyEvents:new Map(),sellEvents:new Map(),stats:{},bull:0,bear:0};
+ if(c.length<40)return result;
+ const close=c.map(x=>x.close),vol=c.map(x=>x.volume),rr=rsi(close),mm=calcMACDSeries(close),kk=calcKDJSeries(c),e50=ema(close,50),e200=ema(close,200);
+ const series={rsi:[],macd:[],kdj:[],volume:[],fng:[],combined:[]};let fngPointer=0;
+ for(let i=1;i<c.length-3;i++){
+  const rPrev=rr[i-1],rNow=rr[i],mPrev=mm.macd[i-1],sPrev=mm.signal[i-1],mNow=mm.macd[i],sNow=mm.signal[i],kPrev=kk.k[i-1],dPrev=kk.d[i-1],kNow=kk.k[i],dNow=kk.d[i];
+  if(![rPrev,rNow,mPrev,sPrev,mNow,sNow,kPrev,dPrev,kNow,dNow].every(Number.isFinite))continue;
+  const rBuy=rPrev<=30&&rNow>30,rSell=rPrev>=70&&rNow<70;
+  const mBuy=mPrev<=sPrev&&mNow>sNow,mSell=mPrev>=sPrev&&mNow<sNow;
+  const kBuy=kPrev<=dPrev&&kNow>dNow&&Math.min(kPrev,dPrev)<=35,kSell=kPrev>=dPrev&&kNow<dNow&&Math.max(kPrev,dPrev)>=65;
+  const avgVol=vol.slice(Math.max(0,i-20),i).reduce((a,b)=>a+b,0)/Math.max(1,vol.slice(Math.max(0,i-20),i).length);
+  const volRatio=avgVol>0?vol[i]/avgVol:0,green=c[i].close>c[i].open,red=c[i].close<c[i].open,prevRed=c[i-1].close<c[i-1].open,prevGreen=c[i-1].close>c[i-1].open;
+  const vBuy=volRatio>=1.5&&green&&prevRed,vSell=volRatio>=1.5&&red&&prevGreen;
+  if(rBuy)series.rsi.push({i,side:'buy'});if(rSell)series.rsi.push({i,side:'sell'});
+  if(mBuy)series.macd.push({i,side:'buy'});if(mSell)series.macd.push({i,side:'sell'});
+  if(kBuy)series.kdj.push({i,side:'buy'});if(kSell)series.kdj.push({i,side:'sell'});
+  if(vBuy)series.volume.push({i,side:'buy'});if(vSell)series.volume.push({i,side:'sell'});
+  while(fngPointer+1<fearGreedHistory.length&&fearGreedHistory[fngPointer+1].timestamp*1000<=c[i].closeTime)fngPointer++;
+  const fngNow=fearGreedHistory[fngPointer],fngPrev=fngPointer>0?fearGreedHistory[fngPointer-1]:null;
+  const fBuy=!!(fngNow&&fngPrev&&fngNow.timestamp*1000<=c[i].closeTime&&fngNow.value<=25&&fngNow.value>fngPrev.value),fSell=!!(fngNow&&fngPrev&&fngNow.timestamp*1000<=c[i].closeTime&&fngNow.value>=75&&fngNow.value<fngPrev.value);
+  if(fBuy)series.fng.push({i,side:'buy'});if(fSell)series.fng.push({i,side:'sell'});
+  const buyVotes=(rBuy?1:0)+(mBuy?1:0)+(kBuy?1:0)+(vBuy?1:0)+(fBuy?1:0),sellVotes=(rSell?1:0)+(mSell?1:0)+(kSell?1:0)+(vSell?1:0)+(fSell?1:0);
+  const regimeUp=Number.isFinite(e50[i])&&Number.isFinite(e200[i])&&close[i]>e200[i]&&e50[i]>e200[i]&&e50[i]>e50[Math.max(0,i-5)],regimeDown=Number.isFinite(e50[i])&&Number.isFinite(e200[i])&&close[i]<e200[i]&&e50[i]<e200[i]&&e50[i]<e50[Math.max(0,i-5)];
+  const sellAllowed=!regimeUp||(close[i]<e50[i]&&rr[i]<42&&mm.hist[i]<0&&mSell),buyAllowed=!regimeDown||(close[i]>e50[i]&&rr[i]>52&&mm.hist[i]>0&&mBuy&&kBuy);
+  if(buyVotes>=2&&sellVotes===0&&buyAllowed)series.combined.push({i,side:'buy',votes:buyVotes,volumeConfirmed:volRatio>=1.2,regime:regimeUp?'ALTA':regimeDown?'BAIXA':'TRANSIÇÃO'});
+  else if(sellVotes>=2&&buyVotes===0&&sellAllowed)series.combined.push({i,side:'sell',votes:sellVotes,volumeConfirmed:volRatio>=1.2,regime:regimeUp?'ALTA':regimeDown?'BAIXA':'TRANSIÇÃO'});
+ }
+ for(const [name,events] of Object.entries(series)){
+  let hit=0,n=0,net=0,volumeConfirmed=0;
+  for(const e of events){const start=c[e.i].close,end=c[e.i+3].close,ret=end/start-1,correct=e.side==='buy'?ret>0.002:ret< -0.002;n++;if(correct)hit++;net+=e.side==='buy'?ret:-ret;if(e.volumeConfirmed)volumeConfirmed++;}
+  result.stats[name]={n,hit,rate:n?100*hit/n:0,avg:n?net/n*100:0,volumeConfirmed};
+ }
+ for(const e of series.combined){const cndl=c[e.i],dest=e.side==='buy'?result.buyEvents:result.sellEvents;dest.set(cndl.time,{price:cndl.close,votes:e.votes,volumeConfirmed:e.volumeConfirmed});if(e.side==='buy')result.bull++;else result.bear++;}
+ result.ready=true;return result;
+}
+function renderReversalAnalysis(a){
+ const put=(id,value)=>{const el=$(id);if(el)el.textContent=value;};
+ if(!a||!a.ready){put('revPeriod','Histórico insuficiente');put('revCount','—');put('revCombinedHit','—');put('revRsiHit','—');put('revMacdHit','—');put('revKdjHit','—');put('revVolumeHit','—');put('revFngHit','—');put('revVolumeConfirm','—');put('revConclusion','São necessários pelo menos 40 candles 3D fechados para comparar os indicadores.');return;}
+ const f=s=>s&&s.n?s.rate.toFixed(1)+'% / '+s.n:'Sem amostra';
+ const combined=a.stats.combined,rsiStat=a.stats.rsi,macdStat=a.stats.macd,kdjStat=a.stats.kdj,volStat=a.stats.volume;
+ const first=a.candles[0].time,last=a.candles[a.candles.length-1].time;
+ put('revPeriod',new Date(first).toLocaleDateString('pt-BR',{month:'short',year:'numeric',timeZone:'UTC'})+' – '+new Date(last).toLocaleDateString('pt-BR',{month:'short',year:'numeric',timeZone:'UTC'}));
+ put('revCount',a.bull+' compras · '+a.bear+' vendas');put('revCombinedHit',f(combined));put('revRsiHit',f(rsiStat));put('revMacdHit',f(macdStat));put('revKdjHit',f(kdjStat));put('revVolumeHit',f(volStat));put('revFngHit',f(a.stats.fng));
+ put('revVolumeConfirm',combined&&combined.n?Math.round(100*combined.volumeConfirmed/combined.n)+'% dos sinais':'—');
+ const fngStat=a.stats.fng;put('revFngHit',f(fngStat));const options=[['RSI',rsiStat],['MACD',macdStat],['KDJ',kdjStat],['Volume',volStat],['Fear & Greed',fngStat],['Combinação',combined]].filter(x=>x[1]&&x[1].n>=5).sort((x,y)=>y[1].rate-x[1].rate);
+ const best=options[0];put('revConclusion',best?'Melhor taxa direcional nesta amostra: '+best[0]+' ('+best[1].rate.toFixed(1)+'% em '+best[1].n+' sinais). A análise individual dos indicadores é exploratória. As bolinhas do gráfico principal vêm do motor oficial diário MACD + EMA 50/200 + filtro de ciclo/ATH; as métricas direcionais desta seção são exploratórias e não alteram o sinal ao vivo. Nenhuma taxa garante resultados futuros.':'Ainda há poucos sinais para eleger um indicador com confiança; mantenha a leitura como experimental.');
+}
+function fearGreedExtremeBlocksSignal(timestamp,side){if(!Number.isFinite(Number(timestamp))||!Array.isArray(fearGreedHistory)||!fearGreedHistory.length)return false;let lo=0,hi=fearGreedHistory.length-1,best=-1;while(lo<=hi){const mid=(lo+hi)>>1;if(Number(fearGreedHistory[mid].timestamp)*1000<=Number(timestamp)){best=mid;lo=mid+1;}else hi=mid-1;}if(best<0)return false;const value=Number(fearGreedHistory[best].value);return side==='buy'?value>=75:side==='sell'?value<=24:false;}
+function calcDailyMacdEmaSignals(raw,period='1d'){
+ const c=(raw||[]).filter(x=>x&&Number.isFinite(x.time)&&Number.isFinite(x.closeTime)&&x.closeTime<Date.now()&&[x.open,x.high,x.low,x.close].every(Number.isFinite)).sort((a,b)=>a.time-b.time);
+ const buySignals=new Map(),sellSignals=new Map(),close=c.map(x=>x.close),m=calcMACDSeries(close),e50=ema(close,50),e200=ema(close,200);
+ const sellAllowedAt=new Array(c.length);let cyclePeak=-Infinity,lockedPeak=NaN,sellUnlocked=false,sellLocked=false;
+ for(let k=0;k<c.length;k++){const high=Number(c[k].high);if(!Number.isFinite(high)){sellAllowedAt[k]=false;continue;}if(!Number.isFinite(cyclePeak)){cyclePeak=high;sellAllowedAt[k]=false;continue;}if(sellLocked){if(high>=lockedPeak){sellLocked=false;sellUnlocked=true;cyclePeak=high;lockedPeak=NaN;}sellAllowedAt[k]=sellUnlocked&&!sellLocked;continue;}if(high>cyclePeak)cyclePeak=high;if(high<=cyclePeak*0.8){lockedPeak=cyclePeak;sellLocked=true;sellUnlocked=false;}sellAllowedAt[k]=sellUnlocked&&!sellLocked;}
+ if(c.length<205)return {ready:false,candles:c,buySignals,sellSignals,current:{signal:'AGUARDAR',score:50,reason:'Histórico insuficiente: são necessários pelo menos 205 candles fechados de '+(period==='3d'?'3 dias':'diários')+'.',buy:false,sell:false,period:period},period:period};
+ for(let i=1;i<c.length;i++){const price=close[i],m0=m.macd[i-1],s0=m.signal[i-1],m1=m.macd[i],s1=m.signal[i],a=e50[i],b=e200[i];if(![price,m0,s0,m1,s1,a,b].every(Number.isFinite))continue;const crossUp=m0<=s0&&m1>s1,crossDown=m0>=s0&&m1<s1,base={signalPrice:price,signalTime:c[i].closeTime,candleTime:c[i].time,ema50:a,ema200:b,macd:m1,macdSignal:s1,period:period};
+ if(crossUp&&price<a){const strongBuy=price<b;buySignals.set(c[i].closeTime,{...base,signal:strongBuy?'COMPRA FORTE':'COMPRA',strong:strongBuy,reason:'Candle '+(period==='3d'?'de 3 dias':'diário')+' fechado abaixo da EMA 50; MACD '+(period==='3d'?'3D':'diário')+' cruzou acima da linha de sinal; '+(strongBuy?'preço abaixo da EMA 200: COMPRA FORTE.':'preço acima ou na EMA 200: COMPRA.')});}
+ if(crossDown&&price>a&&sellAllowedAt[i]===true)sellSignals.set(c[i].closeTime,{...base,signal:price>b?'VENDA FORTE':'VENDA',strong:price>b,reason:'Candle '+(period==='3d'?'de 3 dias':'diário')+' fechado acima da EMA 50; MACD '+(period==='3d'?'3D':'diário')+' cruzou abaixo da linha de sinal e filtro de ciclo/ATH liberado; '+(price>b?'preço acima da EMA 200: VENDA FORTE.':'preço abaixo ou na EMA 200: VENDA.')});}
+ const last=c[c.length-1],i=c.length-1,latestBuy=last?buySignals.get(last.closeTime):null,latestSell=last?sellSignals.get(last.closeTime):null,latest=latestBuy||latestSell||null;
+ const current={ready:true,signal:latest?latest.signal:'AGUARDAR',score:scoreMacdOnly(m,i),buy:!!latestBuy,sell:!!latestSell,close:last?last.close:NaN,ema50:e50[i],ema200:e200[i],macd:m.macd[i],macdSignal:m.signal[i],candleTime:last.time,closeTime:last.closeTime,period:period,reason:latest?latest.reason:'Nenhum novo gatilho confirmado no último candle fechado de '+(period==='3d'?'3 dias':'1 dia')+'. Compra exige cruzamento ascendente do MACD '+(period==='3d'?'3D':'diário')+' com fechamento abaixo da EMA 50; COMPRA FORTE quando também abaixo da EMA 200. Venda exige cruzamento descendente, fechamento acima da EMA 50 e liberação do filtro de ciclo/ATH.'};
+ return {ready:true,candles:c,buySignals,sellSignals,current:current,period:period};
+}
+function renderReversalAnalysis(a){
+ const put=(id,value)=>{const el=$(id);if(el)el.textContent=value;};
+ if(!a||!a.ready){put('revPeriod','Histórico insuficiente');put('revCount','—');put('revCombinedHit','—');put('revRsiHit','—');put('revMacdHit','—');put('revKdjHit','—');put('revVolumeHit','—');put('revFngHit','—');put('revVolumeConfirm','—');put('revConclusion','São necessários pelo menos 40 candles 3D fechados para comparar os indicadores.');return;}
+ const f=s=>s&&s.n?s.rate.toFixed(1)+'% / '+s.n:'Sem amostra';
+ const combined=a.stats.combined,rsiStat=a.stats.rsi,macdStat=a.stats.macd,kdjStat=a.stats.kdj,volStat=a.stats.volume;
+ const first=a.candles[0].time,last=a.candles[a.candles.length-1].time;
+ put('revPeriod',new Date(first).toLocaleDateString('pt-BR',{month:'short',year:'numeric',timeZone:'UTC'})+' – '+new Date(last).toLocaleDateString('pt-BR',{month:'short',year:'numeric',timeZone:'UTC'}));
+ put('revCount',a.bull+' compras · '+a.bear+' vendas');put('revCombinedHit',f(combined));put('revRsiHit',f(rsiStat));put('revMacdHit',f(macdStat));put('revKdjHit',f(kdjStat));put('revVolumeHit',f(volStat));put('revFngHit',f(a.stats.fng));
+ put('revVolumeConfirm',combined&&combined.n?Math.round(100*combined.volumeConfirmed/combined.n)+'% dos sinais':'—');
+ const fngStat=a.stats.fng;put('revFngHit',f(fngStat));const options=[['RSI',rsiStat],['MACD',macdStat],['KDJ',kdjStat],['Volume',volStat],['Fear & Greed',fngStat],['Combinação',combined]].filter(x=>x[1]&&x[1].n>=5).sort((x,y)=>y[1].rate-x[1].rate);
+ const best=options[0];put('revConclusion',best?'Melhor taxa direcional nesta amostra: '+best[0]+' ('+best[1].rate.toFixed(1)+'% em '+best[1].n+' sinais). A análise individual dos indicadores é exploratória. As bolinhas do gráfico principal vêm do motor oficial diário MACD + EMA 50/200 + filtro de ciclo/ATH; as métricas direcionais desta seção são exploratórias e não alteram o sinal ao vivo. Nenhuma taxa garante resultados futuros.':'Ainda há poucos sinais para eleger um indicador com confiança; mantenha a leitura como experimental.');
+}
+function fearGreedExtremeBlocksSignal(timestamp,side){if(!Number.isFinite(Number(timestamp))||!Array.isArray(fearGreedHistory)||!fearGreedHistory.length)return false;let lo=0,hi=fearGreedHistory.length-1,best=-1;while(lo<=hi){const mid=(lo+hi)>>1;if(Number(fearGreedHistory[mid].timestamp)*1000<=Number(timestamp)){best=mid;lo=mid+1;}else hi=mid-1;}if(best<0)return false;const value=Number(fearGreedHistory[best].value);return side==='buy'?value>=75:side==='sell'?value<=24:false;}
+function calcDailyMacdEmaSignals(raw,period='1d'){
+ const c=(raw||[]).filter(x=>x&&Number.isFinite(x.time)&&Number.isFinite(x.closeTime)&&x.closeTime<Date.now()&&[x.open,x.high,x.low,x.close].every(Number.isFinite)).sort((a,b)=>a.time-b.time);
+ const buySignals=new Map(),sellSignals=new Map(),close=c.map(x=>x.close),m=calcMACDSeries(close),e50=ema(close,50),e200=ema(close,200);
+ const sellAllowedAt=new Array(c.length);let cyclePeak=-Infinity,lockedPeak=NaN,sellUnlocked=false,sellLocked=false;
+ for(let k=0;k<c.length;k++){const high=Number(c[k].high);if(!Number.isFinite(high)){sellAllowedAt[k]=false;continue;}if(!Number.isFinite(cyclePeak)){cyclePeak=high;sellAllowedAt[k]=false;continue;}if(sellLocked){if(high>=lockedPeak){sellLocked=false;sellUnlocked=true;cyclePeak=high;lockedPeak=NaN;}sellAllowedAt[k]=sellUnlocked&&!sellLocked;continue;}if(high>cyclePeak)cyclePeak=high;if(high<=cyclePeak*0.8){lockedPeak=cyclePeak;sellLocked=true;sellUnlocked=false;}sellAllowedAt[k]=sellUnlocked&&!sellLocked;}
+ if(c.length<205)return {ready:false,candles:c,buySignals,sellSignals,current:{signal:'AGUARDAR',score:50,reason:'Histórico insuficiente: são necessários pelo menos 205 candles fechados de '+(period==='3d'?'3 dias':'diários')+'.',buy:false,sell:false,period:period},period:period};
+ for(let i=1;i<c.length;i++){const price=close[i],m0=m.macd[i-1],s0=m.signal[i-1],m1=m.macd[i],s1=m.signal[i],a=e50[i],b=e200[i];if(![price,m0,s0,m1,s1,a,b].every(Number.isFinite))continue;const crossUp=m0<=s0&&m1>s1,crossDown=m0>=s0&&m1<s1,base={signalPrice:price,signalTime:c[i].closeTime,candleTime:c[i].time,ema50:a,ema200:b,macd:m1,macdSignal:s1,period:period};
+ if(crossUp&&price<a){const strongBuy=price<b;buySignals.set(c[i].closeTime,{...base,signal:strongBuy?'COMPRA FORTE':'COMPRA',strong:strongBuy,reason:'Candle '+(period==='3d'?'de 3 dias':'diário')+' fechado abaixo da EMA 50; MACD '+(period==='3d'?'3D':'diário')+' cruzou acima da linha de sinal; '+(strongBuy?'preço abaixo da EMA 200: COMPRA FORTE.':'preço acima ou na EMA 200: COMPRA.')});}
+ if(crossDown&&price>a&&sellAllowedAt[i]===true)sellSignals.set(c[i].closeTime,{...base,signal:price>b?'VENDA FORTE':'VENDA',strong:price>b,reason:'Candle '+(period==='3d'?'de 3 dias':'diário')+' fechado acima da EMA 50; MACD '+(period==='3d'?'3D':'diário')+' cruzou abaixo da linha de sinal e filtro de ciclo/ATH liberado; '+(price>b?'preço acima da EMA 200: VENDA FORTE.':'preço abaixo ou na EMA 200: VENDA.')});}
+ const last=c[c.length-1],i=c.length-1,latestBuy=last?buySignals.get(last.closeTime):null,latestSell=last?sellSignals.get(last.closeTime):null,latest=latestBuy||latestSell||null;
+ const current={ready:true,signal:latest?latest.signal:'AGUARDAR',score:scoreMacdOnly(m,i),buy:!!latestBuy,sell:!!latestSell,close:last?last.close:NaN,ema50:e50[i],ema200:e200[i],macd:m.macd[i],macdSignal:m.signal[i],candleTime:last.time,closeTime:last.closeTime,period:period,reason:latest?latest.reason:'Nenhum novo gatilho confirmado no último candle fechado de '+(period==='3d'?'3 dias':'1 dia')+'. Compra exige cruzamento ascendente do MACD '+(period==='3d'?'3D':'diário')+' com fechamento abaixo da EMA 50; COMPRA FORTE quando também abaixo da EMA 200. Venda exige cruzamento descendente, fechamento acima da EMA 50 e liberação do filtro de ciclo/ATH.'};
+ return {ready:true,candles:c,buySignals,sellSignals,current,macd:m,e50,e200,period:period};
+}
+
+function runDailyMacdEmaBacktest(raw,period='1d'){
+ const sig=calcDailyMacdEmaSignals(raw,period),c=sig.candles||[],fee=0.001,slippage=0.0005,trades=[];
+ let pos=null,equity=1,peak=1,maxDD=0;
+ const mark=value=>{if(Number.isFinite(value)&&value>0){peak=Math.max(peak,value);maxDD=Math.max(maxDD,(peak-value)/peak);}};
+ if(!sig.ready||c.length<206)return {ready:false,reason:'Histórico insuficiente para candles '+(period==='3d'?'3D':'diários'),trades,buyCount:sig.buySignals.size,sellCount:sig.sellSignals.size,winRate:null,totalReturn:null,maxDD:null,buyHold:null,closedTrades:0,openPosition:false,comparisonPeriod:null};
+ // A comparação começa no primeiro candle em que a EMA 200 e o MACD estão disponíveis.
+ const firstValidIndex=Array.isArray(sig.e200)?sig.e200.findIndex(Number.isFinite):-1;
+ const startIndex=Math.max(0,firstValidIndex);
+ const entryIndex=startIndex+1;
+ if(entryIndex>=c.length||!Number.isFinite(c[entryIndex].open)||c[entryIndex].open<=0)return {ready:false,reason:'Não há candle seguinte válido para comparar as estratégias',trades,buyCount:sig.buySignals.size,sellCount:sig.sellSignals.size,winRate:null,totalReturn:null,maxDD:null,buyHold:null,closedTrades:0,openPosition:false,comparisonPeriod:null};
+ for(let i=startIndex;i<c.length;i++){
+  const cur=c[i],next=c[i+1],buy=sig.buySignals.get(cur.closeTime),sell=sig.sellSignals.get(cur.closeTime);
+  if(pos){const markedLow=Number.isFinite(cur.low)&&cur.low>0?equity*(cur.low/pos.entry)*(1-fee)*(1-fee)*(1-slippage)*(1-slippage):NaN;mark(markedLow);const marked=equity*(cur.close/pos.entry)*(1-fee)*(1-fee)*(1-slippage)*(1-slippage);mark(marked);}else mark(equity);
+  if(!next)break;
+  if(pos&&sell){
+   const exitPrice=next.open*(1-slippage),net=(exitPrice/pos.entry)*(1-fee)*(1-fee)-1;
+   trades.push({entry:pos.entry,exit:exitPrice,entryTime:pos.time,exitTime:next.time,netReturn:net});
+   equity*=1+net;pos=null;mark(equity);
+  }
+  if(!pos&&buy&&Number.isFinite(next.open)&&next.open>0)pos={entry:next.open*(1+slippage),time:next.time};
+ }
+ if(pos){
+  const last=c[c.length-1],exitPrice=last.close*(1-slippage),net=(exitPrice/pos.entry)*(1-fee)*(1-fee)-1;
+  trades.push({entry:pos.entry,exit:exitPrice,entryTime:pos.time,exitTime:last.closeTime,netReturn:net,openPosition:true});
+  equity*=1+net;mark(equity);
+ }
+ const closed=trades.filter(t=>!t.openPosition),wins=closed.filter(t=>t.netReturn>0).length;
+ let realizedEquity=1;closed.forEach(t=>{realizedEquity*=1+t.netReturn;});
+ const realizedReturn=(realizedEquity-1)*100;
+ const winRate=closed.length?100*wins/closed.length:0,totalReturn=(equity-1)*100;
+ // Buy-and-hold uses the same start date/open, end close, and entry/exit fee assumptions.
+ const buyHold=((c[c.length-1].close*(1-slippage)/(c[entryIndex].open*(1+slippage)))*(1-fee)*(1-fee)-1)*100;
+ return {ready:true,trades,closedTrades:closed.length,openPosition:trades.some(t=>t.openPosition),buyCount:sig.buySignals.size,sellCount:sig.sellSignals.size,winRate,realizedReturn,totalReturn,maxDD:maxDD*100,buyHold,comparisonPeriod:{startTime:c[entryIndex].time||c[entryIndex].closeTime,endTime:c[c.length-1].closeTime,startPrice:c[entryIndex].open,endPrice:c[c.length-1].close,feePerSidePct:fee*100,slippagePerSidePct:slippage*100,candleCount:c.length-entryIndex}};
+}
+function renderCycleBacktest(b){
+ const el=$('cycleBacktestPanel');if(!el)return;
+ if(!b||!b.ready){el.innerHTML='<div class="cardhead"><h2>Validação histórica · motor oficial do gráfico (MACD 3D + EMA 50/200)</h2><span class="pill">DADOS INSUFICIENTES</span></div><p class="note">Aguardando candles de 3 dias fechados suficientes.</p>';return;}
+ const f=n=>Number.isFinite(n)?(n>=0?'+':'')+n.toFixed(2)+'%':'—';
+ const trades=Array.isArray(b.trades)?b.trades:[],openTrades=trades.filter(t=>t.openPosition),closedTrades=trades.filter(t=>!t.openPosition);
+ const openPnl=openTrades.length?openTrades.reduce((sum,t)=>sum+(Number(t.netReturn)||0),0)*100:null;
+ const openLabel=openTrades.length?(openTrades.length+' posição(ões) aberta(s) · variação estimada da posição aberta '+f(openPnl)):'Nenhuma posição aberta no fim do histórico.';
+ const auditPrice=n=>Number.isFinite(Number(n))?(selectedAnalysisSymbol==='BTCUSDT'?fmtUSD(Number(n)):fmtAltPrice(Number(n))):'—';let auditEquity=1;const tradeRows=trades.map((t,i)=>{auditEquity*=1+(Number(t.netReturn)||0);return '<tr><td>'+(i+1)+'</td><td>'+new Date(t.entryTime).toLocaleDateString("pt-BR")+'</td><td>'+auditPrice(t.entry)+'</td><td>'+new Date(t.exitTime).toLocaleDateString("pt-BR")+'</td><td>'+auditPrice(t.exit)+'</td><td>'+f((Number(t.netReturn)||0)*100)+'</td><td>'+f((auditEquity-1)*100)+'</td><td>'+(t.openPosition?'Aberta · marcada a mercado':'Encerrada')+'</td></tr>';}).join('');
+ const tradeTable='<div style="margin-top:18px;overflow-x:auto;border-top:1px solid #26364a;padding-top:14px"><h3>Auditoria das operações</h3><table style="width:100%;min-width:760px;border-collapse:collapse;font-size:13px"><thead><tr><th>#</th><th>Data entrada</th><th>Preço entrada</th><th>Data saída</th><th>Preço saída</th><th>Retorno líquido</th><th>Capital composto</th><th>Status</th></tr></thead><tbody>'+tradeRows+'</tbody></table><p class="note">Retornos por operação incluem custos estimados de 0,10% na entrada e 0,10% na saída/avaliação. A posição aberta é marcada pelo último fechamento e não é retorno realizado.</p></div>';
+ const html='<div class="cardhead"><h2>Validação histórica · motor oficial do gráfico (MACD 3D + EMA 50/200)</h2><span class="pill">CANDLES FECHADOS</span></div>'+
+ '<div class="metrics-grid"><div class="metric"><span>Gatilhos de compra</span><strong>'+b.buyCount+'</strong></div><div class="metric"><span>Gatilhos de venda</span><strong>'+b.sellCount+'</strong></div><div class="metric"><span>Operações encerradas</span><strong>'+closedTrades.length+'</strong></div><div class="metric"><span>Acerto · encerradas</span><strong>'+((closedTrades.length>0&&Number.isFinite(b.winRate))?b.winRate.toFixed(1)+'%':'—')+'</strong></div><div class="metric"><span>Retorno realizado · encerradas</span><strong>'+f(b.realizedReturn)+'</strong></div><div class="metric"><span>Retorno total simulado*</span><strong>'+f(b.totalReturn)+'</strong></div><div class="metric"><span>Período analisado</span><strong>'+(b.comparisonPeriod?new Date(b.comparisonPeriod.startTime).toLocaleDateString("pt-BR")+' – '+new Date(b.comparisonPeriod.endTime).toLocaleDateString("pt-BR"):'—')+'</strong><span>'+(b.comparisonPeriod?b.comparisonPeriod.candleCount+' candles diários':'')+'</span></div><div class="metric"><span>Drawdown máximo</span><strong>'+f(-b.maxDD)+'</strong></div><div class="metric"><span>Comprar e manter · mesmo período e custos</span><strong>'+f(b.buyHold)+'</strong></div></div>'+
+ tradeTable+
+ '<p class="note"><strong>'+openLabel+'</strong></p>'+
+ '<p class="note">*O retorno total inclui a marcação da posição aberta no último candle, se houver; por isso pode diferir do resultado das operações encerradas. A taxa de acerto considera somente operações encerradas e não representa probabilidade futura. '+(closedTrades.length<5?'AMOSTRA INSUFICIENTE: menos de 5 operações encerradas; não há evidência estatística suficiente.':closedTrades.length<30?'AMOSTRA PEQUENA: menos de 30 operações encerradas; valide fora da amostra.':'Valide também em períodos fora da amostra e diferentes regimes de mercado.')+'</p>'+
+ '<p class="note">Motor oficial: compra no fechamento diário abaixo da EMA 50 com cruzamento ascendente do MACD; compra forte quando também abaixo da EMA 200. Venda no fechamento diário acima da EMA 50 com cruzamento descendente do MACD e filtro de ciclo/ATH liberado após queda de pelo menos 20% e recuperação da máxima registrada. O backtest usa o mesmo motor dos marcadores do gráfico. MVRV não participa do sinal atual. Execução simulada na abertura seguinte, custo de 0,10% por lado. Comparação com comprar e manter no mesmo período elegível, usando entrada na abertura seguinte e custo de 0,10% por lado em ambas as estratégias. Sem slippage nem impostos; histórico não garante resultados futuros.</p>';
+ el.innerHTML=html;
+}
+
+let btcMvrvHistoryState={rows:null,loadedAt:0,error:null,sourceDate:null,delayed:false};
+let btcMvrvLoadPromise=null;
+function mvrvDateKey(v){
+ const n=Number(v);
+ if(Number.isFinite(n)&&n>0)return new Date(n<1e11?n*1000:n).toISOString().slice(0,10);
+ const d=String(v||"").slice(0,10);
+ return /^\d{4}-\d{2}-\d{2}$/.test(d)?d:null;
+}
+function getMvrvZForTime(v){
+ if(!btcMvrvHistoryState.rows)return null;
+ const key=mvrvDateKey(v);
+ if(!key)return null;
+ const exact=btcMvrvHistoryState.rows.get(key);if(Number.isFinite(exact))return exact;
+ const target=Date.parse(key+'T00:00:00Z');if(!Number.isFinite(target))return null;
+ for(let days=1;days<=7;days++){const prior=new Date(target-days*86400000).toISOString().slice(0,10),value=btcMvrvHistoryState.rows.get(prior);if(Number.isFinite(value))return value;}
+ return null;
+}
+async function loadBtcMvrvHistory(force=false){
+ const MVRV_CACHE_KEY="btc-cycle-mvrv-history-v2";
+ if(!btcMvrvHistoryState.rows){try{const saved=JSON.parse(localStorage.getItem(MVRV_CACHE_KEY)||"null");if(saved&&Array.isArray(saved.data)&&saved.data.length){const cachedRows=new Map(saved.data.filter(x=>x&&typeof x.date==="string"&&Number.isFinite(Number(x.value))).map(x=>[x.date,Number(x.value)]));if(cachedRows.size)btcMvrvHistoryState={rows:cachedRows,loadedAt:Number(saved.loadedAt)||0,error:null,sourceDate:saved.sourceDate||null,sourceName:(saved.sourceName||"cache local")+" · cache",delayed:false};}}catch(_){}}
+ if(!force&&btcMvrvHistoryState.rows&&Date.now()-btcMvrvHistoryState.loadedAt<6*60*60*1000)return btcMvrvHistoryState;
+ if(btcMvrvLoadPromise)return btcMvrvLoadPromise;
+ btcMvrvLoadPromise=(async()=>{
+  try{
+   let rows=new Map(),sourceName="Explore21",delayed=false,sourceError=null;
+   try{
+    const response=await fetch("https://charts.explore21.com/data/bitcoin-mvrv-z-score.csv",{method:"GET",headers:{accept:"text/csv"},cache:"no-store"});
+    if(!response.ok)throw new Error("CSV HTTP "+response.status);
+    const csv=await response.text(),lines=csv.trim().split(/\r?\n/);
+    if(lines.length<2)throw new Error("CSV histórico vazio");
+    const headers=lines[0].replace(/^\uFEFF/,"").split(",").map(x=>x.trim().toLowerCase());
+    const dateIndex=headers.indexOf("date"),valueIndex=headers.indexOf("mvrv_z_score");
+    if(dateIndex<0||valueIndex<0)throw new Error("Colunas date/mvrv_z_score ausentes");
+    for(let i=1;i<lines.length;i++){
+     const cols=lines[i].split(","),key=mvrvDateKey(cols[dateIndex]),raw=cols[valueIndex],value=Number(raw);
+     if(key&&raw!==undefined&&raw!==""&&Number.isFinite(value)&&value>-100&&value<100)rows.set(key,value);
+    }
+    if(!rows.size)throw new Error("CSV sem valores MVRV válidos");
+   }catch(csvError){
+    sourceError=String(csvError&&csvError.message||csvError);
+    const response=await fetch("https://bitcoin-data.com/v1/mvrv-zscore?limit=10000",{method:"GET",headers:{accept:"application/json"},cache:"no-store"});
+    if(!response.ok)throw new Error("Fonte histórica e fallback indisponíveis: "+sourceError+"; HTTP "+response.status);
+    const payload=await response.json(),list=Array.isArray(payload)?payload:(Array.isArray(payload.data)?payload.data:[payload]);
+    for(const item of list){
+     if(!item||typeof item!=="object")continue;
+     const key=mvrvDateKey(item.d??item.date??item.day??item.unixTs??item.timestamp);
+     const raw=item.mvrvZscore??item.mvrv_zscore??item.mvrvZScore??item.mvrvzscore??item.zscore??item.zScore,value=Number(raw);
+     if(key&&raw!==undefined&&Number.isFinite(value)&&value>-100&&value<100)rows.set(key,value);
+    }
+    sourceName="BGeometrics (fallback)";delayed=Boolean(payload&&payload.delayed);
+   }
+   if(!rows.size)throw new Error("Nenhuma linha MVRV Z-Score reconhecível");
+   const dates=[...rows.keys()].sort(),latest=dates[dates.length-1],first=dates[0];
+   btcMvrvHistoryState={rows,loadedAt:Date.now(),error:null,sourceDate:latest,delayed,sourceName};
+   try{localStorage.setItem(MVRV_CACHE_KEY,JSON.stringify({loadedAt:btcMvrvHistoryState.loadedAt,sourceDate:latest,sourceName,data:dates.map(date=>({date,value:rows.get(date)}))}));}catch(_){}
+   const status=document.getElementById("chartMvrvStatus");
+   if(status){const stale=latest<new Date(Date.now()-2*86400000).toISOString().slice(0,10);status.textContent="MVRV Z-Score · "+rows.get(latest).toFixed(2)+" · histórico recebido: "+first+" a "+latest+" ("+rows.size+" datas)"+(first>"2017-01-01"?" · ATENÇÃO: série histórica incompleta para o ciclo de 2017":"")+(stale?" · ATENÇÃO: atualização MVRV atrasada; sinais atuais pós-2022 exigem dado válido do dia":"")+(delayed?" · fonte sinaliza atraso":"")+" · fonte: "+sourceName;}
+   if(typeof renderSelectedChart==="function")renderSelectedChart();
+   return btcMvrvHistoryState;
+  }catch(error){
+   btcMvrvHistoryState={...btcMvrvHistoryState,error:String(error&&error.message||error)};
+   const status=document.getElementById("chartMvrvStatus");
+   if(status)status.textContent="MVRV Z-Score indisponível. Para datas desde 2022, sinais de compra/venda que dependem desse filtro ficam bloqueados até haver dados válidos; antes de 2022, o filtro MVRV é dispensado. "+btcMvrvHistoryState.error;
+   return btcMvrvHistoryState;
+  }finally{btcMvrvLoadPromise=null;}
+ })();
+ return btcMvrvLoadPromise;
+}
+function renderSelectedChart(){if(window.__btcRenderSelectedBusy)return;window.__btcRenderSelectedBusy=true;try{return renderSelectedChartCore();}finally{window.__btcRenderSelectedBusy=false;}}
+window.__btcCycleHyperliquidOpenPositions=window.__btcCycleHyperliquidOpenPositions||[];
+window.__btcCycleHyperliquidPositionsStatus=window.__btcCycleHyperliquidPositionsStatus||{updatedAt:0,error:null};
+async function refreshHyperliquidOpenPositions(){
+ try{
+  const response=await fetch('https://btc-cycle-push-backend.onrender.com/api/trader-radar/open-positions',{cache:'no-store'});
+  const payload=await response.json();
+  if(!response.ok||!payload||payload.ok!==true)throw new Error(payload&&payload.message||payload&&payload.error||'Posições Hyperliquid indisponíveis');
+  window.__btcCycleHyperliquidOpenPositions=Array.isArray(payload.positions)?payload.positions.slice(0,5):[];
+  window.__btcCycleHyperliquidPositionsStatus={updatedAt:Number(payload.updatedAt)||Date.now(),error:null,monitoredWallets:payload.monitoredWallets||0,source:payload.source||''};
+ }catch(error){window.__btcCycleHyperliquidPositionsStatus={...window.__btcCycleHyperliquidPositionsStatus,error:String(error&&error.message||error)};}
+ if(selectedAnalysisSymbol==='BTCUSDT'&&typeof renderSelectedChart==='function')renderSelectedChart();
+}
+if(!window.__btcCycleHyperliquidPollingStarted){window.__btcCycleHyperliquidPollingStarted=true;refreshHyperliquidOpenPositions();window.setInterval(refreshHyperliquidOpenPositions,60000);}
+function renderSelectedChartCore(){
+ 
+ const tf=$('timeframe').value,source=tf==='4h'?fourHourCandles:tf==='3d'?threeDayCandles:tf==='1w'?weeklyCandles:tf==='1M'?monthlyCandles:dailyCandles;
+ if(!source||!source.length)return;
+ const closed=source.filter(x=>x.closeTime<Date.now()),displayCandles=source;
+ if(displayCandles.length<5)return;
+ const rangeButton=document.querySelector('[data-chart-range].range-active'),days=rangeButton?Number(rangeButton.dataset.chartRange):99999,daysPerCandle=tf==='4h'?1/6:tf==='3d'?3:tf==='1w'?7:tf==='1M'?30:1,cutoff=Date.now()-days*86400000,visibleStart=days>=99999?0:Math.max(0,displayCandles.findIndex(x=>x.time>=cutoff)),shown=displayCandles.slice(visibleStart);
+ if(!shown.length)return;
+ const fullE50=ema(displayCandles.map(x=>x.close),50),fullE200=ema(displayCandles.map(x=>x.close),200),e50=fullE50.slice(visibleStart),e200=fullE200.slice(visibleStart);
+ const cycleSignals=primaryChartEngine&&primaryChartEngine.ready?primaryChartEngine:calcDailyMacdEmaSignals(dailyCandles),dailyBuySignals=cycleSignals.buySignals||new Map(),dailySellSignals=cycleSignals.sellSignals||new Map();
+ const weeklyClosedForOrange=(weeklyCandles||[]).filter(x=>x&&Number.isFinite(x.time)&&Number.isFinite(x.closeTime)&&x.closeTime<Date.now()&&Number.isFinite(x.close)).sort((a,b)=>a.time-b.time),weeklyEma200ForOrange=ema(weeklyClosedForOrange.map(x=>x.close),200);
+ const weeklyEma200AtSignal=ts=>{let lo=0,hi=weeklyClosedForOrange.length-1,best=-1;while(lo<=hi){const mid=(lo+hi)>>1;if(weeklyClosedForOrange[mid].closeTime<=ts){best=mid;lo=mid+1;}else hi=mid-1;}return best>=0?weeklyEma200ForOrange[best]:NaN;};
+ let markers={buy:shown.map(()=>null),strongBuy:shown.map(()=>null),mvrvBuy:shown.map(()=>null),sell:shown.map(()=>null),current:shown.map(()=>null),portfolioDatasets:[],traderPositionDatasets:[]};
+ const reversalAnalysis=computeReversalAnalysis(weeklyCandles);renderReversalAnalysis(reversalAnalysis);
+ for(let j=0;j<shown.length;j++){
+  const candle=shown[j],startTime=Number(candle.time),endTime=Number.isFinite(candle.closeTime)?candle.closeTime:startTime+daysPerCandle*86400000-1;
+  const closeValue=Number(candle.close),ema50Value=Number(e50[j]),ema200Value=Number(e200[j]);
+  const candleStartMs=startTime>0&&startTime<1e11?startTime*1000:startTime,candleEndMs=endTime>0&&endTime<1e11?endTime*1000:endTime;
+  for(const [time,event] of dailyBuySignals){const signalTime=Number(time)>0&&Number(time)<1e11?Number(time)*1000:Number(time);if(signalTime>=candleStartMs&&signalTime<=candleEndMs){if((selectedAnalysisSymbol==='ETHUSDT'||selectedAnalysisSymbol==='SOLUSDT')&&!(Number.isFinite(Number(event.signalPrice))&&Number.isFinite(Number(event.ema50))&&Number.isFinite(Number(event.ema200))&&Number(event.signalPrice)<Number(event.ema50)&&Number(event.signalPrice)<Number(event.ema200)))continue;const signalPrice=Number.isFinite(event.signalPrice)?event.signalPrice:closeValue;const weeklyEma200=weeklyEma200AtSignal(signalTime);const strong=(event.strong===true||event.signal==='COMPRA FORTE')&&Number.isFinite(event.ema200)&&signalPrice<=Number(event.ema200)&&Number.isFinite(weeklyEma200)&&signalPrice<weeklyEma200;if(strong){markers.strongBuy[j]=signalPrice;}else{markers.buy[j]=signalPrice;}break;}}
+  for(const [time,event] of dailySellSignals){const signalTime=Number(time)>0&&Number(time)<1e11?Number(time)*1000:Number(time);if(signalTime>=candleStartMs&&signalTime<=candleEndMs){markers.sell[j]=Number.isFinite(event.signalPrice)?event.signalPrice:closeValue;break;}}
+ }
+ const live=Number(lastSpotPrice)>0?Number(lastSpotPrice):shown[shown.length-1].close;markers.current[markers.current.length-1]=live;
+ const trades=(()=>{try{return readTrades().filter(t=>['BUY','SELL'].includes(String(t.side).toUpperCase())&&Number(t.qty)>0&&Number(t.price)>0&&isValidISODate(t.date)).sort((a,b)=>String(a.date).localeCompare(String(b.date))||(Number(a.created)||0)-(Number(b.created)||0));}catch(e){return []}})();
+ const dateFmt=v=>new Date(v+'T00:00:00Z').toLocaleDateString('pt-BR',{day:'2-digit',month:'2-digit',year:'numeric',timeZone:'UTC'});
+ const msTime=v=>{const n=Number(v);return Number.isFinite(n)?(n>0&&n<1e11?n*1000:n):NaN;};
+ if(selectedAnalysisSymbol==='BTCUSDT')for(const t of trades){
+  const ts=Date.parse(String(t.date)+'T00:00:00Z');
+  if(!Number.isFinite(ts))continue;
+  const markerScale=Math.max(0.4,Math.min(1,Math.sqrt(100/Math.max(shown.length,1))));
+ const candleStart=c=>{let v=Number(c.time);if(Number.isFinite(v)&&v>0&&v<1e11)v*=1000;return v;};
+  const candleEnd=(c,a)=>{let v=Number(c.closeTime);if(Number.isFinite(v)&&v>0&&v<1e11)v*=1000;return Number.isFinite(v)?v:a+daysPerCandle*86400000-1;};
+  let idx=shown.findIndex(c=>{const a=candleStart(c),b=candleEnd(c,a);return Number.isFinite(a)&&ts<=b&&ts+86400000>a;});
+  if(idx<0){let best=Infinity;for(let i=0;i<shown.length;i++){const a=candleStart(shown[i]);if(!Number.isFinite(a))continue;const d=Math.abs(a-ts);if(d<best){best=d;idx=i;}}if(best>daysPerCandle*86400000)idx=-1;}
+  if(idx<0)continue;
+  const candle=shown[idx],recorded=Number(t.price),close=Number(candle.close),ratio=recorded/close;
+  const priceCompatible=Number.isFinite(ratio)&&ratio>=0.5&&ratio<=1.5,plotted=priceCompatible?recorded:close;
+  const extrema=shown.reduce((acc,c)=>{const hi=Number(c.high)||Number(c.close)||0,lo=Number(c.low)||Number(c.close)||Infinity;if(hi>acc.high)acc.high=hi;if(lo<acc.low)acc.low=lo;return acc;},{high:-Infinity,low:Infinity}),visibleHigh=extrema.high,visibleLow=extrema.low,markerGap=Math.max((visibleHigh-visibleLow)*0.035,close*0.004);
+  const sameDayBefore=markers.portfolioDatasets.filter(d=>d.__markerIndex===idx).length,markerY=(Number(candle.high)||close)+markerGap*(1+sameDayBefore*0.85);
+  const data=shown.map(()=>null);data[idx]=markerY;
+  const buy=String(t.side).toUpperCase()==='BUY',qtyText=Number(t.qty).toLocaleString('pt-BR',{maximumFractionDigits:8}),memo=String(t.memo||'').slice(0,50);
+  const desc=(buy?'MINHA COMPRA':'MINHA VENDA')+' · '+dateFmt(t.date)+' · '+qtyText+' BTC · preço informado: '+fmtUSD(recorded)+(priceCompatible?'':' · marcador no fechamento do candle: '+fmtUSD(close))+(memo?' · '+memo:'');
+  markers.portfolioDatasets.push({label:desc,data,__markerIndex:idx,borderColor:buy?'#45e6a1':'#ff657a',backgroundColor:buy?'#45e6a1':'#ff657a',pointRadius:data.map(v=>v==null?0:(buy?4.2*markerScale:(window.__btcStrongBuyBlinkOn===false?0:(window.matchMedia('(max-width:760px)').matches?4:7)*markerScale))),pointHoverRadius:data.map(v=>v==null?0:(buy?7*markerScale:10*markerScale)),pointHitRadius:data.map(v=>v==null?0:16),pointStyle:buy?makeWalletBtcMarker():makeBtcChartIcons().usd,rotation:0,showLine:false,order:-1});
+ }
+ // Hyperliquid: top five currently open BTC positions among monitored Trader Radar wallets.
+ const openPositions=selectedAnalysisSymbol==='BTCUSDT'&&Array.isArray(window.__btcCycleHyperliquidOpenPositions)?window.__btcCycleHyperliquidOpenPositions:[];
+ const toMs=v=>{const n=Number(v);return Number.isFinite(n)?(n>0&&n<1e11?n*1000:n):NaN;};
+ for(let rank=0;rank<Math.min(5,openPositions.length);rank++){
+   const pos=openPositions[rank],entryPrice=Number(pos.entryPrice);
+   if(!Number.isFinite(entryPrice)||entryPrice<=0)continue;
+   const entryTs=toMs(pos.entryTime);
+   let idx=Number.isFinite(entryTs)?shown.findIndex(c=>{const a=toMs(c.time),b=toMs(c.closeTime);return Number.isFinite(a)&&Number.isFinite(b)&&entryTs>=a&&entryTs<=b;}):-1;
+   const inVisibleRange=idx>=0;
+   if(idx<0)idx=shown.length-1;
+   if(idx<0)continue;
+   const data=shown.map(()=>null);data[idx]=entryPrice;
+   const isLong=String(pos.direction).toUpperCase()==='LONG';
+   const color=isLong?'#22d68a':'#ff4d61';
+   const trader=String(pos.trader||pos.wallet||'Trader');
+   const notional=Number(pos.notionalUsd)||0,pnl=Number(pos.unrealizedPnl);
+   const timing=inVisibleRange?'entrada observada no histórico':'entrada fora do período visível/horário não observado; ponto no candle atual no nível de entrada';
+   const desc='HYPERLIQUID #'+(rank+1)+' · '+(isLong?'COMPRA / LONG':'VENDA / SHORT')+' · '+trader+' · entrada '+fmtUSD(entryPrice)+' · posição '+fmtUSD(notional)+(Number.isFinite(pnl)?' · PnL aberto '+fmtUSD(pnl):'')+' · '+timing;
+   markers.traderPositionDatasets.push({label:desc,data,borderColor:color,backgroundColor:color,pointRadius:data.map(v=>v==null?0:7),pointHoverRadius:data.map(v=>v==null?0:10),pointHitRadius:data.map(v=>v==null?0:18),pointStyle:'circle',showLine:false,order:-2});
+ }
+ const legend=$('chartSignalLegend');
+ if(legend){const bc=markers.buy.filter(Number.isFinite).length,sbc=markers.strongBuy.filter(Number.isFinite).length,sc=markers.sell.filter(Number.isFinite).length,pc=markers.portfolioDatasets.filter(d=>d.label.startsWith('MINHA COMPRA')).length,ps=markers.portfolioDatasets.filter(d=>d.label.startsWith('MINHA VENDA')).length;legend.innerHTML='<span style=\"color:#22d68a;font-weight:900\">₿ COMPRA: '+bc+'</span><span style=\"color:#f7931a;font-weight:900\">₿ COMPRA FORTE (Bitcoin laranja piscante, abaixo/próximo EMA 200): '+sbc+'</span><span style=\"color:#ff657a;font-weight:900\">$ VENDA: '+sc+'</span><span style=\"color:#22d68a;font-weight:900\">₿ MINHAS COMPRAS · verde pulsante</span><span style=\"color:#22d68a;font-weight:900\">💵 MINHAS VENDAS · no gráfico</span>';}if(legend&&selectedAnalysisSymbol==='BTCUSDT'){let hlLegend=legend.querySelector('[data-hyperliquid-legend]');if(!hlLegend){hlLegend=document.createElement('span');hlLegend.dataset.hyperliquidLegend='1';hlLegend.style.cssText='display:block;width:100%;margin-top:6px;font-weight:800;color:#c6d5e6';legend.appendChild(hlLegend);}hlLegend.textContent=openPositions.length?'🟢 LONG/COMPRA · 🔴 SHORT/VENDA · '+openPositions.length+' maiores posições BTC abertas entre carteiras monitoradas da Hyperliquid':'Hyperliquid: aguardando snapshot de posições BTC abertas';}renderChart(shown,e50,e200,markers);if(chart){chart.__candleRows=shown;chart.__timeframe=tf;}const liveStatus=$('chartLiveStatus');if(liveStatus){const last=shown[shown.length-1],forming=last&&last.closeTime>Date.now();liveStatus.textContent=(forming?'CANDLE EM FORMAÇÃO':'ÚLTIMO CANDLE')+' · '+({'4h':'4 horas','1d':'diário','3d':'3 dias','1w':'semanal','1M':'mensal'}[tf]||tf)+' · dados da Binance · '+new Date().toLocaleTimeString('pt-BR');}
+ requestAnimationFrame(()=>{if(chart){chart.resize();chart.update('none');}});
+}
+function updatePrimaryChartEnginePanel(engine){const root=$('threeDayAnalysis');if(!root)return;if(!engine||!engine.ready||!engine.current||!Array.isArray(engine.candles)||!engine.candles.length){$('threeDayStatus').textContent='Motor indisponível';['threeDayTrend','threeDayCross','threeDayRsi','threeDayMacd','threeDayScore','threeDayCloseTime'].forEach(id=>{const el=$(id);if(el)el.textContent='—';});$('threeDayInterpretation').textContent='Não há dados de 3 dias fechados suficientes para o motor oficial. Não use sinais anteriores.';return;}const c=engine.candles.filter(x=>x.closeTime<Date.now()),last=c[c.length-1],cur=engine.current,closes=c.map(x=>x.close),e50=engine.e50||ema(closes,50),e200=engine.e200||ema(closes,200),i=closes.length-1,macd=engine.macd||calcMACDSeries(closes),r=rsi(closes),avg=c.slice(-21,-1).reduce((sum,x)=>sum+(Number(x.volume)||0),0)/Math.max(1,c.slice(-21,-1).length),vr=avg>0?(Number(last.volume)||0)/avg:NaN;const trend=last.close>e50[i]&&last.close>e200[i]?'Preço acima das EMA 50/200':last.close<e50[i]&&last.close<e200[i]?'Preço abaixo das EMA 50/200':'Preço entre EMA 50/200';const macdState=macd.macd[i]>macd.signal[i]?'MACD acima da linha de sinal':macd.macd[i]<macd.signal[i]?'MACD abaixo da linha de sinal':'MACD na linha de sinal';$('threeDayStatus').textContent='Fonte única · candles de 3 dias fechados';$('threeDayTrend').textContent=trend;$('threeDayTrend').className=last.close>e50[i]&&last.close>e200[i]?'green':last.close<e50[i]&&last.close<e200[i]?'red':'yellow';$('threeDayCross').textContent='EMA 50 '+(e50[i]>e200[i]?'acima':'abaixo')+' da EMA 200';$('threeDayCross').className=e50[i]>e200[i]?'green':'red';$('threeDayRsi').textContent=Number.isFinite(r[i])?r[i].toFixed(1)+' · contextual':'—';$('threeDayMacd').textContent=macdState;$('threeDayMacd').className=macd.macd[i]>macd.signal[i]?'green':macd.macd[i]<macd.signal[i]?'red':'yellow';$('threeDayScore').textContent=Number.isFinite(cur.score)?Math.round(cur.score)+'/100 · MACD':'—';$('threeDayCloseTime').textContent=new Date(last.closeTime).toLocaleString('pt-BR',{timeZone:'UTC'})+' UTC';const flow=Number.isFinite(vr)?'Volume 3D '+vr.toFixed(2)+'× a média de 20 candles (contexto; não altera o gatilho). ':'Volume 3D indisponível. ';$('threeDayInterpretation').textContent='Decisão oficial: '+cur.signal+'. '+(cur.reason||'Sem novo gatilho confirmado no último candle de 3 dias fechado.')+' '+macdState+'. '+flow+'Os marcadores históricos e a decisão do painel usam a mesma função MACD 3D + EMA 50/200 + filtro de ciclo/ATH.';}
+function updateThreeDayPanel(d,series,engine){const ids=['threeDayTrend','threeDayCross','threeDayRsi','threeDayMacd'
