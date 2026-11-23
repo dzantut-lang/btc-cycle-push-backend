@@ -1,0 +1,264 @@
+le">Diagnóstico de confluência</span><span class="signal-conflict-badge" id="signalConflictBadge">ANALISANDO</span></div><div class="signal-conflict-body" id="signalConflictBody">Aguardando indicadores para explicar o sinal.</div><ul class="signal-conflict-list" id="signalConflictList"></ul></div></section><div class="signal-explainer" id="signalExplainer"><div class="explainer-icon" aria-hidden="true">✦</div><div><div class="explainer-title" id="explainerTitle">Como interpretar este sinal</div><p id="explainerText">O sistema está analisando os dados fechados. Aguarde a atualização antes de tomar decisões.</p></div><span class="explainer-badge" id="explainerBadge">GUIA RÁPIDO</span></div><div class="quick-plan" id="quickPlan"><div><span>Entrada</span><strong id="quickEntry">—</strong></div><div><span>Alvo</span><strong id="quickTarget">—</strong></div><div><span>Invalidação</span><strong id="quickInvalidation">—</strong></div><div><span>Risco-retorno</span><strong id="quickRR">—</strong></div></div><div class="risk-calc card" id="riskCalcPanel"><div class="cardhead"><h2>Calculadora de tamanho da posição</h2><span class="pill" id="riskCalcStatus">AGUARDANDO SINAL</span></div><p class="note" style="margin-top:0">Calcula o tamanho máximo de uma posição comprada com base no capital e no risco escolhido. Não envia ordens à corretora.</p><div class="risk-inputs"><label>Capital disponível (USDT)<input id="riskCapital" type="number" min="1" step="any" placeholder="Ex.: 1000"></label><label>Risco máximo por operação (%)<input id="riskPercent" type="number" min="0.1" max="2" step="0.1" value="1"></label><label>Entrada estimada (USDT)<input id="riskEntry" type="number" min="0.01" step="any" placeholder="Preço atual"></label><label>Invalidação / stop técnico (USDT)<input id="riskStop" type="number" min="0.01" step="any" placeholder="Calculado pelo sinal"></label><label>Alvo técnico (USDT)<input id="riskTarget" type="number" min="0.01" step="any" placeholder="Calculado pelo sinal"></label></div><button class="primary" type="button" id="riskCalcBtn" disabled>Calcular posição</button><div id="riskCalcResult" class="note" role="status">Aguardando sinal de compra aprovado e níveis válidos.</div><div class="note">O stop é apenas um nível técnico estimado; gaps, slippage, taxas e execução podem aumentar a perda. Não use alavancagem com base neste cálculo.</div></div><div class="decision-foot"><span class="pill wait" id="signalPill">CALCULANDO</span><span class="decision-disclaimer">Análise técnica experimental · não garante acerto nem lucro.</span></div>
+<details class="technical-details"><summary>Ver análise técnica detalhada</summary><div class="signalbox"><div class="signal-icon" id="signalIcon">…</div><div><div class="signal-word" id="signalWord">ANALISANDO</div><div class="signal-desc">Gatilho confirmado no candle diário fechado</div></div><div class="score"><strong id="score">—</strong><div class="label">Estado do gatilho · não é probabilidade</div></div></div><div class="bar"><span id="scoreBar"></span></div>
+<div class="metric"><span>Estrutura de tendência</span><strong id="trend">—</strong></div><div class="metric"><span>MACD diário · cruzamento</span><strong id="macd">—</strong></div><div class="metric"><span>Momentum / RSI</span><strong id="momentum">—</strong></div><div class="metric"><span>Volume relativo</span><strong id="volume">—</strong></div><div class="metric"><span>Tendência semanal</span><strong id="weeklyTrend">—</strong></div><div class="metric"><span>Histórico comparável · retorno positivo em 90 dias</span><strong id="historicalOdds">Calculando…</strong></div><div class="note">Este é um filtro técnico experimental, não uma previsão garantida. “Compra forte” significa que mais regras foram atendidas, não que a operação tem alta probabilidade comprovada de ganhar. Só considere operar com dados atualizados, preço de entrada válido e risco definido.</div></details></div>
+<div class="card" id="dailyEnginePanel"><div class="cardhead"><h2>Backtest experimental · motor diário (não altera sinal oficial)</h2></div><p class="note">Aguardando candles diários fechados.</p></div>
+<div class="card" id="weeklyEnginePanel"><div class="cardhead"><h2>Backtest experimental · confluência semanal (não altera sinal oficial)</h2></div><p class="note">Aguardando candles semanais fechados.</p></div>
+
+</section>
+<section data-ce4-level="advanced" class="card" id="reversalAnalysisPanel" aria-live="polite">
+  <div class="cardhead"><h2>QUALIDADE DOS SINAIS DE REVERSÃO · 3D</h2><span class="pill">TESTE HISTÓRICO</span></div>
+  <p class="note">Compara RSI, MACD, KDJ, volume e a combinação de indicadores usando somente candles fechados. Um sinal é avaliado pela direção do preço nos 3 candles seguintes (9 dias), com margem de 0,20% para custos estimados. Isso mede direção histórica, não rentabilidade garantida. O Fear &amp; Greed atual é apenas contexto e não é retroativamente aplicado aos candles.</p>
+  <div class="metrics-grid">
+    <div class="metric"><span>Período 3D avaliado</span><strong id="revPeriod">Calculando…</strong></div>
+    <div class="metric"><span>Sinais combinados</span><strong id="revCount">—</strong></div>
+    <div class="metric"><span>Acerto combinado</span><strong id="revCombinedHit">—</strong></div>
+    <div class="metric"><span>RSI · acerto / amostra</span><strong id="revRsiHit">—</strong></div>
+    <div class="metric"><span>MACD · acerto / amostra</span><strong id="revMacdHit">—</strong></div>
+    <div class="metric"><span>Fear &amp; Greed · acerto / amostra</span><strong id="revFngHit">—</strong></div>
+  </div>
+  <p class="note" id="revConclusion">Aguardando candles históricos fechados.</p>
+</section>
+<section data-ce4-level="advanced" class="card" id="cycleBacktestPanel" aria-live="polite"><div class="cardhead"><h2>Validação histórica · ativo selecionado · motor oficial (MACD diário + EMA 50/200) (MVRV desativado)</h2><span class="pill">CANDLES FECHADOS</span></div><p class="note">O teste usa exatamente os gatilhos exibidos no gráfico. Execução simulada na abertura seguinte; custo estimado de 0,10% por lado. Histórico não garante resultados futuros.</p></section>
+<section class="card fear-greed-panel" id="fearGreedPanel" aria-live="polite" aria-label="Índice Fear and Greed do mercado cripto">
+ <div class="cardhead"><h2>FEAR &amp; GREED · SENTIMENTO DO MERCADO</h2><span class="pill" id="fgUpdated">Carregando</span></div>
+ <div class="fg-layout">
+  <div class="fg-score-block"><div class="fg-score" id="fgScore">—</div><div class="fg-class" id="fgClass">Buscando sentimento…</div><div class="fg-date" id="fgDate">Aguardando fonte de dados</div></div>
+  <div class="fg-detail"><div class="fg-meter" role="img" aria-label="Escala de medo a ganância"><div class="fg-meter-fill" id="fgMeterFill"></div><span class="fg-meter-marker" id="fgMeterMarker"></span></div><div class="fg-meter-labels"><span>Medo extremo</span><span>Neutro</span><span>Ganância extrema</span></div><div class="fg-comparison"><div><small>Ontem</small><strong id="fgYesterday">—</strong></div><div><small>Variação diária</small><strong id="fgChange">—</strong></div><div class="fg-advanced-only"><small>7 leituras</small><strong id="fgWeek">—</strong></div></div><p class="note" id="fgInterpretation">O sentimento complementa a análise técnica; não é um sinal de compra ou venda isolado.</p><div class="fg-history fg-advanced-only" id="fgHistory" aria-label="Histórico de 30 leituras de sentimento e linha de preço BTC"></div><div class="fg-btc-line-legend fg-advanced-only"><span><i></i> BTC · preço diário (USD)</span><b id="fgBtcLineStatus" data-state="pending">Sincronizando Binance…</b></div><section data-ce4-level="advanced" class="fg-btc-compare" id="fgBtcCompare" aria-label="Comparação entre sentimento e preço do Bitcoin"><div class="fg-btc-compare-head"><div><span class="fg-btc-kicker">SENTIMENTO × MERCADO</span><h3>Sentimento × preço do Bitcoin</h3><p>Até 30 dias com datas coincidentes; score e preço alinhados por data.</p></div><span class="fg-btc-period">ATÉ 30 DIAS</span></div><div class="fg-btc-legend"><span><i class="fg-dot-sentiment"></i> Fear &amp; Greed · pontos</span><span><i class="fg-dot-price"></i> BTC · variação acumulada</span></div><div id="fgBtcCompareBody" class="fg-btc-compare-body"><div class="fg-btc-loading">Aguardando as séries oficiais de sentimento e preço…</div></div><div id="fgBtcDivergence" class="fg-btc-divergence" data-class="pending" aria-live="polite"><span class="fg-btc-divergence-icon">◎</span><div class="fg-btc-divergence-copy"><small>LEITURA DE RELAÇÃO</small><strong id="fgBtcDivergenceTitle">Aguardando dados</strong><p id="fgBtcDivergenceText">A classificação aparecerá quando houver dados coincidentes suficientes.</p></div><span class="fg-btc-divergence-tag" id="fgBtcDivergenceTag">—</span></div><div id="fgBtcCompareInsight" class="fg-btc-insight" role="status">A comparação é contextual; não gera sinais de compra ou venda.</div><div class="fg-btc-note">Janela de até 30 dias coincidentes com candles diários fechados. BTC: variação acumulada desde o primeiro dia comparável. Sentimento: índice oficial de 0 a 100. Dias sem correspondência não são estimados.</div></section>
+</div>
+ </div>
+ 
+<div class="fg-foot">Fonte: <a href="https://alternative.me/crypto/fear-and-greed-index/" target="_blank" rel="noopener noreferrer">Alternative.me · Crypto Fear &amp; Greed Index</a>. Atualização diária. Sentimento é contexto, não previsão de preço.</div>
+</section>
+
+<section class="card btc-dominance-panel" id="btcDominancePanel" aria-label="Dominância do Bitcoin" data-ce4-level="advanced"><div class="cardhead"><div><span class="btc-dom-kicker">BTC CYCLE INTELLIGENCE · MARKET STRUCTURE</span><h2>BTC DOMINANCE · DOMINÂNCIA DO BITCOIN</h2></div><span class="pill" id="btcDomStatus">CONECTANDO</span></div><div class="btc-dom-main"><div><strong id="btcDomValue">—</strong><span>PARTICIPAÇÃO DO BTC NO MERCADO</span></div><div class="btc-dom-change"><small>Variação 24h da dominância</small><b id="btcDomChange">—</b></div></div><div class="btc-dom-stats"><div><small>Market cap BTC</small><b id="btcDomBtcCap">—</b></div><div><small>Market cap total</small><b id="btcDomTotalCap">—</b></div><div><small>Atualizado em</small><b id="btcDomUpdated">—</b></div></div><div class="btc-dom-reading" id="btcDomReading">Aguardando dados globais do mercado.</div><div class="btc-dom-chart-wrap btc-dom-tradingview-wrap"><div class="btc-dom-chart-head"><b>HISTÓRICO COMPLETO DA DOMINÂNCIA</b><span>TRADINGVIEW · CRYPTOCAP:BTC.D · DADOS HISTÓRICOS DE MERCADO</span></div><div class="tradingview-widget-container" style="height:520px;width:100%"><div id="btcDomTradingViewChart" style="height:calc(520px - 32px);width:100%"></div><div class="tradingview-widget-copyright"><a href="https://www.tradingview.com/symbols/CRYPTOCAP-BTC.D/" rel="noopener" target="_blank"><span class="blue-text">BTC Dominance chart</span></a><span class="trademark"> by TradingView</span></div></div><div class="btc-dom-history-note" id="btcDomHistoryNote">Gráfico histórico completo com zoom, seleção de períodos, candles, volume e ferramentas do TradingView.</div></div><div class="btc-dom-foot">Fonte única: CoinGecko Global API. O percentual principal e o gráfico histórico usam os mesmos snapshots, coletados automaticamente a cada 5 minutos neste navegador. Indicador contextual, não é gatilho isolado de compra ou venda.</div></section>
+
+
+
+<section class="grid bottom" id="portfolioAltcoins" style="margin-top:18px"><div class="card"><div class="cardhead"><h2>Minha carteira BTC</h2><span class="pill">REGISTRO LOCAL</span></div><div class="note">Registre suas compras e vendas para acompanhar posição e resultado estimado. A validação respeita a data de cada operação e impede vendas que excedam o saldo disponível naquela data. Registros ficam apenas neste navegador e não são sincronizados com sua conta. Informe o preço executado.</div><form id="tradeForm" style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin:12px 0"><label class="label">Operação<select id="tradeSide" style="display:block;width:100%;margin-top:6px;padding:11px;border-radius:9px;background:#0b111b;color:var(--text);border:1px solid #35435a"><option value="BUY">Compra</option><option value="SELL">Venda</option></select></label><label class="label">Data<input id="tradeDate" type="date" required style="display:block;width:100%;margin-top:6px;padding:11px;border-radius:9px;background:#0b111b;color:var(--text);border:1px solid #35435a"></label><label class="label">Quantidade (BTC)<input id="tradeQty" type="number" min="0.00000001" step="0.00000001" required placeholder="0,1" style="display:block;width:100%;margin-top:6px;padding:11px;border-radius:9px;background:#0b111b;color:var(--text);border:1px solid #35435a"></label><label class="label">Preço executado (USDT)<input id="tradePrice" type="number" min="0.01" step="0.01" required placeholder="Preço por BTC" style="display:block;width:100%;margin-top:6px;padding:11px;border-radius:9px;background:#0b111b;color:var(--text);border:1px solid #35435a"></label><label class="label">Taxa (%)<input id="tradeFee" type="number" min="0" max="10" step="0.01" value="0.10" style="display:block;width:100%;margin-top:6px;padding:11px;border-radius:9px;background:#0b111b;color:var(--text);border:1px solid #35435a"></label><label class="label">Observação (opcional)<input id="tradeMemo" maxlength="120" placeholder="Ex.: compra parcelada" style="display:block;width:100%;margin-top:6px;padding:11px;border-radius:9px;background:#0b111b;color:var(--text);border:1px solid #35435a"></label><button class="primary" type="submit" style="grid-column:1/-1">Registrar operação</button></form><div id="portfolioSummary"><div class="metric"><span>Status</span><strong>Aguardando dados</strong></div></div><div id="walletEvolutionWrap" style="display:none"><h3>Evolução do saldo BTC</h3><p>Saldo acumulado após cada operação registrada. Este gráfico mostra quantidade de BTC, não previsão de preço ou rentabilidade futura.</p><div id="walletEvolutionCanvasBox"><canvas id="walletEvolutionCanvas" aria-label="Evolução histórica do saldo BTC" role="img"></canvas></div></div><div id="portfolioMessage" class="note" role="status"></div><div class="metric"><span>Histórico de operações</span><button id="clearTradesBtn" type="button">Limpar carteira</button><button id="exportTradesBtn" type="button">Exportar backup</button><button id="importTradesBtn" type="button">Restaurar backup</button><input id="importTradesFile" type="file" accept=".json,application/json" hidden></div><div id="tradeHistory" style="overflow-x:auto"></div></div></section>
+
+<section class="market-snapshot card" id="marketSnapshot" aria-label="Resumo rápido do mercado"><div class="snapshot-intro"><span class="snapshot-eyebrow">RESUMO DO MERCADO</span><strong>O que merece atenção agora</strong><span class="snapshot-note">Leitura automática dos dados e do sinal técnico atual.</span></div><div class="snapshot-item"><span>Movimento em 24h</span><strong id="snapshotChange">Aguardando cotação</strong><small id="snapshotChangeNote">Dados spot</small></div><div class="snapshot-item"><span>Leitura técnica</span><strong id="snapshotSignal">Analisando</strong><small id="snapshotSignalNote">Aguardando candle fechado</small></div><div class="snapshot-item"><span>Próximo passo</span><strong id="snapshotNext">Verificar dados</strong><small id="snapshotNextNote">Confirme o horário da atualização</small></div></section>
+<section class="card" id="threeDayAnalysis" style="margin:0 0 18px">
+<div class="cardhead"><h2>MOTOR OFICIAL DO GRÁFICO</h2><span class="pill" id="threeDayStatus">Aguardando candles fechados</span></div>
+<p class="note" style="margin-top:0">Sinal oficial calculado pelo mesmo motor das bolinhas do gráfico: MACD diário, filtros EMA 50/200 e filtro de ciclo/ATH. Volume e RSI são contexto, não gatilhos independentes.</p>
+<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(145px,1fr));gap:12px">
+<div class="metric"><span>Tendência do gráfico</span><strong id="threeDayTrend">—</strong></div>
+<div class="metric"><span>Filtro EMA 50 / 200</span><strong id="threeDayCross">—</strong></div>
+<div class="metric"><span>RSI semanal · contexto</span><strong id="threeDayRsi">—</strong></div>
+<div class="metric"><span>MACD diário</span><strong id="threeDayMacd">—</strong></div>
+
+
+<div class="metric"><span>Score do motor oficial</span><strong id="threeDayScore">—</strong></div>
+<div class="metric"><span>Último candle fechado</span><strong id="threeDayCloseTime">—</strong></div>
+</div><p id="threeDayInterpretation" class="note" style="margin-bottom:0">Aguardando dados válidos da Binance.</p>
+</section>
+<section class="grid stats">
+<div class="card"><div class="label">BTC / USDT</div><div class="value" id="price">—</div><div class="delta" id="priceChange">Buscando cotação…</div></div>
+<div class="card"><div class="label">Variação 24h</div><div class="value" id="change">—</div><div class="delta">Mercado spot · Binance</div></div>
+<div class="card"><div class="label">RSI (14) · 3 dias</div><div class="value" id="rsi">—</div><div class="delta" id="rsiDesc">Força relativa</div></div>
+<div class="card"><div class="label">Dados atualizados às</div><div class="value" style="font-size:18px" id="updated">—</div><div class="delta">Atualização automática a cada 15 min</div></div>
+</section>
+<section class="grid bottom">
+<div class="card"><div class="cardhead"><h2>Plano técnico · médio e longo prazo</h2><span class="pill" id="planPill">ANALISANDO</span></div><div class="metric"><span>Zona de interesse para compra</span><strong id="entryZone">—</strong></div><div class="metric"><span>Confirmação de tendência</span><strong id="trendConfirm">—</strong></div><div class="metric"><span>Regra de proteção</span><strong id="riskRule">—</strong></div><div class="metric"><span>Leitura semanal</span><strong id="weeklyRead">—</strong></div><div class="metric"><span>Suporte técnico (90 dias)</span><strong id="supportLevel">—</strong></div><div class="metric"><span>Resistência técnica (90 dias)</span><strong id="resistanceLevel">—</strong></div><div class="metric"><span>Alvo técnico de referência</span><strong id="targetLevel">—</strong></div><div class="metric"><span>Invalidação da tese compradora</span><strong id="invalidationLevel">—</strong></div><div class="metric"><span>Relação risco/retorno indicativa</span><strong id="riskReward">—</strong></div><div class="note">Zonas técnicas estimadas a partir de médias móveis e tendência, não ordens nem garantias. Preferir entradas fracionadas e limitar o risco por posição.</div></div><div class="card"><div class="cardhead"><h2>Alertas de mercado</h2><span class="pill" id="alertCount">0 ativos</span></div>
+<div class="alertrow"><span class="dot" style="background:var(--blue)"></span><div><strong>Preço e indicadores</strong><small>Notifica quando o score cruza uma zona de sinal durante esta sessão.</small></div></div>
+<div class="alertrow"><span class="dot" style="background:var(--yellow)"></span><div><strong>RSI extremo</strong><small>Alerta informativo para RSI abaixo de 30 ou acima de 70.</small></div>
+<div class="alertrow"><span class="dot" style="background:var(--green)"></span><div><strong>Bitcoin Pulse · Compra e venda</strong><small>Notifica quando o Bitcoin Pulse muda para BUY (compra) ou SELL (venda), sem repetir a cada atualização.</small></div></div></div>
+<div class="alertrow"><span class="dot" style="background:var(--green)"></span><div><strong>Notificações do navegador</strong><small id="notifyState">Desativadas. Clique em “Ativar alertas”.</small><small id="marketSignalAlertNote" style="display:block;margin-top:6px;color:#b8c4d6;font-size:12px;line-height:1.45">Alertas locais de RSI e do Bitcoin Pulse funcionam com o painel aberto e notificações permitidas. Push com o painel fechado ainda depende da ativação do serviço no backend.</small></div></div>
+<div class="note">No celular ou computador, permita as notificações do navegador e mantenha o painel aberto para receber alertas locais. Para receber alertas com o aplicativo fechado, é necessário ativar e testar o Web Push no backend; esse recurso ainda não está ativo.</div></div>
+<div class="card"><div class="cardhead"><h2>Regras e gestão de risco</h2><span class="pill">PROTOCOLO</span></div>
+<div class="metric"><span>Compra potencial</span><strong class="green">Score ≥ 70</strong></div><div class="metric"><span>Aguardar / neutro</span><strong class="yellow">Score 40–69</strong></div><div class="metric"><span>Reduzir / venda potencial</span><strong class="red">Score &lt; 40</strong></div><div class="metric"><span>Confirmação</span><strong>Fechamento do candle</strong></div><div class="metric"><span>Stop / tamanho da posição</span><strong>Definir por risco</strong></div>
+<div class="note">Os limites são parâmetros iniciais para demonstração e devem ser validados com backtest fora da amostra, custos, slippage e testes em diferentes regimes antes de qualquer uso com capital real.</div></div>
+</section>
+<section class="grid bottom" style="margin-top:14px">
+
+<div class="card"><div class="cardhead"><h2>Conta e acesso premium</h2><span class="pill">PRÓXIMA ETAPA</span></div><p style="margin:0 0 10px">Cadastro e login por e-mail com autenticação do Wix. O plano premium e a proteção de conteúdos serão conectados em uma etapa separada.</p><button type="button" class="primary" id="accountCardBtn">Entrar ou criar conta</button><div id="memberStatus" class="metric"><span>Status da conta</span><strong class="muted">Não conectado</strong></div><div class="metric"><span>Plano premium e cobrança</span><strong class="muted">Ainda não conectado</strong></div><div class="metric"><span>Alertas em segundo plano</span><strong class="muted">Backend necessário</strong></div><div class="note">A área premium só deve liberar conteúdo após autenticação real e validação de permissões no backend.</div></div>
+</section>
+<div class="footer"><span>BTC Cycle Desk · MVP demonstrativo · Sem execução de ordens</span><span id="dataSource">Fonte: API pública da Binance · Sem chave de API</span></div>
+</div>
+<script>
+const $=id=>document.getElementById(id);
+let historicalBacktest=null, dailyBacktest=null, weeklyBacktest=null, fearGreedHistory=[];
+let selectedAnalysisSymbol='BTCUSDT',lastBtcSpotPrice=0;function assetScopedStorageKey(base){return selectedAnalysisSymbol==='BTCUSDT'?base:base+'_'+selectedAnalysisSymbol;}const analysisAssetName=()=>selectedAnalysisSymbol==='ETHUSDT'?'Ethereum':selectedAnalysisSymbol==='SOLUSDT'?'Solana':selectedAnalysisSymbol==='LINKUSDT'?'Chainlink':'Bitcoin';
+let candles=[], dailyCandles=[], fourHourCandles=[], threeDayCandles=[], weeklyCandles=[], monthlyCandles=[], lastSignal=null, lastRsiZone=null, chart=null, currentChartSignal='AGUARDAR', primaryChartEngine=null, notificationEnabled=('Notification'in window&&Notification.permission==='granted');
+let lastBitcoinPulseAlertState=null;
+let fourHourHistoryLoading=false,fourHourHistoryAsset=null;
+const fmtUSD=n=>new Intl.NumberFormat('en-US',{style:'currency',currency:'USD',maximumFractionDigits:0}).format(n);
+const fmtAltPrice=n=>{if(!Number.isFinite(Number(n)))return '—';const v=Number(n);const digits=v>=100?2:v>=1?4:v>=0.01?6:8;return 'USDT '+v.toLocaleString('en-US',{minimumFractionDigits:Math.min(2,digits),maximumFractionDigits:digits})};
+const fmtPct=n=>(n>=0?'+':'')+n.toFixed(2)+'%';
+async function getJSON(url){const hosts=[url,url.replace('https://api.binance.com','https://api1.binance.com'),url.replace('https://api.binance.com','https://api2.binance.com'),url.replace('https://api.binance.com','https://api3.binance.com'),url.replace('https://api.binance.com','https://data-api.binance.vision')].filter((v,i,a)=>a.indexOf(v)===i);let lastError=null,failures=[];for(const endpoint of hosts){const controller=new AbortController();const timer=setTimeout(()=>controller.abort(),15000);try{const r=await fetch(endpoint,{signal:controller.signal,cache:'no-store'});if(!r.ok)throw new Error('HTTP '+r.status+' em '+new URL(endpoint).host);return await r.json()}catch(e){lastError=e;failures.push(new URL(endpoint).host+': '+String(e&&e.message||e))}finally{clearTimeout(timer)}}throw new Error('Não foi possível acessar a API de mercado após '+hosts.length+' tentativas: '+failures.join(' | '))}
+function ema(values,p){if(values.length<p)return values.map(()=>null);let out=Array(values.length).fill(null),k=2/(p+1),sum=values.slice(0,p).reduce((a,b)=>a+b,0)/p;out[p-1]=sum;for(let i=p;i<values.length;i++)out[i]=values[i]*k+out[i-1]*(1-k);return out}
+function rsi(values,p=14){let out=Array(values.length).fill(null);if(values.length<=p)return out;let gain=0,loss=0;for(let i=1;i<=p;i++){let d=values[i]-values[i-1];gain+=Math.max(d,0);loss+=Math.max(-d,0)}let ag=gain/p,al=loss/p;out[p]=al===0?(ag===0?50:100):100-100/(1+ag/al);for(let i=p+1;i<values.length;i++){let d=values[i]-values[i-1];ag=(ag*(p-1)+Math.max(d,0))/p;al=(al*(p-1)+Math.max(-d,0))/p;out[i]=al===0?(ag===0?50:100):100-100/(1+ag/al)}return out}
+function calcMACD(v){const a=ema(v,12),b=ema(v,26),m=v.map((_,i)=>a[i]!=null&&b[i]!=null?a[i]-b[i]:null),valid=m.filter(x=>x!=null),s=ema(valid,9);const macd=m.at(-1),signal=s.at(-1);let hist=macd-signal;const tolerance=1e-10*Math.max(1,Math.abs(macd),Math.abs(signal));if(Number.isFinite(hist)&&Math.abs(hist)<tolerance)hist=0;return {macd,signal,hist}}
+function fmtCompact(n){return n>=1e9?(n/1e9).toFixed(2)+'B':n>=1e6?(n/1e6).toFixed(1)+'M':n>=1e3?(n/1e3).toFixed(1)+'K':n.toFixed(0)}
+function calcScore(c){
+  const close=c.map(x=>x.close),e20=ema(close,20),e50=ema(close,50),e200=ema(close,200),r=rsi(close),m=calcMACD(close),i=close.length-1;
+  if(i<200||![e20[i],e50[i],e200[i],r[i],m.macd,m.signal,m.hist].every(Number.isFinite)||![e20[i],e50[i],e200[i]].every(v=>v>0))return {ready:false,score:50,e20,e50,e200,rsi:r[i],macd:m,volRatio:1,close:close[i],items:['Aguardando dados válidos de MACD e EMA'],trend:'Dados insuficientes'};
+  const prev=calcMACD(close.slice(0,-1));
+  const histRising=Number.isFinite(prev.hist)&&m.hist>prev.hist,histFalling=Number.isFinite(prev.hist)&&m.hist<prev.hist,aboveSignal=m.macd>m.signal,belowSignal=m.macd<m.signal;
+  let macdScore=50,items=[];
+  if(aboveSignal){macdScore=histRising?80:histFalling?65:72;items.push('MACD acima da linha de sinal');}
+  else if(belowSignal){macdScore=histFalling?20:histRising?35:28;items.push('MACD abaixo da linha de sinal');}
+  else {items.push('MACD sobre a linha de sinal');}
+  if(histRising)items.push('Histograma MACD aumentando');else if(histFalling)items.push('Histograma MACD diminuindo');else items.push('Histograma MACD estável');
+  const crossUp=Number.isFinite(prev.macd)&&Number.isFinite(prev.signal)&&prev.macd<=prev.signal&&aboveSignal,crossDown=Number.isFinite(prev.macd)&&Number.isFinite(prev.signal)&&prev.macd>=prev.signal&&belowSignal;
+  if(crossUp){macdScore=90;items.push('Cruzamento altista recente do MACD');}else if(crossDown){macdScore=10;items.push('Cruzamento baixista recente do MACD');}
+  const price=close[i],averages=[['EMA 20',e20[i]],['EMA 50',e50[i]],['EMA 200',e200[i]]];
+  const positionScores=averages.map(([name,value])=>{const dist=(price/value-1)*100;const part=Math.max(0,Math.min(100,50-dist*5));items.push(name+': preço '+(dist<0?'abaixo ':dist>0?'acima ':'na ')+name+' ('+(dist>0?'+':'')+dist.toFixed(2)+'%)');return part;});
+  const positionScore=positionScores.reduce((a,b)=>a+b,0)/positionScores.length;
+  let score=Math.round(Math.max(0,Math.min(100,macdScore*0.65+positionScore*0.35)));
+  const below20=price<e20[i],below50=price<e50[i],below200=price<e200[i],above20=price>e20[i],above50=price>e50[i],above200=price>e200[i];
+  if(below20&&below50&&below200)items.push('Zona de desconto: preço abaixo das EMA 20, 50 e 200; score favorecido pela posição das médias.');
+  else if(above20&&above50&&above200)items.push('Zona estendida: preço acima das EMA 20, 50 e 200; score reduzido pelo risco de entrada em preço elevado.');
+  else if(below20&&below50)items.push('Preço abaixo das EMA 20 e 50; posição favorece score de compra.');
+  else if(above20&&above50)items.push('Preço acima das EMA 20 e 50; posição reduz score por maior risco de entrada esticada.');
+  const trendUp=price>e200[i]&&e50[i]>e200[i],trendDown=price<e200[i]&&e50[i]<e200[i];
+  return {ready:true,score,macdScore,positionScore:Math.round(positionScore),e20,e50,e200,rsi:r[i],macd:m,volRatio:1,items,close:price,trend:trendUp?'Alta estrutural':trendDown?'Baixa estrutural':'Transição',trendUp,trendDown,dist20:(price/e20[i]-1)*100,dist50:(price/e50[i]-1)*100,dist200:(price/e200[i]-1)*100,scoreModel:'65% MACD + 35% posição/distância da EMA 20/50/200; score técnico, não probabilidade de acerto'};
+}
+function calcKDJ(series){const n=series.length,high=series.map(c=>Number(c.high)),low=series.map(c=>Number(c.low)),close=series.map(c=>Number(c.close));const K=Array(n).fill(null),D=Array(n).fill(null),J=Array(n).fill(null);let k=50,d=50;for(let i=8;i<n;i++){let hh=-Infinity,ll=Infinity;for(let j=i-8;j<=i;j++){hh=Math.max(hh,high[j]);ll=Math.min(ll,low[j]);}const rsv=hh===ll?50:(close[i]-ll)/(hh-ll)*100;k=(2*k+rsv)/3;d=(2*d+k)/3;K[i]=k;D[i]=d;J[i]=3*k-2*d;}const i=n-1,p=i-1;if(i<1||K[i]==null||D[i]==null||K[p]==null||D[p]==null)return {ready:false,k:50,d:50,j:50,prevK:50,prevD:50};return {ready:true,k:K[i],d:D[i],j:J[i],prevK:K[p],prevD:D[p]};}
+function calcATRValue(series,period=14){if(!Array.isArray(series)||series.length<period+1)return NaN;const trs=[];for(let i=Math.max(1,series.length-period);i<series.length;i++){const c=series[i],p=series[i-1],tr=Math.max(c.high-c.low,Math.abs(c.high-p.close),Math.abs(c.low-p.close));if(Number.isFinite(tr))trs.push(tr);}return trs.length?trs.reduce((a,b)=>a+b,0)/trs.length:NaN;}
+function calcMacdTouchSeries(series){
+ const c=(series||[]).filter(x=>Number.isFinite(x.time)&&Number.isFinite(x.closeTime)&&x.closeTime<Date.now()&&[x.open,x.high,x.low,x.close].every(Number.isFinite)).sort((a,b)=>a.time-b.time);
+ const close=c.map(x=>x.close),m=calcMACDSeries(close),atr=Array(c.length).fill(null),buySignals=new Map(),sellSignals=new Map(),events=Array(c.length).fill(null);
+ for(let i=1;i<c.length;i++){
+  const tr=Math.max(c[i].high-c[i].low,Math.abs(c[i].high-c[i-1].close),Math.abs(c[i].low-c[i-1].close));
+  const start=Math.max(1,i-13),trs=[];
+  for(let j=start;j<=i;j++)trs.push(Math.max(c[j].high-c[j].low,Math.abs(c[j].high-c[j-1].close),Math.abs(c[j].low-c[j-1].close)));
+  if(trs.length)atr[i]=trs.reduce((a,b)=>a+b,0)/trs.length;
+ }
+ const gaps=c.map((_,i)=>Number.isFinite(m.macd[i])&&Number.isFinite(m.signal[i])?Math.abs(m.macd[i]-m.signal[i]):NaN);
+ const tolAt=i=>Math.max(Number.isFinite(atr[i])?atr[i]*0.12:0,Math.abs(close[i]||0)*0.0005);
+ let inTouch=false,lastTouchDirection=null;
+ for(let i=2;i<c.length;i++){
+  if(![m.macd[i],m.signal[i],m.macd[i-1],m.signal[i-1],gaps[i],atr[i]].every(Number.isFinite)){inTouch=false;lastTouchDirection=null;continue;}
+  const tolerance=tolAt(i),touch=gaps[i]<=tolerance;
+  if(!touch){inTouch=false;lastTouchDirection=null;continue;}
+  const macdSlope=m.macd[i]-m.macd[i-1],signalSlope=m.signal[i]-m.signal[i-1];
+  const direction=macdSlope>0&&signalSlope>0?'buy':macdSlope<0&&signalSlope<0?'sell':null;
+  if(!direction){inTouch=true;continue;}
+  if(inTouch&&lastTouchDirection===direction)continue;
+  const bullishTouch=direction==='buy',bearishTouch=direction==='sell';
+  const item={signalPrice:c[i].close,signalTime:c[i].closeTime,candleTime:c[i].time,macd:m.macd[i],signal:m.signal[i],hist:m.hist[i],gap:gaps[i],tolerance,atr:atr[i],direction,reason:bullishTouch?'MACD 3D encostou na linha de sinal com inclinação ascendente':'MACD 3D encostou na linha de sinal com inclinação descendente'};
+  events[i]=item;
+  if(bullishTouch)buySignals.set(c[i].closeTime,item);
+  if(bearishTouch)sellSignals.set(c[i].closeTime,item);
+  inTouch=true;lastTouchDirection=direction;
+ }
+ return {candles:c,macd:m,atr,gaps,buySignals,sellSignals,events};
+}
+function calcWeeklyMacdTouchEngine(series,d){
+ const empty={ready:false,score:50,label:'SEM DADOS',reasons:['Histórico 3D insuficiente'],macdCross:'none',macdTouch:'none',kdjCross:'none',buy:false,buyStrong:false,sell:false,sellStrong:false,regime:'indisponível',atr:NaN};
+ if(!d||!d.ready||!Array.isArray(series)||series.length<205)return empty;
+ const c=series.filter(x=>Number.isFinite(x.closeTime)&&x.closeTime<Date.now()&&[x.open,x.high,x.low,x.close].every(Number.isFinite));
+ if(c.length<205)return {...empty,reasons:['Menos de 205 candles 3D fechados']};
+ const closes=c.map(x=>x.close),i=c.length-1,price=closes[i],e50s=ema(closes,50),e200s=ema(closes,200),e50=e50s[i],e200=e200s[i],slopeE50=e50s[i]-e50s[Math.max(0,i-6)];
+ const touchData=calcMacdTouchSeries(c),event=touchData.events.at(-1),macd=d.macd,prevMacd=calcMACD(closes.slice(0,-1));
+ const macdCross=prevMacd.macd<=prevMacd.signal&&macd.macd>macd.signal?'bull':prevMacd.macd>=prevMacd.signal&&macd.macd<macd.signal?'bear':'none';
+ const macdTouch=event?(event.direction==='buy'?'bull':'bear'):'none';
+ const kdj=calcKDJ(c),kdjCross=kdj.ready&&kdj.prevK<=kdj.prevD&&kdj.k>kdj.d?'bull':kdj.ready&&kdj.prevK>=kdj.prevD&&kdj.k<kdj.d?'bear':'none';
+ const avgVol=c.slice(-21,-1).reduce((a,x)=>a+(Number(x.volume)||0),0)/Math.max(1,c.slice(-21,-1).length),volNow=Number(c[i].volume),volRatio=avgVol>0?volNow/avgVol:NaN,volKnown=Number.isFinite(volRatio),volStrong=volKnown&&volRatio>=1.2,volLow=volKnown&&volRatio<0.7,bullCandle=c[i].close>c[i].open,bearCandle=c[i].close<c[i].open,volumeBuy=volStrong&&bullCandle,volumeSell=volStrong&&bearCandle;
+ const trendUp=price>e200&&e50>e200&&slopeE50>0,trendDown=price<e200&&e50<e200&&slopeE50<0,regime=trendUp?'ALTA':trendDown?'BAIXA':'TRANSIÇÃO';
+ const rsiSeries=rsi(closes),rsiPrev=rsiSeries[i-1],rsiNow=d.rsi,atr=calcATRValue(c,14);
+ let score=50;const reasons=[];
+ if(macd.hist>0){score+=8;reasons.push('histograma MACD positivo (+8)')}else if(macd.hist<0){score-=8;reasons.push('histograma MACD negativo (-8)')}
+ if(macdTouch==='bull'){score= Math.max(score,75);reasons.push('TOQUE COMPRADOR MACD 3D: linhas encostaram com inclinação ascendente; score direcional 75+')}
+ else if(macdTouch==='bear'){score=Math.min(score,25);reasons.push('TOQUE VENDEDOR MACD 3D: linhas encostaram com inclinação descendente; score direcional 25 ou menos')}
+ else if(macdCross==='bull'){score+=3;reasons.push('cruzamento MACD observado, mas não é gatilho de entrada (+3)')}
+ else if(macdCross==='bear'){score-=3;reasons.push('cruzamento MACD observado, mas não é gatilho de entrada (-3)')}
+ if(rsiNow>=50&&rsiNow<=68){score+=5;reasons.push('RSI entre 50 e 68 (+5)')}else if(rsiNow>68){score-=3;reasons.push('RSI elevado (-3)')}else if(rsiNow<42){score-=5;reasons.push('RSI abaixo de 42 (-5)')}
+ if(rsiNow>50&&rsiNow>=rsiPrev){score+=3;reasons.push('RSI ascendente acima de 50 (+3)')}else if(rsiNow<45&&rsiNow<=rsiPrev){score-=3;reasons.push('RSI perdendo força (-3)')}
+ if(trendUp){score+=4;reasons.push('estrutura EMA favorece alta (+4)')}else if(trendDown){score-=4;reasons.push('estrutura EMA favorece baixa (-4)')}
+ score=Math.max(0,Math.min(100,Math.round(score)));
+ const buy=macdTouch==='bull',sell=macdTouch==='bear',buyStrong=buy&&score>=80,sellStrong=sell&&score<=20;
+ reasons.push('regime atual: '+regime);
+ if(event)reasons.push(event.reason+'; distância MACD/sinal '+fmtUSD(event.gap)+'; tolerância '+fmtUSD(event.tolerance));
+ else reasons.push('sem toque MACD confirmado no candle 3D atual; o cruzamento isolado não gera sinal');
+ if(Number.isFinite(atr))reasons.push('ATR(14) 3D: '+fmtUSD(atr)+'; referência de risco, não gatilho');
+ return {ready:true,score,label:buyStrong?'COMPRA FORTE · TOQUE MACD 3D':buy?'COMPRA · TOQUE MACD 3D':sellStrong?'VENDA FORTE · TOQUE MACD 3D':sell?'VENDA · TOQUE MACD 3D':trendUp?'ALTA · AGUARDAR TOQUE MACD':trendDown?'BAIXA · AGUARDAR TOQUE MACD':'AGUARDAR TOQUE MACD 3D',reasons,macdCross,macdTouch,macdTouchEvent:event,kdj,kdjCross,volRatio,volKnown,volStrong,volumeBuy,volumeSell,bullCandle,bearCandle,buy,buyStrong,sell,sellStrong,trendUp,trendDown,regime,atr,structuralBreak:false};
+}
+function calcHistoricalOdds(candles,current){
+ const horizon=30,step=12,rows=[]; // 30 candles 3D ≈ 90 dias corridos; amostras a cada 36 dias se sobrepõem e não são independentes.
+ if(!current||!current.ready||candles.length<390)return {ready:false,n:0,up:0,avg:0};
+ const end=candles.length-horizon-1;
+ for(let i=205;i<=end;i+=step){
+  const hist=candles.slice(0,i+1),d=calcScore(hist);
+  if(!d.ready)continue;
+  const sameTrend=d.trendUp===current.trendUp&&d.trendDown===current.trendDown;
+  const similarScore=Math.abs(d.score-current.score)<=12;
+  const similarRsi=Math.abs(d.rsi-current.rsi)<=15;
+  if(!sameTrend||!similarScore||!similarRsi)continue;
+  const ret=candles[i+horizon].close/d.close-1;
+  if(Number.isFinite(ret))rows.push(ret);
+ }
+ const up=rows.filter(x=>x>0).length,avg=rows.length?rows.reduce((a,b)=>a+b,0)/rows.length:0;
+ return {ready:rows.length>=20,n:rows.length,up:rows.length?up/rows.length*100:0,avg:avg*100};
+}
+function calcReversalSeries(raw){
+ const c=(raw||[]).filter(x=>Number.isFinite(x.time)&&Number.isFinite(x.closeTime)&&x.closeTime<Date.now()&&[x.open,x.high,x.low,x.close,x.volume].every(Number.isFinite)).sort((a,b)=>a.time-b.time),n=c.length,close=c.map(x=>x.close),vol=c.map(x=>x.volume),e20=ema(close,20),e50=ema(close,50),e200=ema(close,200),rr=rsi(close),mm=calcMACDSeries(close),kk=calcKDJSeries(c);
+ const atr=Array(n).fill(null),volAvg=Array(n).fill(null),buy=Array(n).fill(false),sell=Array(n).fill(false),buyScore=Array(n).fill(0),sellScore=Array(n).fill(0),trendUp=Array(n).fill(false),trendDown=Array(n).fill(false),tr=Array(n).fill(null);
+ for(let i=1;i<n;i++)tr[i]=Math.max(c[i].high-c[i].low,Math.abs(c[i].high-c[i-1].close),Math.abs(c[i].low-c[i-1].close));
+ for(let i=14;i<n;i++)atr[i]=tr.slice(i-13,i+1).reduce((a,b)=>a+b,0)/14;
+ for(let i=20;i<n;i++)volAvg[i]=c.slice(i-20,i).reduce((a,x)=>a+x.volume,0)/20;
+ for(let i=201;i<n;i++){
+  const p=i-1,vr=volAvg[i]>0?vol[i]/volAvg[i]:0;
+  const mb=Number.isFinite(mm.macd[p])&&Number.isFinite(mm.signal[p])&&Number.isFinite(mm.macd[i])&&Number.isFinite(mm.signal[i])&&mm.macd[p]<=mm.signal[p]&&mm.macd[i]>mm.signal[i];
+  const ms=Number.isFinite(mm.macd[p])&&Number.isFinite(mm.signal[p])&&Number.isFinite(mm.macd[i])&&Number.isFinite(mm.signal[i])&&mm.macd[p]>=mm.signal[p]&&mm.macd[i]<mm.signal[i];
+  const kb=Number.isFinite(kk.k[p])&&Number.isFinite(kk.d[p])&&Number.isFinite(kk.k[i])&&Number.isFinite(kk.d[i])&&kk.k[p]<=kk.d[p]&&kk.k[i]>kk.d[i]&&(kk.k[p]<35||kk.d[p]<35);
+  const ks=Number.isFinite(kk.k[p])&&Number.isFinite(kk.d[p])&&Number.isFinite(kk.k[i])&&Number.isFinite(kk.d[i])&&kk.k[p]>=kk.d[p]&&kk.k[i]<kk.d[i]&&(kk.k[p]>65||kk.d[p]>65);
+  const rb=Number.isFinite(rr[p])&&Number.isFinite(rr[i])&&((rr[p]<=40&&rr[i]>40)||(rr[p]<=50&&rr[i]>50));
+  const rs=Number.isFinite(rr[p])&&Number.isFinite(rr[i])&&((rr[p]>=60&&rr[i]<60)||(rr[p]>=50&&rr[i]<50));
+  const rec=close[i]>e20[i]&&close[p]<=e20[p],los=close[i]<e20[i]&&close[p]>=e20[p],vb=vr>=1.2&&c[i].close>c[i].open,vs=vr>=1.2&&c[i].close<c[i].open;
+  const up=close[i]>e200[i]&&e50[i]>e200[i]&&e50[i]>e50[Math.max(0,i-5)],down=close[i]<e200[i]&&e50[i]<e200[i]&&e50[i]<e50[Math.max(0,i-5)];
+  const b=(mb?2:0)+(kb?2:0)+(rb?2:0)+(rec?2:0)+(vb?1:0)+((rr[i]>50&&rr[i]>=rr[p])?1:0),z=(ms?2:0)+(ks?2:0)+(rs?2:0)+(los?2:0)+(vs?1:0)+((rr[i]<50&&rr[i]<=rr[p])?1:0);
+  buyScore[i]=b;sellScore[i]=z;trendUp[i]=up;trendDown[i]=down;
+  buy[i]=b>=4&&rr[i]<72&&rr[i]>rr[p]&&(!down||(rec||rb)&&b>=5);
+  sell[i]=z>=4&&rr[i]>28&&rr[i]<rr[p]&&(!up||(los||rs)&&z>=5);
+ }
+ const i=n-1,ready=n>=205&&Number.isFinite(rr[i])&&Number.isFinite(mm.hist[i])&&Number.isFinite(e50[i])&&Number.isFinite(e200[i]),vr=volAvg[i]>0?vol[i]/volAvg[i]:NaN,score=ready?Math.max(0,Math.min(100,Math.round(50+(buyScore[i]-sellScore[i])*7))):50,reasons=[];
+ if(ready){reasons.push(trendUp[i]?'regime de alta estrutural':trendDown[i]?'regime de baixa estrutural':'regime de transição');reasons.push('RSI diário '+rr[i].toFixed(1));reasons.push('MACD '+(mm.hist[i]>0?'positivo':'negativo'));reasons.push('KDJ K '+(Number.isFinite(kk.k[i])?kk.k[i].toFixed(1):'—')+' / D '+(Number.isFinite(kk.d[i])?kk.d[i].toFixed(1):'—'));reasons.push(Number.isFinite(vr)?'volume '+vr.toFixed(2)+'× média de 20 candles':'volume indisponível');}
+ const current={ready,score,buy:!!buy[i],sell:!!sell[i],buyStrong:!!buy[i]&&buyScore[i]>=7&&trendUp[i]&&vr>=1.2,sellStrong:!!sell[i]&&sellScore[i]>=7&&trendDown[i]&&vr>=1.2,label:buy[i]?'COMPRA · MOTOR DIÁRIO':sell[i]?'REDUZIR EXPOSIÇÃO · MOTOR DIÁRIO':trendUp[i]?'ALTA · AGUARDAR ENTRADA':trendDown[i]?'BAIXA · AGUARDAR CONFIRMAÇÃO':'AGUARDAR',reasons,close:close[i],rsi:rr[i],macd:{macd:mm.macd[i],signal:mm.signal[i],hist:mm.hist[i]},e20:e20[i],e50:e50[i],e200:e200[i],dist50:(close[i]/e50[i]-1)*100,dist200:(close[i]/e200[i]-1)*100,volRatio:vr,volKnown:Number.isFinite(vr),trend:trendUp[i]?'Alta estrutural':trendDown[i]?'Baixa estrutural':'Transição',trendUp:!!trendUp[i],trendDown:!!trendDown[i],atr:atr[i],buyScore:buyScore[i],sellScore:sellScore[i],period:'1d'};
+ return {candles:c,close,e20,e50,e200,rsi:rr,macd:mm,kdj:kk,atr,volAvg,buy,sell,buyScore,sellScore,trendUp,trendDown,current,ready};
+}
+
+function runWeeklyConfluenceBacktest(raw){
+ const c=(raw||[]).filter(x=>Number.isFinite(x.time)&&Number.isFinite(x.closeTime)&&x.closeTime<Date.now()&&[x.open,x.high,x.low,x.close].every(Number.isFinite)).sort((a,b)=>a.time-b.time);
+ const buySignals=new Map(),sellSignals=new Map(),trades=[],fee=0.001;
+ if(c.length<205)return {ready:false,reason:'Histórico semanal insuficiente',n:c.length,buySignals,sellSignals,trades,period:'1w',current:{ready:false,label:'AGUARDAR',reasons:['Histórico semanal insuficiente'],buy:false,sell:false}};
+ const close=c.map(x=>x.close),m=calcMACDSeries(close),rv=rsi(close),kd=calcKDJSeries(c),smaN=(a,n)=>a.map((_,i)=>i+1<n?null:a.slice(i+1-n,i+1).reduce((x,y)=>x+y,0)/n);
+ const bandSma=smaN(close,20),bandEma=ema(close,21),sma200=smaN(close,200),buyAt=Array(c.length).fill(false),sellAt=Array(c.length).fill(false);
+ const readyAt=i=>[m.macd[i],m.signal[i],m.hist[i],rv[i],rv[i-1],kd.k[i],kd.d[i],kd.k[i-1],kd.d[i-1],bandSma[i],bandEma[i],sma200[i]].every(Number.isFinite);
+ for(let i=2;i<c.length;i++){
+  if(!readyAt(i)||!readyAt(i-1))continue;
+  const macdCrossUp=m.macd[i-1]<=m.signal[i-1]&&m.macd[i]>m.signal[i],macdCrossDown=m.macd[i-1]>=m.signal[i-1]&&m.macd[i]<m.signal[i];
+  const macdBull=m.hist[i]>0&&(macdCrossUp||(m.hist[i]>m.hist[i-1]&&m.hist[i-1]>=m.hist[i-2]&&m.macd[i]>m.signal[i]));
+  const macdBear=m.hist[i]<0&&(macdCrossDown||(m.hist[i]<m.hist[i-1]&&m.hist[i-1]<=m.hist[i-2]&&m.macd[i]<m.signal[i]));
+  const rsiBull=(rv[i]>=50&&rv[i]>rv[i-1])||(rv[i]>=40&&rv[i]>rv[i-1]&&rv[i-1]<40);
+  const rsiBear=(rv[i]<50&&rv[i]<rv[i-1])||(rv[i]<60&&rv[i]<rv[i-1]&&rv[i-1]>=60);
+  const kdjCrossUp=kd.k[i-1]<=kd.d[i-1]&&kd.k[i]>kd.d[i],kdjCrossDown=kd.k[i-1]>=kd.d[i-1]&&kd.k[i]<kd.d[i];
+  const kdjBull=(kdjCrossUp&&kd.k[i]<=65)||(kd.k[i]>kd.d[i]&&kd.k[i]<80&&kd.k[i]>=kd.k[i-1]);
+  const kdjBear=(kdjCrossDown&&kd.k[i]>=35)||(kd.k[i]<kd.d[i]&&kd.k[i]>20&&kd.k[i]<=kd.k[i-1]);
+  const bandLow=Math.min(bandSma[i],bandEma[i]),bandHigh=Math.max(bandSma[i],bandEma[i]);
+  const nearBand=c[i].close>=bandLow*0.90,aboveBand=c[i].close>=bandLow;
+  const recovery=rv[i]>=40&&rv[i]>rv[i-1]&&m.hist[i]>m.hist[i-1]&&c[i].close>=sma200[i]*0.82;
+  const breakdown=c[i].close<bandHigh&&c[i].close<sma200[i]&&m.hist[i]<m.hist[i-1];
+  const buy=macdBull&&rsiBull&&kdjBull&&(aboveBand||nearBand&&recovery);
+  const sell=macdBear&&rsiBear&&kdjBear&&(c[i].close<bandHigh||breakdown);
+  const prevBuy=i>2&&buyAt[i-1],prevSell=i>2&&sellAt[i-1];
+  buyAt[i]=buy;sellAt[i]=sell;
+  if(buy&&!prevBuy)buySignals.set(c[i].time,{signalPrice:c[i].close,executionTime:c[i+1]?.time??c[i].closeTime,executionPrice:c[i+1]?.open??c[i].close,reason:'CONFLUÊNCIA SEMANAL MACD + RSI + KDJ + SUPORTE',macd:m.macd[i],signal:m.signal[i],hist:m.hist[i],rsi:rv[i],k:kd.k[i],d:kd.d[i],bandSma:bandSma[i],bandEma:bandEma[i],sma200:sma200[i]});
+  if(sell&&!prevSell)sellSignals.set(c[i].time,{signalPrice:c[i].close,executionTime:c[i+1]?.time??c[i].closeTime,executionPrice:c[i+1]?.open??c[i].close,reason:'CONFLUÊNCIA SEMANAL MACD + RSI + KDJ + PERDA DE SUPORTE',macd:m.macd[i],signal:m.signal[i],hist:m.hist[i],rsi:rv[i],k:kd.k[i],d:kd.d[i],bandSma:bandSma[i],bandEma:bandEma[i],sma200:sma200[i]});
+ }
+ let pos=null,equity=1,peak=1,maxDD=0;
+ for(let i=1;i<c.length-1;i++){
+  if(sellAt[i]&&pos){const px=c[i+1].open,net=px*(1-fee)/(pos.entry*(1+fee))-1;trades.push({...pos,exitTime:c[i+1].time,exit:px,netReturn:net,exitReason:'Confluência semanal de baixa'});equity*=1+net;peak=Math.max(peak,equity);maxDD=Math.max(maxDD,(peak-equity)/peak);pos=null;}
+  else if(buyAt[i]&&!pos)pos={entry:c[i+1].open,entryTime:c[i+1].time,signalTime:c[i].time,entryReason:'Confluência semanal de alta'};
+ }
+ if(pos){const last=c.at(-1),net=last.close*(1-fee)/(pos.entry*(1+fee))-1;trades.push({...pos,exitTime:last.time,exit:last.close,netReturn:net,exitReason:'Marcação no fim do histórico',forcedClose:true});equity*=1+net;peak=Math.max(peak,equity);maxDD=Math.max(maxDD,(peak-equity)/peak);}
+ const i=c.length-1,valid=readyAt(i),recentBuy=buySignals.has(c[i].time),recentSell=sellSignals.has(c[i].time),wins=trades.filter(t=>t.netReturn>0),losses=trades.filter(t=>t.netReturn<=0),grossWin=wins.reduce((a,t)=>a+t.netReturn,0),grossLoss=-losses.reduce((a,t)=>a+t.netReturn,0);
+ const current={ready:valid,period:'1w',label:recentBuy?'COMPRA · CONFLUÊNCIA SEMANAL':recentSell?'VENDA · CONFLUÊNCIA SEMANAL':'AGUARDAR · SEM NOVA CONFLUÊNCIA',buy:recentBuy,sell:recentSell,score:recentBuy?100:recentSell?0:50,rsi:rv[i],macd:{macd:m.macd[i],signal:m.signal[i],hist:m.hist[i]},k:kd.k[i],d:kd.d[i],sma200:sma200[i],bandSma:bandSma[i],bandEma:bandEma[i],close:close[i],reasons:[recentBuy?'MACD, RSI e KDJ confirmam alta; preço avaliado em relação à Bull Market Support Band e SMA 200 semanal':recentSell?'MACD, RSI e KDJ confirmam baixa; perda de suporte semanal verificada':'Sem nova confluência completa no último candle semanal fechado.']};
+ return {ready:true,n:c.length,start:c[0].time,end:c[i].time,buySignals,sellSignals,trades,fee,winRate:trades.length?wins.length/trades.length*100:0,totalReturn:(equity-1)*100,buyHold:(close[i]/close[0]-1)*100,maxDD:maxDD*100,profitFactor:grossLoss?grossWin/grossLoss:null,current,period:'1w'};
+}
+function renderWeeklyEnginePanel(){
+ const root=$('weeklyEnginePanel');if(!root)return;
+ const b=weeklyBacktest,cur=b&&b.current;
+ if(!b||!b.ready||!cur||!cur.ready){root.innerHTML='<div class="cardhead"><h2>Backtest experimental · confluência semanal (não altera sinal oficial)</h2><span class="pill">AGUARDANDO DADOS</span></div><p class="note">O motor semanal precisa de pelo menos 205 candles semanais fechados para avaliar MACD, RSI, KDJ e contexto de ciclo.</p>';return;}
+ const cls=cur.buy?'green':cur.sell?'red':'yellow';
+ root.innerHTML='<div class="cardhead"><h2>Backtest experimental · confluência semanal (não altera sinal oficial)</h2><span class="pill '+cls+'">'+cur.label+'</span></div><div class="metrics-grid"><div class="metric"><span>RSI 14 semanal</span><strong>'+Number(cur.rsi).toFixed(1)+'</strong></div>
