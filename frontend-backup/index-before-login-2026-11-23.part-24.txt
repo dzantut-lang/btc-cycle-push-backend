@@ -1,0 +1,349 @@
+(0,Math.min(points.length-1,Math.round((x-left)/pw*(points.length-1))));if(best&&bestD<=30*30)return {...best,points,x,y};return {j:jx,type:'candle',x,y,points};};
+ const show=(e,pin)=>{const found=locate(e);if(!found)return;const points=found.points,j=found.j,type=found.type,r=canvas.getBoundingClientRect(),w=r.width,h=r.height,left=w<390?31:39,right=13,top=18,bottom=31,pw=Math.max(10,w-left-right),ph=Math.max(10,h-top-bottom);canvas.dataset.hoverIndex=String(j);canvas.dataset.hoverX=String(found.x);canvas.dataset.hoverY=String(found.y);canvas.dataset.hoverType=type;const tip=$('tbrScoreTooltip');if(tip)showTbrScoreTooltip(j,points,tip,canvas,left,right,top,bottom,pw,ph,0,100,w,h);if(pin){canvas.dataset.selectedIndex=String(j);canvas.dataset.selectedType=type;renderPanel(j,type,points);drawScoreChart(points);}};
+ const move=e=>show(e,false);
+ canvas.addEventListener('pointermove',e=>{if(e.pointerType==='touch')return;move(e);});
+ canvas.addEventListener('pointerdown',e=>{if(e.pointerType==='touch')return;show(e,true);});
+ canvas.addEventListener('pointerleave',hide);
+ canvas.addEventListener('touchstart',e=>{if(hideTimer)clearTimeout(hideTimer);if(e.touches&&e.touches[0])show(e.touches[0],true);},{passive:true});
+ canvas.addEventListener('touchmove',e=>{if(hideTimer)clearTimeout(hideTimer);if(e.touches&&e.touches[0])move(e.touches[0]);},{passive:true});
+ canvas.addEventListener('touchend',()=>{hideTimer=setTimeout(()=>{const t=$('tbrScoreTooltip');if(t)t.style.display='none';},2600);},{passive:true});
+ canvas.addEventListener('touchcancel',hide,{passive:true});
+}
+
+
+ let tbrLivePreview=null,tbrLivePoint=null,tbrChartPoints=series.slice();
+ drawScoreChart(tbrChartPoints);if(!window.__tbrChartResizeBound){window.__tbrChartResizeBound=true;window.addEventListener('resize',function(){const c=$('tbrScoreChart');if(c&&c.dataset.points){try{drawScoreChart(JSON.parse(c.dataset.points))}catch(e){}}})}
+ $('tbrScoreChart').dataset.points=JSON.stringify(tbrChartPoints);bindTbrScoreHover();
+ window.__tbrScoreLiveUpdate=function(live){try{if(!live||!Number.isFinite(live.close)||live.close<=0)return;const base=candles.filter(c=>c.time!==live.time&&c.closeTime<Date.now());if(base.length<220)return;const provisional=[...base,{time:live.time,closeTime:Number.isFinite(live.closeTime)?live.closeTime:Date.now(),open:live.open,high:live.high,low:live.low,close:live.close,volume:live.volume}].sort((a,b)=>a.time-b.time);const pc=provisional.map(x=>x.close),pv=provisional.map(x=>x.volume),pr=rsi(pc),pm=macd(pc),pe50=ema(pc,50),pe200=ema(pc,200),li=provisional.length-1,sc=scoreAt(li,provisional,pr,pm,pe50,pe200,pv);if(!sc)return;const closed=live.isClosed===true;if(tbrLivePoint&&tbrLivePoint.time!==live.time){tbrChartPoints.push({...tbrLivePoint,closeTime:Date.now(),live:false});tbrLivePoint=null;}const point={i:-1,time:live.time,closeTime:closed&&Number.isFinite(live.closeTime)?live.closeTime:Date.now(),price:live.close,bottom:sc.bottom,top:sc.top,live:!closed};if(closed){if(tbrLivePoint&&tbrLivePoint.time===live.time)tbrLivePoint=null;tbrChartPoints=tbrChartPoints.filter(p=>p.time!==live.time);tbrChartPoints.push(point);}else{tbrLivePoint=point;}tbrLivePreview=closed?null:{bottom:sc.bottom,top:sc.top};const displayPoints=tbrLivePoint?tbrChartPoints.concat([tbrLivePoint]):tbrChartPoints.slice();$('tbrScoreChart').dataset.points=JSON.stringify(displayPoints);const panel=$('tbrLivePanel'),priceEl=$('tbrLivePrice'),b=$('tbrLiveBottom'),t=$('tbrLiveTop'),bl=$('tbrLiveBottomLabel'),tl=$('tbrLiveTopLabel'),stamp=$('tbrLiveUpdated'),status=$('tbrLiveStatus');if(panel)panel.classList.remove('is-stale','is-offline');if(priceEl)priceEl.textContent=fmtUSD(live.close);if(b)b.innerHTML=sc.bottom+'<em>/100</em>';if(t)t.innerHTML=sc.top+'<em>/100</em>';if(bl)bl.textContent=labelScore(sc.bottom,'bottom')+(closed?' · confirmado':' · provisório');if(tl)tl.textContent=labelScore(sc.top,'top')+(closed?' · confirmado':' · provisório');const readingBottom=$('tbrHistoryBottomText'),readingBottomDesc=$('tbrHistoryBottomDesc'),readingTop=$('tbrHistoryTopText'),readingTopDesc=$('tbrHistoryTopDesc');if(readingBottom&&readingBottomDesc){readingBottom.textContent=sc.bottom>=75?'CONFLUÊNCIA FORTE · POSSÍVEL FUNDO':sc.bottom>=55?'PRESSÃO DE FUNDO ELEVADA':sc.bottom>=35?'SINAIS PARCIAIS DE FUNDO':'SEM PRESSÃO FORTE DE FUNDO';readingBottomDesc.textContent='Score verde '+sc.bottom+'/100 · '+(closed?'candle 3D fechado e confirmado. ':'leitura provisória ao vivo; pode oscilar até o fechamento. ')+(sc.bottom>=75?'Forte confluência técnica; aguardar confirmação de preço.':sc.bottom>=55?'Há fatores relevantes favorecendo possível fundo.':sc.bottom>=35?'Alguns fatores favorecem fundo, ainda sem confluência suficiente.':'Poucos fatores favorecem fundo neste momento.');}if(readingTop&&readingTopDesc){readingTop.textContent=sc.top>=75?'RISCO FORTE · POSSÍVEL TOPO':sc.top>=55?'RISCO DE TOPO ELEVADO':sc.top>=35?'SINAIS PARCIAIS DE TOPO':'SEM RISCO FORTE DE TOPO';readingTopDesc.textContent='Score vermelho '+sc.top+'/100 · '+(closed?'candle 3D fechado e confirmado. ':'leitura provisória ao vivo; pode oscilar até o fechamento. ')+(sc.top>=75?'Forte confluência de risco; aguardar confirmação de preço.':sc.top>=55?'Há fatores relevantes indicando possível risco de topo.':sc.top>=35?'Alguns fatores sugerem risco de topo, ainda sem confluência suficiente.':'Poucos fatores sugerem risco de topo neste momento.');}if(stamp)stamp.textContent=(closed?'Candle 3D fechado · ':'Atualizado às ')+(closed?new Date(live.closeTime).toLocaleString('pt-BR'):new Date().toLocaleTimeString('pt-BR')+' · candle 3D em formação');if(status)status.textContent=closed?'CANDLE 3D FECHADO · SCORE CONSOLIDADO':'FLUXO BINANCE ATIVO · ATUALIZAÇÃO CONTÍNUA';$('tbrRsi').textContent=nfmt(sc.rsi,1)+(closed?' · fechado':' · ao vivo');$('tbrMacd').textContent=nfmt(sc.macd,2)+(closed?' · fechado':' · ao vivo');$('tbrEma').textContent=(sc.dist>0?'+':'')+nfmt(sc.dist,1)+'%'+(closed?' · fechado':' · ao vivo');setScore('tbrBottomScore','tbrBottomFill',sc.bottom);setScore('tbrTopScore','tbrTopFill',sc.top);$('tbrBottomState').textContent=labelScore(sc.bottom,'bottom')+ (closed?' · confirmado':' · provisório');$('tbrTopState').textContent=labelScore(sc.top,'top')+(closed?' · confirmado':' · provisório');setGauge('tbrBottomNeedle','tbrBottomGaugeScore','tbrBottomGaugeCaption',sc.bottom,sc.bottom>=75?'Confluência técnica forte; aguarde confirmação de reversão.':sc.bottom>=55?'Pressão de fundo relevante, ainda não confirmada.':'Sem confluência técnica forte de fundo.');setGauge('tbrTopNeedle','tbrTopGaugeScore','tbrTopGaugeCaption',sc.top,sc.top>=75?'Risco técnico elevado; não confirma topo definitivo.':sc.top>=55?'Risco de topo relevante, ainda não confirmado.':'Sem alerta técnico forte de topo.');$('tbrBottomDesc').textContent=sc.bottom>=55?'Confluência de sobrevenda, momentum e/ou preço abaixo das médias. Aguarde confirmação de reversão.':'Ainda não há confluência técnica forte de fundo no candle '+(closed?'fechado.':'em formação.');$('tbrTopDesc').textContent=sc.top>=55?'Confluência de sobrecompra, perda de momentum e/ou preço esticado. Aguarde confirmação de reversão.':'Ainda não há confluência técnica forte de topo no candle '+(closed?'fechado.':'em formação.');const dec=$('tbrDecision'),dt=$('tbrDecisionTitle'),dx=$('tbrDecisionText'),onchainMvrv=Number(($('tbrMvrv')||{}).textContent),onchainAvailable=Number.isFinite(onchainMvrv)&&onchainMvrv>0;let state='wait',title='AGUARDAR · SEM SINAL FORTE',detail='Scores técnicos ainda não mostram confluência suficiente. A leitura ao vivo é provisória e a camada on-chain precisa de dados válidos antes de qualquer confirmação.';if(Math.round(sc.bottom)>=75&&Math.round(sc.top)<80){state='buy';title='CANDIDATO A COMPRA · CONFIRMAÇÃO PENDENTE';detail='Pressão de fundo técnica elevada '+(closed?'no candle fechado. ':'na leitura provisória ao vivo. ') +(onchainAvailable?'MVRV disponível ('+onchainMvrv.toFixed(2)+'×); ainda exige validação dos demais fatores e confirmação de preço.':'On-chain indisponível ou não validado: alerta técnico, não compra confirmada.');}else if(Math.round(sc.top)>=75&&Math.round(sc.bottom)<80){state='sell';title='CANDIDATO A VENDA · CONFIRMAÇÃO PENDENTE';detail='Risco de topo técnico elevado '+(closed?'no candle fechado. ':'na leitura provisória ao vivo. ')+(onchainAvailable?'MVRV disponível ('+onchainMvrv.toFixed(2)+'×); ainda exige validação dos demais fatores e confirmação de preço.':'On-chain indisponível ou não validado: alerta técnico, não venda confirmada.');}else if(sc.bottom>=55&&sc.top>=55){detail='Há sinais mistos de fundo e topo na '+(closed?'leitura fechada. ':'leitura provisória ao vivo. ')+'Não gerar decisão unilateral; aguardar resolução da confluência e confirmação on-chain.';}if(dec)dec.dataset.state=state;if(dt)dt.textContent=title+(closed?' · FECHADO':' · AO VIVO');if(dx)dx.textContent=detail;window.__btcPulseTbr={state:state,title:title,detail:detail,bottom:sc.bottom,top:sc.top,score:Math.max(sc.bottom,sc.top),price:live.close,live:!closed,rsi:sc.rsi,macd:sc.macd,dist:sc.dist,closeTime:Number.isFinite(live.closeTime)?live.closeTime:Date.now()};if(typeof updateDecisionCenter==='function')updateDecisionCenter(title,{score:Math.max(sc.bottom,sc.top),ready:true});/* Pulse DOM state is owned by stable visual controller; analysis engine untouched. */window.__tbrScoreLiveLastAt=Date.now();drawScoreChart(displayPoints);if(tbrLivePoint)startTbrScorePulse();}catch(err){console.warn('TBR live score update failed',err)}};
+ if(!window.__tbrLiveWatchdog){window.__tbrLiveWatchdog=setInterval(function(){const panel=document.getElementById('tbrLivePanel'),status=document.getElementById('tbrLiveStatus');if(!panel)return;const age=Date.now()-(window.__tbrScoreLiveLastAt||0);if(!window.__tbrScoreLiveLastAt||age>60000){panel.classList.add('is-offline');panel.classList.remove('is-stale');if(status)status.textContent='FLUXO SEM DADOS · VERIFICAR CONEXÃO';}else if(age>20000){panel.classList.add('is-stale');panel.classList.remove('is-offline');if(status)status.textContent='ATUALIZAÇÃO ATRASADA · RECONECTANDO';}},5000);}
+ const selected=events.slice().reverse();const historyEl=$('tbrHistory');const historyLabel=historyEl.previousElementSibling;const historyHtml=selected.length?selected.map(ev=>'<div class=\"tbr-event '+ev.type+'\" data-type=\"'+ev.type+'\"><time>'+fmtDate(candles[ev.i].closeTime)+'</time><span class=\"tbr-tag '+ev.type+'\">'+ev.status+'</span><div class=\"tbr-price\">BTC · '+nfmt(ev.price,0)+' USDT</div><div class=\"tbr-scores\"><span class=\"tbr-score-chip tbr-score-bottom\">FUNDO <b>'+ev.bottom+'/100</b></span><span class=\"tbr-score-chip tbr-score-top\">TOPO <b>'+ev.top+'/100</b></span></div></div>').join(''):'<div class=\"tbr-event tbr-empty\"><span>Nenhum possível fundo ou topo nos últimos 4 anos</span><span>Nenhum candle 3D fechado atingiu os mesmos critérios do Bitcoin Pulse: score de fundo ou topo igual ou superior a 75/100.</span></div>';historyEl.innerHTML=historyHtml;const renderedCount=selected.length?historyEl.querySelectorAll(':scope > .tbr-event').length:0;if(historyLabel)historyLabel.textContent='HISTÓRICO DE 4 ANOS · '+renderedCount+' EVENTOS DO MOTOR TOP/BOTTOM 3D';
+ $('tbrStatus').textContent='DADOS ATUALIZADOS';$('tbrUpdated').textContent='Última atualização: '+new Intl.DateTimeFormat('pt-BR',{hour:'2-digit',minute:'2-digit',second:'2-digit'}).format(new Date())+' · Binance BTCUSDT · candles 3D fechados';
+ }catch(err){$('tbrStatus').textContent='DADOS INDISPONÍVEIS';$('tbrBottomScore').textContent='—';$('tbrTopScore').textContent='—';$('tbrBottomFill').style.width='0';$('tbrTopFill').style.width='0';$('tbrBottomState').textContent='Sem leitura válida';$('tbrTopState').textContent='Sem leitura válida';$('tbrBottomDesc').textContent='Não foi possível calcular o score. Tente atualizar novamente.';$('tbrTopDesc').textContent='Não foi possível calcular o score. Tente atualizar novamente.';$('tbrBottomGaugeScore').textContent='—';$('tbrTopGaugeScore').textContent='—';$('tbrBottomGaugeCaption').textContent='Dados indisponíveis';$('tbrTopGaugeCaption').textContent='Dados indisponíveis';$('tbrDecisionTitle').textContent='DADOS INDISPONÍVEIS · SEM SINAL';$('tbrDecisionText').textContent='Nenhuma decisão deve ser tomada com base em uma leitura incompleta.';$('tbrHistory').textContent='Histórico indisponível nesta atualização.';$('tbrUpdated').textContent=String(err&&err.message||err);console.error('BTC TOP & BOTTOM RADAR:',err)}finally{btn.disabled=false}}
+
+ // Fluxo exclusivo do BTC: o radar não depende do ativo selecionado no gráfico principal.
+ $('tbrRefresh').addEventListener('click',run);if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',run,{once:true});else run();
+})();
+</script>
+<style id="btc-top-bottom-nav-style-20261027">.quick-nav .tbr-nav-btn{border:1px solid #40536a!important;background:#172638!important;color:#dfeaf6!important;font-weight:800!important;letter-spacing:.25px!important}.quick-nav .tbr-nav-btn:hover{border-color:#6d91b9!important;background:#22364c!important}#btcTopBottomRadar{scroll-margin-top:100px!important}</style>
+
+<style id="btc-top-bottom-upgrade-20261028">
+#btcTopBottomRadar .tbr-phase-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin:14px 0}
+#btcTopBottomRadar .tbr-phase-box{background:rgba(20,31,45,.72);border:1px solid #34465a;border-radius:12px;padding:14px;min-width:0}
+#btcTopBottomRadar .tbr-phase-box>span{display:block;font-size:10px;letter-spacing:1.1px;color:#9aabba;font-weight:800;margin-bottom:8px}
+#btcTopBottomRadar .tbr-phase-box>strong{display:block;font-size:17px;line-height:1.3;color:#e6edf5;overflow-wrap:anywhere}
+#btcTopBottomRadar .tbr-phase-box>small{display:block;color:#aebccc;font-size:12px;line-height:1.45;margin-top:6px}
+#btcTopBottomRadar .tbr-history-chart{margin:14px 0;padding:14px;border:1px solid #2d3e50;border-radius:14px;background:rgba(8,15,24,.72);min-width:0}
+#btcTopBottomRadar #tbrScoreChart{display:block;width:100%;height:190px;max-width:100%}
+#btcTopBottomRadar .tbr-chart-legend{display:flex;flex-wrap:wrap;gap:14px;margin:8px 0 6px;color:#bdc9d6;font-size:11px}
+#btcTopBottomRadar .tbr-chart-legend span{display:flex;align-items:center;gap:6px}
+#btcTopBottomRadar .tbr-dot-bottom,#btcTopBottomRadar .tbr-dot-top{display:inline-block;width:8px;height:8px;border-radius:50%}
+#btcTopBottomRadar .tbr-dot-bottom{background:#41d6a0}
+#btcTopBottomRadar .tbr-dot-top{background:#ff7777}
+#btcTopBottomRadar .tbr-chart-note{font-size:11px;color:#8f9eae;line-height:1.45;margin-top:5px}
+@media(max-width:560px){#btcTopBottomRadar .tbr-phase-grid{grid-template-columns:1fr}#btcTopBottomRadar .tbr-phase-box{padding:12px}#btcTopBottomRadar .tbr-history-chart{padding:10px}}
+</style>
+<style id="btc-onchain-layer-20261029">#btcTopBottomRadar .tbr-onchain{margin:14px 0;border:1px solid #2d4054;border-radius:12px;overflow:hidden;background:#0c1520}#btcTopBottomRadar .tbr-onchain-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;padding:10px}#btcTopBottomRadar .tbr-onchain-item{padding:12px;border:1px solid #263649;border-radius:9px;background:#101a27;min-width:0}#btcTopBottomRadar .tbr-onchain-item span{display:block;color:#91a6bb;font-size:10px;line-height:1.4}#btcTopBottomRadar .tbr-onchain-item strong{display:block;color:#eaf2fa;font-size:18px;margin:7px 0;overflow-wrap:anywhere}#btcTopBottomRadar .tbr-onchain-item small{display:block;color:#9aacc0;font-size:10px;line-height:1.45}#btcTopBottomRadar .tbr-onchain-foot{padding:0 12px 12px;color:#8298b0;font-size:10px;line-height:1.5}@media(max-width:620px){#btcTopBottomRadar .tbr-onchain-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}</style><script id="btc-top-bottom-nav-handler-20261027">(function(){function bind(){document.querySelectorAll('.tbr-nav-btn[data-jump="btcTopBottomRadar"]').forEach(function(b){if(b.dataset.bound)return;b.dataset.bound="1";b.addEventListener("click",function(){var target=document.getElementById("btcTopBottomRadar");if(target)target.scrollIntoView({behavior:"smooth",block:"start"});});});}if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",bind);else bind();window.addEventListener("load",bind);})();</script>
+<script id="btc-onchain-refresh-binding-20261029">(function(){function bind(){var b=document.getElementById("tbrRefresh");if(!b||b.dataset.onchainRefreshBound)return;b.dataset.onchainRefreshBound="1";b.addEventListener("click",function(){var s=document.getElementById("tbrOnchainStatus");if(s)s.textContent="Atualizando métricas on-chain…";});if(!window.__btcOnchainTimer){window.__btcOnchainTimer=setInterval(function(){if(document.visibilityState==="visible"&&typeof window.__btcOnchainRefresh==="function")window.__btcOnchainRefresh();},900000);}}if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",bind,{once:true});else bind();})();</script><script id="tbr-onchain-interpretation-20261029">(function(){
+const root=document.getElementById("btcTopBottomRadar");if(!root||root.dataset.ocInterpretationReady==="2")return;root.dataset.ocInterpretationReady="2";
+const $=id=>document.getElementById(id);
+function readMetric(valueId,stateId,kind){
+ const v=$(valueId),s=$(stateId);if(!v||!s)return null;
+ const raw=(v.textContent||"").trim(),state=(s.textContent||"").trim();
+ if(!raw||raw==="—"||raw==="-"||/indisponível|atualizando|bloquead|aguardando|sem dado|erro|fonte/i.test(state))return null;
+ const match=raw.replace(/,/g,".").match(/[+-]?[0-9]+(?:.[0-9]+)?/);if(!match)return null;
+ const value=Number(match[0]);if(!Number.isFinite(value))return null;
+ const dm=state.match(/(20[0-9]{2}-[0-9]{2}-[0-9]{2})/);if(!dm)return null;
+ const date=new Date(dm[1]+"T00:00:00Z"),age=(Date.now()-date.getTime())/86400000;
+ if(!Number.isFinite(age)||age < -1||age>5)return null;
+ if(kind==="mvrv"&&value<=0)return null;if(kind==="nupl"&&Math.abs(value)>100)return null;if(kind==="puell"&&value<=0)return null;
+ return {value,date:dm[1]};
+}
+function interpret(){
+ const m=readMetric("tbrMvrv","tbrMvrvState","mvrv"),n=readMetric("tbrNupl","tbrNuplState","nupl"),p=readMetric("tbrPuell","tbrPuellState","puell");
+ const ms=$("tbrOcMvrvText"),ns=$("tbrOcNuplText"),ps=$("tbrOcPuellText"),total=$("tbrOcTotal"),fill=$("tbrOcMeterFill"),foot=$("tbrOcFoot");if(!ms||!ns||!ps||!total||!fill||!foot)return;
+ let buy=0,sell=0,count=0,points=0;
+ if(m){count++;if(m.value<1){points+=30;buy++;ms.textContent=m.value.toFixed(2)+"× · valuation historicamente deprimida; possível acumulação, não garantia de fundo. ("+m.date+")"}else if(m.value<1.5){points+=22;buy++;ms.textContent=m.value.toFixed(2)+"× · valuation relativamente baixa; validar com tendência e ciclo. ("+m.date+")"}else if(m.value<2.5){points+=12;ms.textContent=m.value.toFixed(2)+"× · faixa intermediária, sem extremo claro. ("+m.date+")"}else if(m.value<3.5){points+=3;sell++;ms.textContent=m.value.toFixed(2)+"× · valuation elevada; cautela crescente. ("+m.date+")"}else{sell++;ms.textContent=m.value.toFixed(2)+"× · valuation muito elevada; não confirma topo. ("+m.date+")"}}else ms.textContent="Sem dado atual validado; nenhuma pontuação atribuída.";
+ if(n){count++;if(n.value<0){points+=30;buy++;ns.textContent=n.value.toFixed(1)+"% · NUPL negativo: perdas não realizadas agregadas; pode refletir capitulação. ("+n.date+")"}else if(n.value<25){points+=22;buy++;ns.textContent=n.value.toFixed(1)+"% · zona de medo/esperança; pode ser compatível com acumulação. ("+n.date+")"}else if(n.value<50){points+=14;ns.textContent=n.value.toFixed(1)+"% · faixa intermediária de lucro não realizado. ("+n.date+")"}else if(n.value<75){points+=5;sell++;ns.textContent=n.value.toFixed(1)+"% · lucro agregado elevado; monitorar distribuição. ("+n.date+")"}else{sell++;ns.textContent=n.value.toFixed(1)+"% · euforia potencial; risco de realização de lucro. ("+n.date+")"}}else ns.textContent="Sem dado atual validado; NUPL deve estar expresso em porcentagem.";
+ if(p){count++;if(p.value<0.5){points+=25;buy++;ps.textContent=p.value.toFixed(2)+"× · emissão muito abaixo da média anual; historicamente deprimida. ("+p.date+")"}else if(p.value<0.8){points+=18;buy++;ps.textContent=p.value.toFixed(2)+"× · emissão abaixo da média; possível estresse dos mineradores. ("+p.date+")"}else if(p.value<1.5){points+=12;ps.textContent=p.value.toFixed(2)+"× · faixa intermediária, sem extremo claro. ("+p.date+")"}else if(p.value<2){points+=5;sell++;ps.textContent=p.value.toFixed(2)+"× · emissão acima da média; cautela. ("+p.date+")"}else{sell++;ps.textContent=p.value.toFixed(2)+"× · emissão muito elevada; não confirma topo isoladamente. ("+p.date+")"}}else ps.textContent="Sem dado atual validado; nenhuma pontuação atribuída.";
+ const score=count?Math.round(points/count):0;fill.style.width=score+"%";
+ if(count<2){total.textContent="DADOS INSUFICIENTES · SEM CONFIRMAÇÃO";fill.style.width="0%";foot.textContent="Confirmação bloqueada: são necessárias pelo menos duas métricas com valor e data recente (até 5 dias). Dados ausentes ou antigos nunca contam como sinal."}
+ else if(buy>=2&&buy>sell){total.textContent="VIÉS ON-CHAIN FAVORÁVEL À ACUMULAÇÃO · "+score+"/100";foot.textContent="Confluência compatível com acumulação histórica. É contexto secundário, não ordem nem garantia de fundo; confirme com o motor técnico e o gerenciamento de risco."}
+ else if(sell>=2&&sell>buy){total.textContent="ALERTA ON-CHAIN DE VALUATION/LUCRO ELEVADO · "+score+"/100";foot.textContent="Métricas elevadas podem indicar risco de ciclo, mas não são ordem de venda. Compare com o motor técnico e o plano de risco."}
+ else{total.textContent="SINAL ON-CHAIN MISTO · "+score+"/100";foot.textContent="As métricas não formam direção dominante. Não use esta camada isoladamente para validar compra ou venda."}
+}
+interpret();const observer=new MutationObserver(interpret);["tbrMvrv","tbrMvrvState","tbrNupl","tbrNuplState","tbrPuell","tbrPuellState"].forEach(id=>{const el=$(id);if(el)observer.observe(el,{childList:true,subtree:true,characterData:true})});setInterval(interpret,30000);
+})();</script>
+<style id="customerIndicatorStackV2Styles">
+/* Fluxo de leitura: motor e gráfico, ciclo, traders, sentimento e carteira. */
+#customerIndicatorStackV2{display:flex;flex-direction:column;gap:16px;width:100%;min-width:0;margin:0 auto 22px}
+#customerIndicatorStackV2>*{width:100%;min-width:0;margin-top:0!important;margin-bottom:0!important;scroll-margin-top:18px}
+#customerIndicatorStackV2 .decision-center{order:1}
+#customerIndicatorStackV2 #priceChartCard{order:2}
+#customerIndicatorStackV2 #halvingCycleV1{order:3}
+#customerIndicatorStackV2 #traderRadarPanel{order:4}
+#customerIndicatorStackV2 #btcTopBottomRadar{order:5}
+#customerIndicatorStackV2 #fearGreedPanel{order:6}
+#customerIndicatorStackV2 #portfolioAltcoins{order:7}
+#customerIndicatorStackV2 .indicator-hub{order:0}
+#customerIndicatorStackV2 .indicator-hub-head{align-items:center;margin-bottom:9px}
+#customerIndicatorStackV2 .indicator-hub-head h2{font-size:17px}
+#customerIndicatorStackV2 .indicator-hub-head p{font-size:11px;max-width:330px}
+#customerIndicatorStackV2 .indicator-hub-grid{grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}
+#customerIndicatorStackV2 .indicator-tile{min-height:0;padding:10px;gap:5px;border-radius:11px}
+#customerIndicatorStackV2 .indicator-tile strong{font-size:12px}
+#customerIndicatorStackV2 .indicator-tile small{font-size:10px;line-height:1.4}
+#customerIndicatorStackV2 .indicator-action{font-size:10px}
+#customerIndicatorStackV2 .indicator-tile.indicator-context{grid-column:auto;display:flex;align-items:flex-start}
+#customerIndicatorStackV2 .indicator-tile.indicator-context .indicator-action{margin-top:auto}
+#customerIndicatorStackV2 .indicator-hub-note{font-size:10px;margin-top:8px}
+#customerIndicatorStackV2 #traderRadarPanel,#customerIndicatorStackV2 #btcTopBottomRadar{padding:14px!important;border-radius:15px!important}
+#customerIndicatorStackV2 #traderRadarHeading{font-size:19px!important}
+#customerIndicatorStackV2 .halving-title{font-size:19px}
+#customerIndicatorStackV2 #fearGreedPanel .cardhead h2{font-size:16px}
+@media(max-width:700px){
+ #customerIndicatorStackV2{gap:12px}
+ #customerIndicatorStackV2 .indicator-hub{padding:12px}
+ #customerIndicatorStackV2 .indicator-hub-head{display:flex;flex-direction:column;align-items:flex-start;gap:5px}
+ #customerIndicatorStackV2 .indicator-hub-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+ #customerIndicatorStackV2 .indicator-tile{min-height:112px;padding:10px}
+ #customerIndicatorStackV2 .indicator-tile strong{font-size:12px}
+ #customerIndicatorStackV2 .indicator-tile small{font-size:10px}
+ #customerIndicatorStackV2 .indicator-tile.indicator-context{grid-column:auto}
+}
+@media(max-width:380px){
+ #customerIndicatorStackV2 .indicator-hub-grid{grid-template-columns:minmax(0,1fr)}
+ #customerIndicatorStackV2 .indicator-tile{min-height:0}
+}
+</style>
+<script id="customerIndicatorStackV2Logic">
+(function(){
+ function organize(){
+  if(document.getElementById("customerIndicatorStackV2"))return;
+  var decision=document.getElementById("decisionCenterV1");
+  var chart=document.getElementById("priceChartCard");
+  if(!decision||!chart||!decision.parentNode)return;
+  var parent=decision.parentNode;
+  var stack=document.createElement("div");
+  stack.id="customerIndicatorStackV2";
+  stack.setAttribute("aria-label","Painéis de análise do mercado");
+  parent.insertBefore(stack,decision);
+  var hub=document.querySelector(".indicator-hub");
+  if(hub)stack.appendChild(hub);
+  stack.appendChild(decision);
+  stack.appendChild(chart);
+  function moveRange(startId,stopId){
+   var start=document.getElementById(startId),stop=document.getElementById(stopId);
+   if(!start||!stop||start.parentNode!==stop.parentNode)return;
+   var node=start;
+   while(node&&node!==stop){
+    var next=node.nextSibling;
+    stack.appendChild(node);
+    node=next;
+   }
+  }
+  moveRange("halvingCycleV1","cycleBacktestPanel");
+  /* O histórico comparativo deve aparecer logo abaixo do mapa do halving. */
+  var cycleHistory=document.getElementById("btcCycleHistory");
+  if(cycleHistory)stack.appendChild(cycleHistory);
+  var trader=document.getElementById("traderRadarPanel");
+  if(trader)stack.appendChild(trader);
+  var topBottom=document.getElementById("btcTopBottomRadar");
+  if(topBottom)stack.appendChild(topBottom);
+  var fear=document.getElementById("fearGreedPanel");
+  if(fear)stack.appendChild(fear);
+  var history=document.getElementById("chartPortfolioHistory");
+  if(history)stack.appendChild(history);
+  /* Conjunto Halving 500/500: mapa, backtest e estratégia, agrupados acima da carteira. */
+  var halvingBundle=document.getElementById("halvingCycleBundle");
+  if(!halvingBundle){halvingBundle=document.createElement("section");halvingBundle.id="halvingCycleBundle";halvingBundle.setAttribute("aria-label","Mapa do ciclo Bitcoin 500/500, backtest histórico e estratégia");halvingBundle.style.cssText="display:flex;flex-direction:column;gap:14px;width:100%;min-width:0;scroll-margin-top:18px";}
+  stack.appendChild(halvingBundle);
+  ["halvingCycleMap500","halvingBacktestV1","halvingCompareV1"].forEach(function(id){var el=document.getElementById(id);if(el)halvingBundle.appendChild(el);});
+  var wallet=document.getElementById("portfolioAltcoins");
+  if(wallet)stack.appendChild(wallet);
+  /* As análises de apoio não precisam ocupar o fluxo principal. */
+  var backtest=document.getElementById("cycleBacktestPanel");
+  if(backtest){backtest.style.display="none";backtest.setAttribute("aria-hidden","true");}
+  var walletNav=document.querySelector('[data-jump="portfolioAltcoins"]');
+  if(walletNav)walletNav.textContent="Minha carteira";
+ }
+ if(!document.documentElement.dataset.halvingMapJumpReady){document.documentElement.dataset.halvingMapJumpReady="1";document.addEventListener("click",function(e){var btn=e.target.closest("button[data-jump=\"halvingCycleV1\"]");if(!btn)return;e.preventDefault();e.stopImmediatePropagation();var target=document.getElementById("halvingCycleMap500");if(target){target.scrollIntoView({behavior:"smooth",block:"start"});target.setAttribute("tabindex","-1");try{target.focus({preventScroll:true})}catch(err){}}},true);}
+ if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",organize,{once:true});
+ else organize();
+})();
+</script>
+<script id="btc-client-experience-4-mode-v1-20261114-controller">(function(){
+const root=document.body,bar=document.getElementById("ce4-experience-switch");if(!root||!bar)return;
+const buttons=Array.from(bar.querySelectorAll("[data-ce4-mode]")),hint=document.getElementById("ce4ModeHint");
+function setMode(mode,save){mode=mode==="advanced"?"advanced":"essential";root.setAttribute("data-ce4-mode",mode);buttons.forEach(function(btn){const active=btn.getAttribute("data-ce4-mode")===mode;btn.setAttribute("aria-pressed",active?"true":"false")});if(hint)hint.textContent=mode==="essential"?"Modo Essencial · foco no que importa para acompanhar o mercado.":"Modo Avançado · todos os módulos, indicadores e leituras complementares estão visíveis.";if(save){try{localStorage.setItem("btcCycleDeskExperienceMode",mode)}catch(e){}}}
+buttons.forEach(function(btn){btn.addEventListener("click",function(){setMode(btn.getAttribute("data-ce4-mode"),true)})});
+let initial="essential";try{const saved=localStorage.getItem("btcCycleDeskExperienceMode");if(saved==="advanced"||saved==="essential")initial=saved}catch(e){}setMode(initial,false);
+})();</script>
+<script id="btc-pulse-reactive-intelligence-controller-v1">
+(function(){
+ function init(){
+  var root=document.getElementById("btc-intelligence-cockpit-v1");
+  if(!root||root.dataset.reactiveReady==="1")return;
+  root.dataset.reactiveReady="1";
+  var hero=root.querySelector(".btc-cockpit-hero"),score=root.querySelector(".btc-cockpit-score strong");
+  var fields=["dcSignal","dcSignalDetail","dcScore","threeDayTrend","threeDayCross","threeDayRsi","threeDayMacd","threeDayCloseTime","threeDayStatus"];
+  var lastState=null,first=true,lastValues={};
+  var reduced=window.matchMedia&&window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  function read(id){var el=document.getElementById(id);return el?((el.textContent||"").trim()):"";}
+  function resolveState(){
+   var raw=read("dcSignal").toUpperCase(),detail=read("dcSignalDetail").toUpperCase(),status=read("threeDayStatus").toUpperCase();
+   var signal=document.getElementById("dcSignal"),tone=(signal?.getAttribute("data-tone")||"").toLowerCase(),all=raw+" "+detail+" "+status;
+   if(/DADO(S)? INDISPON|INDISPON|ERRO|DESATUALIZ|STALE|SEM DADOS|FALHA/.test(all))return "neutral";
+   if(/(^|\b)(COMPRA FORTE|COMPRA|BUY)(\b|$)/.test(raw)||tone==="buy")return "buy";
+   if(/(^|\b)(VENDA|SELL)(\b|$)/.test(raw)||tone==="sell")return "sell";
+   if(/AGUARDAR|WAIT|ANALISANDO|CALCULANDO|SEM NOVO GATILHO/.test(raw)||tone==="wait"||!raw)return "wait";
+   return "neutral";
+  }
+  function flash(el,cls){if(!el||reduced)return;el.classList.remove(cls);void el.offsetWidth;el.classList.add(cls);window.setTimeout(function(){el.classList.remove(cls);},1000);}
+  function update(){
+   var state=resolveState();
+   if(state!==lastState){root.setAttribute("data-engine-state",state);if(hero&&!first)flash(hero,"btc-engine-state-change");lastState=state;}
+   fields.forEach(function(id){
+    var source=document.getElementById(id);if(!source)return;var value=(source.textContent||"").trim();
+    if(Object.prototype.hasOwnProperty.call(lastValues,id)&&lastValues[id]!==value){
+     var mirror=root.querySelector('[data-cockpit-source="'+id+'"]');if(mirror)flash(mirror,"btc-value-updated");
+     if(id==="dcScore"&&score)flash(score,"btc-score-changed");
+    }
+    lastValues[id]=value;
+   });
+   first=false;
+  }
+  update();
+  fields.forEach(function(id){var el=document.getElementById(id);if(el)new MutationObserver(update).observe(el,{childList:true,subtree:true,characterData:true,attributes:true});});
+  document.addEventListener("visibilitychange",function(){if(!document.hidden)update();});
+ }
+ if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",init,{once:true});else init();
+})();
+</script>
+<script id="btc-decision-chart-motion-controller-v1">
+(function(){
+ function init(){
+  var panel=document.getElementById("decisionCenterV1");
+  var chart=document.getElementById("priceChartCard");
+  if(!panel||panel.dataset.motionReady==="1")return;
+  panel.dataset.motionReady="1";
+  var ids=["dcSignal","dcScore","dcPrice","dcRisk","dcNextText"];
+  var last={},first=true;
+  var reduced=window.matchMedia&&window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  function flash(el,cls){
+   if(!el||reduced)return;
+   el.classList.remove(cls);void el.offsetWidth;el.classList.add(cls);
+   window.setTimeout(function(){el.classList.remove(cls);},950);
+  }
+  function state(){
+   var signal=document.getElementById("dcSignal");
+   var raw=(signal?(signal.textContent||""):"").trim().toUpperCase();
+   var tone=(signal&&signal.getAttribute("data-tone")||"").toLowerCase();
+   if(/INDISPON|SEM DADOS|DESATUALIZ|ERRO|FALHA/.test(raw))return "neutral";
+   if(/COMPRA|BUY/.test(raw)||tone==="buy")return "buy";
+   if(/VENDA|SELL/.test(raw)||tone==="sell")return "sell";
+   if(/AGUARDAR|WAIT|ANALISANDO|CALCULANDO/.test(raw)||tone==="wait")return "wait";
+   return "neutral";
+  }
+  function update(){
+   panel.setAttribute("data-decision-state",state());
+   ids.forEach(function(id){
+    var el=document.getElementById(id);if(!el)return;
+    var value=(el.textContent||"").trim();
+    if(Object.prototype.hasOwnProperty.call(last,id)&&last[id]!==value){
+     flash(el,"btc-decision-value-changed");
+     var tile=el.closest(".dc-tile");if(tile)flash(tile,"btc-tile-updated");
+    }
+    last[id]=value;
+   });
+   first=false;
+  }
+  update();
+  ids.forEach(function(id){
+   var el=document.getElementById(id);
+   if(el)new MutationObserver(update).observe(el,{childList:true,subtree:true,characterData:true,attributes:true});
+  });
+  document.addEventListener("visibilitychange",function(){if(!document.hidden)update();});
+ }
+ if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",init,{once:true});else init();
+})();
+</script>
+
+
+
+
+
+
+
+<style id="tbr-layout-clarity-20261029">
+/* One score presentation only: retain the dial and consolidated decision; suppress the duplicate score cards. */
+#btcTopBottomRadar .tbr-cards{display:none!important}
+#btcTopBottomRadar .tbr-gauges{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;margin:12px 0 16px}
+#btcTopBottomRadar .tbr-gauge-card{padding:18px 16px 16px;background:linear-gradient(155deg,#101e2e 0%,#0a1420 100%);box-shadow:0 8px 22px rgba(0,0,0,.18)}
+#btcTopBottomRadar .tbr-gauge-title{font-size:12px;line-height:1.45;min-height:34px;color:#d3e0ef}
+#btcTopBottomRadar .tbr-gauge-score{font-size:34px;line-height:1.1;font-weight:900;letter-spacing:-.04em;margin:6px 0}
+#btcTopBottomRadar .tbr-gauge-score small{font-size:13px;font-weight:700;color:#9fb2c7;letter-spacing:0}
+#btcTopBottomRadar .tbr-gauge-caption{min-height:38px;font-size:12px;line-height:1.5;color:#c3d1e0}
+#btcTopBottomRadar .tbr-decision{margin:16px 0;padding:18px;border:1px solid #3b5069;border-radius:14px;background:linear-gradient(145deg,#142338,#0c1726);box-shadow:0 8px 24px rgba(0,0,0,.18)}
+#btcTopBottomRadar .tbr-decision-label{font-size:10px;font-weight:850;letter-spacing:.12em;color:#9eb4cc;margin-bottom:8px}
+#btcTopBottomRadar .tbr-decision strong{display:block;font-size:clamp(20px,3vw,28px);line-height:1.25;letter-spacing:-.025em}
+#btcTopBottomRadar .tbr-decision p{font-size:14px;line-height:1.65;color:#d0dceb;margin:9px 0 0}
+#btcTopBottomRadar .tbr-decision[data-state="buy"]{border-color:#2e9c76;background:linear-gradient(145deg,#102d28,#0c1d22)}
+#btcTopBottomRadar .tbr-decision[data-state="sell"]{border-color:#c85c68;background:linear-gradient(145deg,#321b25,#1d1722)}
+#btcTopBottomRadar .tbr-decision[data-state="wait"]{border-color:#9c7a35}
+#btcTopBottomRadar .tbr-reading-guide{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:9px;margin:10px 0 16px}
+#btcTopBottomRadar .tbr-reading-guide article{min-width:0;padding:12px;border:1px solid #2a3d52;border-radius:10px;background:#0b1521}
+#btcTopBottomRadar .tbr-reading-guide b{display:block;font-size:11px;letter-spacing:.04em;color:#d9e5f2;margin-bottom:5px}
+#btcTopBottomRadar .tbr-reading-guide span{display:block;font-size:11px;line-height:1.55;color:#9fb2c7}
+#btcTopBottomRadar .tbr-reading-guide .guide-buy{border-top:2px solid #40d5a0}
+#btcTopBottomRadar .tbr-reading-guide .guide-wait{border-top:2px solid #edc86b}
+#btcTopBottomRadar .tbr-reading-guide .guide-sell{border-top:2px solid #ff747d}
+#btcTopBottomRadar .tbr-metrics{margin-top:14px}
+@media(max-width:560px){
+#btcTopBottomRadar .tbr-gauges{gap:8px}
+#btcTopBottomRadar .tbr-gauge-card{padding:12px 8px}
+#btcTopBottomRadar .tbr-gauge-title{font-size:10px;min-height:42px}
+#btcTopBottomRadar .tbr-gauge-score{font-size:28px}
+#btcTopBottomRadar .tbr-gauge-caption{font-size:10px;min-height:48px}
+#btcTopBottomRadar .tbr-reading-guide{grid-template-columns:minmax(0,1fr)}
+#btcTopBottomRadar .tbr-reading-guide article{padding:10px}
+}
+</style>
+
+<style id="tbr-onchain-source-fallback-20261029">
+#btcTopBottomRadar .tbr-source-hub{margin:14px 0 18px;border:1px solid #31465e;border-radius:14px;overflow:hidden;background:linear-gradient(150deg,#101f31,#0a1421);color:#e5eef8}
+#btcTopBottomRadar .tbr-source-hub-head{padding:15px 16px;border-bottom:1px solid #26394f}
+#btcTopBottomRadar .tbr-source-hub-head b{display:block;font-size:13px;letter-spacing:.07em}
+#btcTopBottomRadar .tbr-source-hub-head p{margin:7px 0 0;color:#b4c5d8;font-size:12px;line-height:1.6}
+#btcTopBottomRadar .tbr-source-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;padding:12px}
+#btcTopBottomRadar .tbr-source-link{display:flex;flex-direction:column;gap:6px;min-width:0;padding:13px;border:1px solid #2d435b;border-radius:10px;background:#0b1725;color:#e5eef8!important;text-decoration:none!important}
+#btcTopBottomRadar .tbr-source-link:hover{border-color:#6ba7e8;background:#11243a}
+#btcTopBottomRadar .tbr-source-link b{font-size:13px;color:#f2f7ff}
+#btcTopBottomRadar .tbr-source-link span{font-size:11px;line-height:1.5;color:#afc0d3}
+#btcTopBottomRadar .tbr-source-link em{font-size:10px;font-style:normal;font-weight:800;letter-spacing:.04em;color:#82c8ff}
+#btcTopBottomRadar .tbr-source-foot{padding:0 15px 14px;color:#9fb2c7;font-size:11px;line-height:1.6}
+#btcTopBottomRadar .tbr-onchain-item{min-width:0}
+#btcTopBottomRadar .tbr-onchain-item small{overflow-wrap:anywhere}
+@media(max-width:520px){#btcTopBottomRadar .tbr-source-grid{grid-template-columns:minmax(0,1fr)}}
+</style>
+<style id="btc-client-experience-visual-v3-20261114">
+/* BTC Cycle Desk — visual experience v3. CSS-only; trading logic unchanged. */
+.btcBrandLogo{display:grid!important;place-items:center!important;background:radial-gradient(circle at 48% 42%,#18263a 0%,#080d16 70%)!important;border:1px solid rgba(247,190,74,.78)!important;box-shadow:0 0 0 1px rgba(255,211,112,.12),0 8px 28px rgba(0,0,0,.34),0 0 26px rgba(247,173,55,.20)!important;overflow:hidden!important;isolation:isolate!important}
+.btcBrandLogo img{position:relative!important;inset:auto!important;display:block!important;width:100%!important;height:100%!important;max-width:100%!important;max-height:100%!important;left:auto!important;top:auto!important;right:auto!important;bottom:auto!important;object-fit:contain!important;object-position:center!important;transform:none!important;margin:0!important;padding:5px!important;box-sizing:border-box!important}
+.brand{align-items:center!important;gap:15px!important}.brand-copy{display:flex;flex-direction:column;justify-content:center;min-width:0}.brand-copy h1{font-weight:900!important;letter-spacing:.075em!important;text-shadow:0 2px 18px rgba(110,190,255,.20)}.brand-copy .sub{line-height:1.55!important;max-width:620px}.brand-signature{letter-spacing:.18em!important;color:#e9c477!important}
+#btcFrontTicker{position:relative!important;isolation:isolate!important;overflow:hidden!important;background:radial-gradient(ellipse at 92% 8%,rgba(48,87,166,.25),transparent 42%),linear-gradient(135deg,#0b1c2d 0%,#0a1424 52%,#111a35 100%)!important;border:1px solid rgba(90,211,235,.48)!important;box-shadow:0 14px 38px rgba(0,0,0,.24),inset 0 1px rgba(255,255,255,.07),0 0 26px rgba(52,194,220,.08)!important}
+#btcFrontTicker:after{content:"₿";position:absolute;right:22px;top:50%;transform:translateY(-48%);font-size:clamp(100px,18vw,170px);font-weight:950;line-height:1;color:rgba(143,174,220,.055);z-index:-1;pointer-events:none}
+.indicator-hub{position:relative!important;isolation:isolate!important;overflow:hidden!important;padding:clamp(18px,3vw,28px)!important;border-radius:22px!important;border:1px solid rgba(91,173,220,.32)!important;background:radial-gradient(ellipse at 100% 0%,rgba(67,95,174,.20),transparent 38%),linear-gradient(145deg,#101f33 0%,#0b1525 58%,#101b31 100%)!important;box-shadow:0 18px 44px rgba(0,0,0,.22),inset 0 1px rgba(255,255,255,.055)!important}
+.indicator-hub:before{content:"";position:absolute;inset:0 0 auto;height:2px;z-index:-1;background:linear-gradient(90deg,#45d8e9,#718dff,#c49b55,transparent 90%)}.indicator-hub-head{gap:18px!important;align-items:end!important}.indicator-kicker{color:#8fbaff!important;letter-spacing:.19em!important;font-weight:900!important}.indicator-hub-head h2{font-size:clamp(22px,3vw,30px)!important;letter-spacing:-.035em!important}.indicator-hub-head p{max-width:520px!important;line-height:1.65!important;color:#aebed1!important}.indicator-hub-grid{gap:13px!important}
+.indicator-tile{position:relative!important;isolation:isolate!important;overflow:hidden!important;min-height:188px!important;padding:20px!important;border-radius:17px!important;text-align:left!important;display:flex!important;flex-direction:column!important;align-items:flex-start!important;justify-content:flex-start!important;gap:10px!important;background:linear-gradient(145deg,rgba(25,44,68,.98),rgba(12,24,41,.98))!important;border:1px solid rgba(116,157,204,.30)!important;box-shadow:0 8px 22px rgba(0,0,0,.16),inset 0 1px rgba(255,255,255,.045)!important;transition:transform .22s ease,border-color .22s ease,box-shadow .22s ease!important}
+.indicator-tile:before{content:"";position:absolute;right:-24px;top:-30px;width:112px;height:112px;border-radius:50%;background:radial-gradient(circle,rgba(75,203,230,.16),rgba(75,203,230,0) 70%);z-index:-1}.indicator-tile:after{content:"";position:absolute;left:0;top:18px;bottom:18px;width:3px;border-radius:4px;background:linear-gradient(180deg,#4edbe5,#738eff);opacity:.78}.indicator-tile:hover,.indicator-tile:focus-visible{transform:translateY(-3px)!important;border-color:rgba(91,218,238,.72)!important;box-shadow:0 14px 30px rgba(0,0,0,.25),0 0 22px rgba(57,195,222,.10)!important}.indicator-tile.indicator-primary{background:radial-gradient(ellipse at 100% 0%,rgba(47,130,213,.23),transparent 50%),linear-gradient(145deg,#183b5b,#10233a)!important;border-color:rgba(88,190,235,.58)!important}.indicator-number{color:#86c7ed!important;font-size:10px!important;font-weight:900!important;letter-spacing:.15em!important;line-height:1.4!important}.indicator-tile strong{font-size:clamp(16px,1.6vw,19px)!important;line-height:1.3!important;color:#f1f6ff!important}.indicator-tile small{font-size:13px!important;line-height:1.55!important;color:#b1c1d4!important}.indicator-action{margin-top:auto!important;padding-top:9px!important;color:#69d8e8!important;font-size:12px!important;font-weight:850!important;letter-spacing:.025em!important}.indicator-hub-note{margin-top:17px!important;padding:12px 14px!important;border-radius:11px!important;border:1px solid rgba(125,153,190,.18)!important;background:rgba(5,13,24,.34)!important;color:#9eafc4!important;font-size:12px!important;line-height:1.6!important}
+#decisionCenterV1{border:1px solid rgba(83,202,225,.38)!important;background:radial-gradient(ellipse at 100% 0%,rgba(52,87,164,.20),transparent 45%),linear-gradient(145deg,#10233a,#0b1627)!important;box-shadow:0 14px 34px rgba(0,0,0,.20),inset 0 1px rgba(255,255,255,.06)!important}#decisionCenterV1 .dc-tile{background:linear-gradient(145deg,rgba(25,43,64,.94),rgba(13,25,41,.94))!important;border:1px solid rgba(112,153,197,.24)!important;border-radius:13px!important}#decisionCenterV1 .dc-value{font-variant-numeric:tabular-nums!important;letter-spacing:-.025em!important}
+#marketFreshness{border:1px solid rgba(99,153,199,.26)!important;background:linear-gradient(120deg,rgba(17,34,54,.96),rgba(12,24,40,.96))!important;box-shadow:inset 0 1px rgba(255,255,255,.035)!important}#quickNav{backdrop-filter:blur(16px)!important;-webkit-backdrop-filter:blur(16px)!important;box-shadow:0 9px 26px rgba(0,0,0,.18)!important}#quickNav button{transition:background .18s ease,border-color .18s ease,transform .18s ease!important}#quickNav button:hover{transform:translateY(-1px)!important}
+@media(max-width:760px){.brand{gap:11px!important;align-items:center!important}.btcBrandLogo{width:60px!important;height:60px!important;flex-basis:60px!important;border-radius:14px!important}.btcBrandLogo img{padding:4px!important}.brand-copy h1{font-size:clamp(17px,4.6vw,23px)!important;line-height:1.15!important}.brand-copy .sub{font-size:12px!important}.brand-signature{font-size:10px!important;letter-spacing:.14em!important}.indicator-hub{padding:16px!important;border-radius:17px!important}.indicator-hub-head{display:block!important}.indicator-hub-head p{margin-top:10px!important}.indicator-hub-grid{grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:9px!important}.indicator-tile{min-height:178px!important;padding:14px 12px 13px 15px!important;border-radius:14px!important;gap:8px!important}.indicator-tile strong{font-size:15px!important}.indicator-tile small{font-size:12px!important;line-height:1.45!important}.indicator-number{font-size:9px!important}.indicator-action{font-size:11px!important}}
+@media(max-width:430px){.indicator-hub-grid{grid-template-columns:minmax(0,1fr)!important}.indicator-tile{min-height:0!important;padding:16px 15px!important}.indicator-tile small{max-width:95%!important}}@media(prefers-reduced-motion:reduce){.indicator-tile,#quickNav button{transition:none!important}.indicator-tile:hover,#quickNav button:hover{transform:none!important}}
+/* BTC Intelligence Cockpit — camada exclusivamente visual */
+.btc-cockpit{position:relative;isolation:isolate;overflow:hidden;margin:18px 0 22px;padding:clamp(17px,2.4vw,26px);border:1px solid rgba(91,190,224,.25);border-radius:22px;background:radial-gradient(ellipse at 92% 0%,rgba(20,111,154,.19),transparent 38%),linear-gradient(145deg,#0c1726 0%,#0a111d 58%,#101b2a 100%);box-shadow:0 18px 48px rgba(0,0,0,.24),inset 0 1px 0 rgba(255,255,255,.045)}
+.btc-cockpit:before{content:"";position:absolute;inset:0;pointer-events:none;opacity:.16;background:linear-gradient(rgba(116,190,220,.08) 1px,transparent 1px),linear-gradient(90deg,rgba(116,190,220,.08) 1px,transparent 1px);background-size:34px 34px;mask-image:linear-gradient(110deg,#000,transparent 75%)}
+.btc-cockpit-head,.btc-cockpit-hero,.btc-cockpit-footer{position:relative;z-index:1;display:flex;align-items:center;justify-content:space-between;gap:18px}
+.btc-cockpit-kicker{font-size:10px;font-weight:800;letter-spacing:.2em;color:#71c9e8}
+.btc-cockpit-head h2{margin:7px 0 4px;color:#f2f7fc;font-size:clamp(20px,2.5vw,27px);letter-spacing:-.035em}
+.btc-cockpit-head p{margin:0;color:#
