@@ -1,0 +1,365 @@
+body.mode-advanced .chart-ranges button{color:#e5eef9!important}
+body.mode-essential :is(button,a,input,select,textarea):focus-visible,body.mode-advanced :is(button,a,input,select,textarea):focus-visible{outline:2px solid #2f80ed!important;outline-offset:2px}
+@media(max-width:650px){body.mode-essential .card,body.mode-essential section.card{border-radius:12px!important}body.mode-essential .card{padding:14px!important}body.mode-essential .card h2{font-size:18px!important;line-height:1.3!important}body.mode-essential .card p,body.mode-essential .card label,body.mode-essential .card small{font-size:14px!important;line-height:1.55!important}body.mode-essential .card :is(input,select,textarea,button){min-height:44px}body.mode-essential #portfolioSummary,body.mode-essential #walletCombinedHistoryWrap,body.mode-essential .wallet-history{overflow-x:auto!important;max-width:100%!important}body.mode-advanced .card p,body.mode-advanced .card small{line-height:1.5!important}}
+</style>
+<style id="dashboard-audit-contrast-and-readability-20261027">
+/* Dashboard audit: prioritize readable data and clear hierarchy on mobile and desktop. */
+/* Essential: classic light dashboard, with dark readable labels and accessible controls. */
+body.mode-essential .card,body.mode-essential .card *{text-shadow:none!important}
+body.mode-essential .card :is(p,small,label,li,td,th,time,.muted,.sub,.note,.description,.help,.caption,.hint){color:#46566c!important;opacity:1!important}
+body.mode-essential .card :is(h1,h2,h3,h4,strong,b,th,.metric-value,.value,.score,.fg-score,.dc-value){color:#1f2c40!important;opacity:1!important}
+body.mode-essential .card :is(input,select,textarea){color:#263449!important;background:#fff!important;border-color:#b9c5d5!important}
+body.mode-essential #fearGreedPanel :is(.fg-score,.score,.value){color:#1f2c40!important}
+body.mode-essential #portfolioSummary,body.mode-essential #chartPortfolioHistory,body.mode-essential #portfolioAltcoins{color:#263449!important}
+body.mode-essential #portfolioSummary :is(th,td,small,label,p,span){color:#46566c!important;opacity:1!important}
+/* Advanced: dark technical dashboard, but every value and table remains readable. */
+body.mode-advanced{background:#070d18!important;color:#e6edf7!important}
+body.mode-advanced .card{color:#dce7f4!important}
+body.mode-advanced .card :is(p,small,label,li,td,time,.muted,.sub,.note,.description,.help,.caption,.hint){color:#b7c5d8!important;opacity:1!important;text-shadow:none!important}
+body.mode-advanced .card :is(h1,h2,h3,h4,strong,b,th,.metric-value,.value,.score,.fg-score,.dc-value){color:#f0f6ff!important;opacity:1!important;text-shadow:none!important}
+body.mode-advanced .card :is(input,select,textarea){background:#0e1a2b!important;color:#edf5ff!important;border:1px solid #42536d!important}
+body.mode-advanced .card :is(input,select,textarea)::placeholder{color:#a8b6c9!important;opacity:1!important}
+body.mode-advanced #fearGreedPanel :is(.fg-score,.score,.value){color:#f5f8ff!important}
+body.mode-advanced #portfolioSummary,body.mode-advanced #chartPortfolioHistory,body.mode-advanced #portfolioAltcoins,body.mode-advanced .portfolio-history,body.mode-advanced .wallet-history{background:#0b1524!important;color:#dce7f4!important;border-color:#34445b!important}
+body.mode-advanced #portfolioSummary :is(th,td,small,label,p,span){color:#b7c5d8!important;opacity:1!important}
+body.mode-advanced #portfolioSummary :is(h2,h3,h4,strong,b,th){color:#f0f6ff!important}
+body.mode-advanced .btc-live-price-card,body.mode-advanced #btcLiveQuoteBar,body.mode-advanced .btc-live-quote{background:#0c1b2b!important;color:#f2f7ff!important;border:1px solid #36506b!important}
+body.mode-advanced .btc-live-price-card :is(h1,h2,h3,p,span,small,strong,b,div){color:#e8f2ff!important;opacity:1!important}
+body.mode-advanced .btc-live-price-card :is(.price,.value,.metric-value){color:#fff!important}
+body.mode-advanced #priceChartCard .chart-toolbar,body.mode-advanced #priceChartCard .chart-controls,body.mode-advanced #priceChartCard .chart-ranges{background:#0b1524!important;color:#dce7f4!important;border-color:#34445b!important}
+body.mode-advanced #priceChartCard .chart-toolbar :is(button,a),body.mode-advanced #priceChartCard .chart-ranges button{background:#122238!important;color:#e6f0ff!important;border-color:#405775!important}
+body.mode-advanced #priceChartCard .chart-ranges button[aria-pressed=true],body.mode-advanced #priceChartCard .chart-ranges button.active,body.mode-advanced #priceChartCard .chart-ranges button.range-active{background:#173c56!important;color:#fff!important;border-color:#4de7ff!important}
+body.mode-advanced #chartFearGreedBadge,body.mode-advanced #chartFearGreedNumber{color:#fff!important;text-shadow:0 1px 4px #000!important}
+body.mode-advanced .decision-center .dc-tile{background:#0b1524!important;border-color:#34445b!important}
+body.mode-advanced .decision-center .dc-tile :is(.dc-label,small,p,.dc-caption){color:#b7c5d8!important;opacity:1!important}
+body.mode-advanced .decision-center .dc-value{color:#f0f6ff!important}
+body.mode-advanced .decision-center .decision-center-bottom{background:#0b1524!important;color:#dce7f4!important}
+body.mode-advanced .decision-center .decision-center-bottom b{color:#f0f6ff!important}
+body.mode-advanced table{color:#dce7f4!important}
+body.mode-advanced th{background:#132238!important;color:#eaf4ff!important}
+body.mode-advanced td{color:#b7c5d8!important}
+:where(button,a,input,select,textarea,[tabindex]):focus-visible{outline:3px solid #377dce!important;outline-offset:2px!important}
+@media(max-width:760px){
+ body.mode-essential .card,body.mode-advanced .card{line-height:1.5}
+ body.mode-essential .card :is(p,small,label,li,td,th),body.mode-advanced .card :is(p,small,label,li,td,th){font-size:14px}
+ body.mode-essential .card :is(input,select,textarea),body.mode-advanced .card :is(input,select,textarea){min-height:44px}
+ body.mode-essential .cardhead h2,body.mode-advanced .cardhead h2{line-height:1.3}
+}
+@media(prefers-reduced-motion:reduce){*,*::before,*::after{scroll-behavior:auto!important;animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}}
+</style>
+
+<style id="btc-price-values-readable-final-20261027">
+/* Legibilidade prioritária: cotação principal e conversão em reais */
+#btcFrontTicker.btc-front-ticker {
+  background: linear-gradient(135deg,#101d30 0%,#172a40 100%) !important;
+  color:#f8fafc !important; border:1px solid #49617d !important;
+  border-radius:18px !important; padding:22px 24px !important;
+  box-shadow:0 8px 24px rgba(15,23,42,.14) !important;
+}
+#btcFrontTicker.btc-front-ticker * { color:#e8f0fb !important; opacity:1 !important; text-shadow:none !important; }
+#btcFrontTicker #btcFrontUsd { display:block !important; color:#ffffff !important; font-size:clamp(30px,6vw,46px) !important; font-weight:850 !important; line-height:1.2 !important; letter-spacing:-.035em !important; margin:12px 0 !important; overflow-wrap:anywhere !important; }
+#btcFrontTicker #btcFrontBrl { color:#67e8b0 !important; font-size:clamp(19px,4vw,27px) !important; font-weight:800 !important; line-height:1.35 !important; overflow-wrap:anywhere !important; }
+#btcFrontTicker #btcFrontStatus { color:#b9f6d7 !important; font-weight:750 !important; }
+#btcFrontTicker #btcFrontChange { color:#d5e0ee !important; font-size:14px !important; }
+#btcLiveQuoteBar.btc-live-quote {
+  background:linear-gradient(135deg,#101d30 0%,#172a40 100%) !important;
+  color:#f8fafc !important; border:1px solid #49617d !important;
+  border-radius:18px !important; padding:22px !important;
+  box-shadow:0 8px 24px rgba(15,23,42,.12) !important;
+}
+#btcLiveQuoteBar.btc-live-quote,
+#btcLiveQuoteBar.btc-live-quote * { opacity:1 !important; text-shadow:none !important; }
+#btcLiveQuoteBar .btc-live-quote-label,
+#btcLiveQuoteBar .btc-live-quote-brl > span,
+#btcLiveQuoteBar .btc-live-quote-status,
+#btcLiveQuoteBar .btc-live-quote-status *,
+#btcLiveQuoteBar .btc-live-quote-main small,
+#btcLiveQuoteBar .btc-live-quote-brl small { color:#dbe7f5 !important; }
+#btcLiveQuoteBar #btcLiveUsd { color:#ffffff !important; display:block !important; font-size:clamp(30px,6vw,44px) !important; line-height:1.2 !important; font-weight:850 !important; overflow-wrap:anywhere !important; margin:10px 0 !important; }
+#btcLiveQuoteBar #btcLiveBrl { color:#67e8b0 !important; display:block !important; font-size:clamp(22px,4.8vw,32px) !important; line-height:1.3 !important; font-weight:850 !important; overflow-wrap:anywhere !important; margin:8px 0 !important; }
+#btcLiveQuoteBar #btcLiveChange { color:#dbe7f5 !important; }
+#btcLiveQuoteBar #btcLiveUpdated { color:#b9f6d7 !important; font-weight:700 !important; }
+#marketFreshness, #marketFreshness * { color:#334155 !important; opacity:1 !important; }
+#marketFreshness .freshness-note { color:#475569 !important; }
+#marketFreshness .freshness-item b { color:#1e293b !important; font-weight:800 !important; }
+#marketFreshness .freshness-item small, #marketFreshness time { color:#475569 !important; }
+#decisionCenterV1, #decisionCenterV1 * { opacity:1 !important; text-shadow:none !important; }
+#decisionCenterV1 { color:#e5edf8 !important; }
+#decisionCenterV1 .decision-center-head,
+#decisionCenterV1 .decision-center-head * { color:#e5edf8 !important; }
+#decisionCenterV1 .decision-center-subtitle { color:#cbd5e1 !important; }
+#decisionCenterV1 .decision-card, #decisionCenterV1 .decision-metric,
+#decisionCenterV1 .decision-next-step { background:#0d1727 !important; border-color:#34445b !important; }
+#decisionCenterV1 .decision-card *, #decisionCenterV1 .decision-metric *,
+#decisionCenterV1 .decision-next-step * { color:#e5edf8 !important; }
+#decisionCenterV1 strong, #decisionCenterV1 .decision-value { color:#ffffff !important; }
+#decisionCenterV1 .decision-label, #decisionCenterV1 small { color:#c4d0e0 !important; }
+#decisionCenterV1 .decision-buy, #decisionCenterV1 [class*="buy"] { color:#5ee6a8 !important; }
+#decisionCenterV1 .decision-sell, #decisionCenterV1 [class*="sell"] { color:#ff7188 !important; }
+#fearGreedPanel, #fearGreedPanel * { opacity:1 !important; text-shadow:none !important; }
+#fearGreedPanel .fear-greed-value, #fearGreedPanel [id*="Value"] { color:#172033 !important; }
+@media(max-width:600px) {
+ #btcFrontTicker.btc-front-ticker, #btcLiveQuoteBar.btc-live-quote { padding:17px !important; border-radius:15px !important; }
+ #btcFrontTicker #btcFrontUsd, #btcLiveQuoteBar #btcLiveUsd { font-size:clamp(28px,8vw,36px) !important; }
+ #btcFrontTicker #btcFrontBrl, #btcLiveQuoteBar #btcLiveBrl { font-size:clamp(20px,5.5vw,26px) !important; }
+}
+@media(prefers-reduced-motion:reduce) {
+ #btcFrontTicker *, #btcLiveQuoteBar * { animation:none !important; transition:none !important; }
+}
+</style>
+<style id="advanced-pro-terminal-visual-system-20261027">
+/* ADVANCED ONLY — professional digital-asset terminal; essential mode remains classic */
+body.mode-advanced{background:#080e19!important;color:#e7eef9!important}
+body.mode-advanced .wrap{max-width:1500px!important;color:#e7eef9!important}
+body.mode-advanced .brand h1{color:#f4f8ff!important;letter-spacing:-.035em!important}
+body.mode-advanced .brand :is(p,.subtitle,.sub,.tagline,.byline){color:#9aacc4!important;opacity:1!important}
+body.mode-advanced .quick-nav{background:#101b2c!important;border:1px solid #263a55!important;border-radius:14px!important;box-shadow:0 8px 28px rgba(0,0,0,.22)!important}
+body.mode-advanced .quick-nav button,body.mode-advanced .mode-picker{background:#142238!important;color:#dce8f7!important;border:1px solid #304663!important}
+body.mode-advanced .mode-picker select{background:#0b1423!important;color:#f4f8ff!important;border:1px solid #405a7c!important}
+body.mode-advanced .card,body.mode-advanced .panel,body.mode-advanced .decision-center,body.mode-advanced #priceChartCard,body.mode-advanced #fearGreedPanel,body.mode-advanced #portfolioAltcoins,body.mode-advanced #btcHalvingCycle,body.mode-advanced .market-freshness{
+ background:linear-gradient(145deg,#111d2e 0%,#0c1524 100%)!important;color:#e7eef9!important;
+ border:1px solid #2a3e58!important;border-radius:18px!important;
+ box-shadow:0 12px 30px rgba(0,0,0,.2),inset 0 1px 0 rgba(180,210,255,.035)!important;
+}
+body.mode-advanced .cardhead :is(h2,h3),body.mode-advanced .card h2,body.mode-advanced .card h3,body.mode-advanced .decision-center-title{color:#f3f7ff!important;letter-spacing:-.025em!important}
+body.mode-advanced :is(.muted,.sub,.description,.help,.note,.decision-center-caption,.decision-center-bottom,.freshness-note){color:#aebed2!important;opacity:1!important}
+body.mode-advanced .card :is(label,.label,.field-label){color:#b7c8dd!important}
+body.mode-advanced .card :is(input,select,textarea),body.mode-advanced input,body.mode-advanced select,body.mode-advanced textarea{background:#0a1423!important;color:#f1f6ff!important;border:1px solid #344a67!important;border-radius:10px!important}
+body.mode-advanced :is(button,.button){border-radius:10px!important}
+body.mode-advanced .card button,body.mode-advanced #priceChartCard button{background:#172940!important;color:#e7f2ff!important;border:1px solid #3a5272!important;box-shadow:none!important}
+body.mode-advanced .card button:hover,body.mode-advanced #priceChartCard button:hover{background:#203956!important;border-color:#4de7ff!important}
+body.mode-advanced .card button.primary,body.mode-advanced .card button.active,body.mode-advanced .card button[aria-pressed=true],body.mode-advanced #priceChartCard .range-active{background:linear-gradient(120deg,#087eaa,#4269d8)!important;color:#fff!important;border-color:#55dff8!important}
+body.mode-advanced #btcLiveQuoteBar{background:linear-gradient(115deg,#0b2031,#10283b 58%,#171d3b)!important;border:1px solid #2c6683!important;border-radius:20px!important;box-shadow:0 0 0 1px rgba(77,231,255,.05),0 12px 32px rgba(0,0,0,.28)!important}
+body.mode-advanced #btcLiveQuoteBar .btc-live-quote-label,body.mode-advanced #btcLiveQuoteBar .btc-live-quote-brl>span,body.mode-advanced #btcLiveQuoteBar .btc-live-quote-status,body.mode-advanced #btcLiveQuoteBar .btc-live-quote-status *,body.mode-advanced #btcLiveQuoteBar .btc-live-quote-main small,body.mode-advanced #btcLiveQuoteBar .btc-live-quote-brl small{color:#b5cce0!important}
+body.mode-advanced #btcLiveQuoteBar #btcLiveUsd{color:#f4fbff!important;font-variant-numeric:tabular-nums!important;letter-spacing:-.04em!important}
+body.mode-advanced #btcLiveQuoteBar #btcLiveBrl{color:#63f0bd!important;font-variant-numeric:tabular-nums!important}
+body.mode-advanced #btcFrontTicker{background:linear-gradient(115deg,#0b2031,#10283b 58%,#171d3b)!important;border:1px solid #2c6683!important;color:#f4fbff!important}
+body.mode-advanced #btcFrontTicker #btcFrontUsd{color:#f4fbff!important;font-variant-numeric:tabular-nums!important}
+body.mode-advanced #btcFrontTicker #btcFrontBrl{color:#63f0bd!important;font-variant-numeric:tabular-nums!important}
+body.mode-advanced #marketFreshness{background:#101b2c!important;border-color:#2a3e58!important}
+body.mode-advanced #marketFreshness :is(b,small,time,span,div,p){color:#b9c9dc!important;opacity:1!important}
+body.mode-advanced #marketFreshness .freshness-item b{color:#f0f6ff!important}
+body.mode-advanced .decision-center .dc-tile,body.mode-advanced #decisionCenterV1 .dc-tile{background:#0a1423!important;border:1px solid #2b405c!important;box-shadow:none!important}
+body.mode-advanced .decision-center .dc-label,body.mode-advanced .decision-center .dc-caption,body.mode-advanced .decision-center small{color:#9fb2ca!important}
+body.mode-advanced .decision-center .dc-value{color:#f4f8ff!important}
+body.mode-advanced #priceChartCard .chart-toolbar,body.mode-advanced #priceChartCard .chart-ranges-wrap{background:#0a1423!important;border-color:#2a3e58!important;color:#b9c9dc!important}
+body.mode-advanced #priceChartCard .chart-ranges{border-color:#2a3e58!important}
+body.mode-advanced #priceChartCard .chart-box,body.mode-advanced #priceChartCard .chart-wrap{border:1px solid #2a3e58!important;border-radius:14px!important;overflow:hidden!important}
+body.mode-advanced .card table{color:#dce8f7!important;border-color:#2b405c!important}
+body.mode-advanced .card th{background:#172940!important;color:#bfeeff!important}
+body.mode-advanced .card td{border-color:#273a52!important;color:#dce8f7!important}
+body.mode-advanced .card hr{border-color:#2a3e58!important}
+body.mode-advanced :is(a,.link){color:#69dff6!important}
+body.mode-advanced :is(button,input,select,textarea,a):focus-visible{outline:2px solid #4de7ff!important;outline-offset:3px!important}
+@media(max-width:700px){
+ body.mode-advanced .card,body.mode-advanced .panel,body.mode-advanced .decision-center,body.mode-advanced #priceChartCard{border-radius:14px!important}
+ body.mode-advanced .wrap{padding-left:10px!important;padding-right:10px!important}
+ body.mode-advanced #btcLiveQuoteBar{padding:16px!important}
+}
+@media(prefers-reduced-motion:reduce){body.mode-advanced *{animation:none!important;transition:none!important}}
+</style>
+<style id="advanced-terminal-layout-reference-v2-20261027">
+/* Advanced terminal layout inspired by the user reference. Essential stays untouched. */
+body.mode-advanced{background:#070b13!important;color:#edf4ff!important}
+body.mode-advanced .wrap{max-width:1580px!important;padding:20px!important}
+body.mode-advanced .top{gap:18px!important;padding:8px 4px 18px!important;border-bottom:1px solid #202b40!important;margin-bottom:16px!important}
+body.mode-advanced .brand h1{font-size:clamp(22px,2vw,31px)!important;letter-spacing:.04em!important;color:#f5f8ff!important}
+body.mode-advanced .brand .sub,body.mode-advanced .brand-signature{color:#9baec8!important;opacity:1!important}
+body.mode-advanced .actions{gap:8px!important}
+body.mode-advanced .quick-nav{display:flex!important;flex-wrap:wrap!important;gap:8px!important;margin:0 0 16px!important;padding:10px!important;background:#0c1422!important;border:1px solid #263750!important;border-radius:14px!important;box-shadow:0 10px 26px rgba(0,0,0,.2)!important}
+body.mode-advanced .quick-nav .nav-caption{color:#8fa5c1!important;font-size:10px!important;letter-spacing:.16em!important}
+body.mode-advanced .quick-nav button{padding:10px 13px!important;background:#111f32!important;color:#dce9fb!important;border:1px solid #2c405c!important;border-radius:9px!important;font-weight:700!important}
+body.mode-advanced .quick-nav button.nav-active,body.mode-advanced .quick-nav button:hover{background:linear-gradient(110deg,#3d2779,#164c70)!important;border-color:#7b6bff!important;color:#fff!important}
+body.mode-advanced .mode-picker{background:#111f32!important;color:#aebfd5!important;border:1px solid #2c405c!important;border-radius:10px!important;padding:7px 10px!important}
+body.mode-advanced .mode-picker select{background:#080f1b!important;color:#f5f8ff!important;border:1px solid #344a68!important}
+body.mode-advanced #refreshFeedback{background:#0d1929!important;color:#c4d5e9!important;border:1px solid #263a55!important;padding:11px 14px!important}
+body.mode-advanced .market-freshness{background:#0c1726!important;border:1px solid #263a55!important;border-radius:12px!important;padding:12px 15px!important}
+body.mode-advanced .market-freshness :is(b,small,time,span,div,p){color:#b7c8dd!important;opacity:1!important;text-shadow:none!important}
+body.mode-advanced .market-freshness .freshness-item b{color:#f2f7ff!important}
+body.mode-advanced .card,body.mode-advanced .panel,body.mode-advanced .decision-center,body.mode-advanced .risk-calc,body.mode-advanced #priceChartCard,body.mode-advanced #fearGreedPanel,body.mode-advanced #fearGreedPanel.card,body.mode-advanced #portfolioAltcoins,body.mode-advanced .halving-panel,body.mode-advanced #halvingCycleV1,body.mode-advanced #halvingBacktestV1,body.mode-advanced #halvingCompareV1{
+ background:linear-gradient(145deg,#111c2c 0%,#0c1421 100%)!important;color:#e8f0fc!important;border:1px solid #293b55!important;border-radius:16px!important;
+ box-shadow:0 8px 24px rgba(0,0,0,.18),inset 0 1px 0 rgba(255,255,255,.025)!important;
+}
+body.mode-advanced .card{padding:18px!important}
+body.mode-advanced .cardhead{gap:10px!important;margin-bottom:14px!important}
+body.mode-advanced .cardhead :is(h2,h3),body.mode-advanced .card :is(h2,h3,h4),body.mode-advanced .decision-center-title{color:#f4f7ff!important;line-height:1.25!important;letter-spacing:-.02em!important}
+body.mode-advanced .card :is(p,li,label,.muted,.sub,.description,.help,.note,small,figcaption),body.mode-advanced .decision-center :is(p,small,.decision-center-caption,.decision-center-bottom){color:#b4c3d7!important;opacity:1!important;text-shadow:none!important}
+body.mode-advanced .card :is(strong,b,th){color:#eaf2ff!important}
+body.mode-advanced .card :is(input,select,textarea){background:#080f1b!important;color:#f2f7ff!important;border:1px solid #354a68!important;border-radius:9px!important;min-height:42px!important}
+body.mode-advanced .card :is(input,select,textarea)::placeholder{color:#8194ae!important;opacity:1!important}
+body.mode-advanced .card button,body.mode-advanced #priceChartCard button{background:#14243a!important;color:#e8f1ff!important;border:1px solid #344b6b!important;border-radius:9px!important;box-shadow:none!important;font-weight:700!important}
+body.mode-advanced .card button:hover,body.mode-advanced #priceChartCard button:hover{background:#1d3552!important;border-color:#58dff5!important}
+body.mode-advanced .card button.primary,body.mode-advanced .card button.active,body.mode-advanced .card button[aria-pressed=true],body.mode-advanced #priceChartCard .range-active{background:linear-gradient(110deg,#6e3cda,#385fe2)!important;color:#fff!important;border-color:#927aff!important}
+body.mode-advanced #btcFrontTicker,body.mode-advanced #btcLiveQuoteBar{background:linear-gradient(112deg,#0a1e2d 0%,#10283a 55%,#191a37 100%)!important;border:1px solid #2b637d!important;border-radius:18px!important;box-shadow:0 12px 32px rgba(0,0,0,.25),inset 0 1px 0 rgba(108,222,255,.08)!important;padding:20px!important}
+body.mode-advanced #btcFrontTicker :is(span,div),body.mode-advanced #btcLiveQuoteBar :is(span,div,small){color:#b8cce0!important;opacity:1!important}
+body.mode-advanced #btcFrontTicker #btcFrontUsd,body.mode-advanced #btcLiveQuoteBar #btcLiveUsd{display:block!important;color:#f6fbff!important;font-size:clamp(28px,3vw,42px)!important;line-height:1.15!important;font-weight:850!important;letter-spacing:-.045em!important;font-variant-numeric:tabular-nums!important;text-shadow:none!important;overflow-wrap:anywhere!important}
+body.mode-advanced #btcFrontTicker #btcFrontBrl,body.mode-advanced #btcLiveQuoteBar #btcLiveBrl{color:#63e7b4!important;font-weight:800!important;font-size:clamp(17px,1.8vw,24px)!important;font-variant-numeric:tabular-nums!important}
+body.mode-advanced #btcLiveQuoteBar .btc-live-quote-label{color:#b7cce0!important}
+body.mode-advanced .decision-center{padding:20px!important}
+body.mode-advanced .decision-center-grid{gap:12px!important}
+body.mode-advanced .decision-center .dc-tile,body.mode-advanced #decisionCenterV1 .dc-tile{background:#091321!important;border:1px solid #2a405d!important;border-radius:13px!important;box-shadow:none!important;padding:16px!important}
+body.mode-advanced .decision-center .dc-label,body.mode-advanced .decision-center .dc-caption{color:#9fb3cd!important}
+body.mode-advanced .decision-center .dc-value{color:#f4f8ff!important;font-size:clamp(20px,2vw,29px)!important;font-variant-numeric:tabular-nums!important}
+body.mode-advanced .decision-center .decision-center-bottom{background:#101e31!important;border:1px solid #2b405b!important;border-radius:12px!important;padding:15px!important;color:#c4d3e6!important}
+body.mode-advanced #priceChartCard .chart-controls,body.mode-advanced #priceChartCard .chart-ranges-wrap,body.mode-advanced #priceChartCard .chart-toolbar{background:#091321!important;border-color:#293d58!important;color:#b9c9dd!important;border-radius:11px!important}
+body.mode-advanced #priceChartCard .chart-ranges button{background:#111f32!important;color:#dbe8f8!important;border-color:#304662!important}
+body.mode-advanced #priceChartCard .chart-ranges button.range-active,body.mode-advanced #priceChartCard .chart-ranges button[aria-pressed=true]{background:#382a75!important;color:#fff!important;border-color:#8d79ff!important}
+body.mode-advanced #priceChartCard .chartbox,body.mode-advanced #priceChartCard .chartbox svg,body.mode-advanced #priceChartCard .chartbox canvas{max-width:100%!important}
+body.mode-advanced #priceChartCard .chartbox{border:1px solid #2a3d57!important;border-radius:13px!important;overflow:hidden!important}
+body.mode-advanced .card table{width:100%!important;color:#dce8f7!important;border-color:#2a3d57!important}
+body.mode-advanced .card th{background:#17273d!important;color:#bceeff!important;white-space:normal!important}
+body.mode-advanced .card td{border-color:#263a53!important;color:#d2deee!important}
+body.mode-advanced .card hr{border-color:#293b55!important}
+body.mode-advanced .card a,body.mode-advanced .card .link{color:#73ddf6!important}
+body.mode-advanced #chartSignalLegend{background:#0a1422!important;border:1px solid #293d57!important;border-radius:12px!important;padding:14px!important}
+body.mode-advanced #chartSignalLegend :is(span,b,strong){opacity:1!important}
+body.mode-advanced :is(button,input,select,textarea,a):focus-visible{outline:2px solid #53e4f6!important;outline-offset:3px!important}
+@media(min-width:1100px){
+ body.mode-advanced .grid.main{grid-template-columns:minmax(0,1.8fr) minmax(300px,1fr)!important;gap:16px!important;align-items:stretch!important}
+ body.mode-advanced .grid.bottom,body.mode-advanced .grid.stats{gap:16px!important}
+ body.mode-advanced #priceChartCard{min-width:0!important}
+}
+@media(max-width:760px){
+ body.mode-advanced .wrap{padding:10px!important}
+ body.mode-advanced .top{padding:4px 0 12px!important}
+ body.mode-advanced .card{padding:14px!important;border-radius:13px!important}
+ body.mode-advanced #btcFrontTicker,body.mode-advanced #btcLiveQuoteBar{padding:16px!important}
+ body.mode-advanced .quick-nav{gap:6px!important;padding:8px!important}
+ body.mode-advanced .quick-nav button{padding:9px 10px!important;font-size:12px!important}
+ body.mode-advanced .decision-center{padding:14px!important}
+ body.mode-advanced .decision-center-grid{grid-template-columns:repeat(2,minmax(0,1fr))!important}
+}
+@media(max-width:420px){
+ body.mode-advanced .decision-center-grid{grid-template-columns:1fr!important}
+ body.mode-advanced #btcFrontTicker #btcFrontUsd,body.mode-advanced #btcLiveQuoteBar #btcLiveUsd{font-size:27px!important}
+}
+@media(prefers-reduced-motion:reduce){body.mode-advanced *{animation:none!important;transition:none!important}}
+</style>
+<style id="advanced-cockpit-dashboard-20261027">
+/* FUTURISTIC AUTOMOTIVE COCKPIT — Advanced mode only */
+body.mode-advanced{
+ --cockpit-bg:#050a12;--cockpit-panel:#0b1522;--cockpit-panel2:#101f30;
+ --cockpit-border:#203c50;--cockpit-cyan:#43eaff;--cockpit-blue:#5b9dff;
+ --cockpit-violet:#9270ff;--cockpit-green:#53f0b0;--cockpit-amber:#ffd166;
+ background:
+ radial-gradient(ellipse at 50% -15%,rgba(43,125,173,.19),transparent 42%),
+ radial-gradient(ellipse at 95% 12%,rgba(109,67,219,.12),transparent 30%),
+ #050a12!important;color:#f3f8ff!important
+}
+body.mode-advanced .wrap{max-width:1660px!important}
+body.mode-advanced .top{position:relative!important;border-bottom:1px solid #254255!important}
+body.mode-advanced .top:after{content:"";position:absolute;bottom:-1px;left:0;width:38%;height:2px;background:linear-gradient(90deg,var(--cockpit-cyan),var(--cockpit-violet),transparent);box-shadow:0 0 12px rgba(67,234,255,.45)}
+body.mode-advanced .brand h1{font-size:clamp(23px,2.2vw,34px)!important;letter-spacing:.1em!important;text-shadow:0 0 18px rgba(67,234,255,.17)!important}
+body.mode-advanced .brand .sub,body.mode-advanced .brand-signature{color:#a7bed3!important;opacity:1!important}
+body.mode-advanced .quick-nav{background:rgba(8,18,30,.92)!important;border:1px solid #29455a!important;border-radius:12px!important;box-shadow:0 8px 30px rgba(0,0,0,.25),inset 0 1px rgba(116,221,255,.05)!important}
+body.mode-advanced .quick-nav button{background:#0d1b2b!important;color:#d9eaff!important;border-color:#2c4b61!important;border-radius:7px!important;text-transform:uppercase!important;letter-spacing:.045em!important;font-size:11px!important}
+body.mode-advanced .quick-nav button.nav-active,body.mode-advanced .quick-nav button:hover{background:linear-gradient(110deg,#123c50,#25265c)!important;border-color:var(--cockpit-cyan)!important;box-shadow:0 0 14px rgba(67,234,255,.13)!important;color:#fff!important}
+body.mode-advanced .mode-picker{background:#0a1725!important;border-color:#2b4a60!important;color:#c3d7e9!important}
+body.mode-advanced .mode-picker select{background:#07111d!important;color:#f4fbff!important;border-color:#31536a!important}
+body.mode-advanced #refreshFeedback,body.mode-advanced .market-freshness{background:linear-gradient(100deg,#091725,#0b1b2a)!important;border:1px solid #203f52!important;color:#d5e8f8!important;border-radius:10px!important}
+body.mode-advanced .market-freshness :is(b,small,time,span,div,p){color:#c2d5e7!important;opacity:1!important;text-shadow:none!important}
+body.mode-advanced .market-freshness .freshness-dot{box-shadow:0 0 10px currentColor!important}
+body.mode-advanced .card,body.mode-advanced .panel,body.mode-advanced .decision-center,body.mode-advanced .risk-calc,body.mode-advanced #priceChartCard,body.mode-advanced #fearGreedPanel,body.mode-advanced #portfolioAltcoins,body.mode-advanced .halving-panel,body.mode-advanced #halvingCycleV1,body.mode-advanced #halvingBacktestV1,body.mode-advanced #halvingCompareV1{
+ background:linear-gradient(145deg,rgba(14,28,44,.98),rgba(7,16,27,.99))!important;
+ color:#f0f7ff!important;border:1px solid #29465b!important;border-radius:15px!important;
+ box-shadow:0 12px 28px rgba(0,0,0,.24),inset 0 1px 0 rgba(127,220,255,.045)!important;
+ position:relative
+}
+body.mode-advanced .card:before,body.mode-advanced .decision-center:before,body.mode-advanced .halving-panel:before{content:"";position:absolute;top:-1px;left:18px;right:18px;height:1px;background:linear-gradient(90deg,transparent,rgba(67,234,255,.42),rgba(146,112,255,.28),transparent);pointer-events:none}
+body.mode-advanced .cardhead :is(h2,h3),body.mode-advanced .card :is(h2,h3,h4),body.mode-advanced .decision-center-title{color:#f5f9ff!important;line-height:1.28!important;letter-spacing:.005em!important;text-shadow:0 0 12px rgba(67,234,255,.07)!important}
+body.mode-advanced .card :is(p,li,label,.muted,.sub,.description,.help,.note,small,figcaption),body.mode-advanced .decision-center :is(p,small,.decision-center-caption,.decision-center-bottom){color:#c0d0e2!important;opacity:1!important;text-shadow:none!important}
+body.mode-advanced .card :is(strong,b,th){color:#f0f7ff!important}
+body.mode-advanced .card :is(input,select,textarea){background:#07111d!important;color:#f4f9ff!important;border:1px solid #34566d!important;border-radius:8px!important;min-height:43px!important;box-shadow:inset 0 1px 5px rgba(0,0,0,.22)!important}
+body.mode-advanced .card :is(input,select,textarea)::placeholder{color:#9aafc5!important;opacity:1!important}
+body.mode-advanced .card button,body.mode-advanced #priceChartCard button{background:linear-gradient(180deg,#15283c,#0d1b2a)!important;color:#eaf5ff!important;border:1px solid #34556b!important;border-radius:8px!important;box-shadow:inset 0 1px rgba(255,255,255,.04)!important;font-weight:750!important}
+body.mode-advanced .card button:hover,body.mode-advanced #priceChartCard button:hover{border-color:var(--cockpit-cyan)!important;box-shadow:0 0 14px rgba(67,234,255,.12)!important}
+body.mode-advanced .card button.primary,body.mode-advanced .card button.active,body.mode-advanced .card button[aria-pressed=true],body.mode-advanced #priceChartCard .range-active{background:linear-gradient(110deg,#11617a,#3c3c93)!important;color:#fff!important;border-color:#4be8ff!important;box-shadow:0 0 16px rgba(67,234,255,.13)!important}
+body.mode-advanced #btcFrontTicker,body.mode-advanced #btcLiveQuoteBar{
+ background:radial-gradient(ellipse at 90% 0%,rgba(81,90,211,.17),transparent 40%),linear-gradient(110deg,#081e2b,#0b1828 58%,#10162c)!important;
+ border:1px solid #34718a!important;border-radius:16px!important;padding:22px!important;
+ box-shadow:0 0 0 1px rgba(67,234,255,.035),0 15px 36px rgba(0,0,0,.32),inset 0 1px rgba(67,234,255,.11)!important
+}
+body.mode-advanced #btcFrontTicker .btc-front-top,body.mode-advanced #btcLiveQuoteBar .btc-live-quote-label{color:#b9d5e6!important;letter-spacing:.11em!important;font-size:11px!important;font-weight:800!important}
+body.mode-advanced #btcFrontTicker :is(span,div),body.mode-advanced #btcLiveQuoteBar :is(span,div,small){color:#c4d7e8!important;opacity:1!important;text-shadow:none!important}
+body.mode-advanced #btcFrontTicker #btcFrontUsd,body.mode-advanced #btcLiveQuoteBar #btcLiveUsd{display:block!important;color:#f7fcff!important;font-size:clamp(32px,4vw,50px)!important;line-height:1.12!important;font-weight:900!important;letter-spacing:-.035em!important;font-variant-numeric:tabular-nums!important;text-shadow:0 0 22px rgba(67,234,255,.13)!important;overflow-wrap:anywhere!important}
+body.mode-advanced #btcFrontTicker #btcFrontBrl,body.mode-advanced #btcLiveQuoteBar #btcLiveBrl{color:#60f0ba!important;font-weight:850!important;font-size:clamp(19px,2.2vw,27px)!important;font-variant-numeric:tabular-nums!important}
+body.mode-advanced #btcFrontTicker #btcFrontStatus,body.mode-advanced #btcLiveQuoteBar .btc-live-quote-status{color:#63f0c1!important;font-weight:800!important}
+body.mode-advanced .decision-center{padding:21px!important}
+body.mode-advanced .decision-center-title{letter-spacing:.12em!important;text-transform:uppercase!important}
+body.mode-advanced .decision-center-grid{gap:12px!important}
+body.mode-advanced .decision-center .dc-tile,body.mode-advanced #decisionCenterV1 .dc-tile{background:linear-gradient(145deg,#0a1725,#09111d)!important;border:1px solid #2c4c61!important;border-radius:11px!important;box-shadow:inset 3px 0 0 rgba(67,234,255,.18)!important;padding:17px!important}
+body.mode-advanced .decision-center .dc-label,body.mode-advanced .decision-center .dc-caption{color:#a9bfd3!important;letter-spacing:.1em!important}
+body.mode-advanced .decision-center .dc-value{color:#f6fbff!important;font-size:clamp(22px,2.1vw,31px)!important;font-variant-numeric:tabular-nums!important;text-shadow:0 0 15px rgba(67,234,255,.09)!important}
+body.mode-advanced .decision-center .decision-center-bottom{background:#0a1927!important;border:1px solid #2b4b60!important;border-radius:10px!important;padding:16px!important;color:#d0e0ef!important}
+body.mode-advanced #priceChartCard .chart-controls,body.mode-advanced #priceChartCard .chart-ranges-wrap,body.mode-advanced #priceChartCard .chart-toolbar{background:#081522!important;border-color:#28485c!important;color:#c7d8e8!important;border-radius:10px!important}
+body.mode-advanced #priceChartCard .chart-ranges button{background:#0e2031!important;color:#e0efff!important;border-color:#2e4d62!important}
+body.mode-advanced #priceChartCard .chart-ranges button.range-active,body.mode-advanced #priceChartCard .chart-ranges button[aria-pressed=true]{background:linear-gradient(110deg,#12566b,#35347d)!important;color:#fff!important;border-color:#4be8ff!important}
+body.mode-advanced #priceChartCard .chartbox{border:1px solid #2a4b60!important;border-radius:12px!important;overflow:hidden!important;max-width:100%!important}
+body.mode-advanced #priceChartCard .chartbox :is(svg,canvas){max-width:100%!important}
+body.mode-advanced .card table{width:100%!important;color:#e2edf9!important;border-color:#2b4358!important}
+body.mode-advanced .card th{background:#14283b!important;color:#8defff!important;white-space:normal!important}
+body.mode-advanced .card td{border-color:#263e54!important;color:#d9e6f4!important}
+body.mode-advanced .card hr{border-color:#2b4358!important}
+body.mode-advanced .card a,body.mode-advanced .card .link{color:#65e7ff!important}
+body.mode-advanced #chartSignalLegend{background:#091725!important;border:1px solid #2b4a60!important;border-radius:11px!important;padding:14px!important}
+body.mode-advanced :is(button,input,select,textarea,a):focus-visible{outline:2px solid #43eaff!important;outline-offset:3px!important}
+@media(min-width:1100px){body.mode-advanced .grid.main{grid-template-columns:minmax(0,1.8fr) minmax(300px,1fr)!important;gap:16px!important;align-items:stretch!important}body.mode-advanced .grid.bottom,body.mode-advanced .grid.stats{gap:16px!important}body.mode-advanced #priceChartCard{min-width:0!important}}
+@media(max-width:760px){body.mode-advanced .wrap{padding:10px!important}body.mode-advanced .card{padding:14px!important;border-radius:12px!important}body.mode-advanced #btcFrontTicker,body.mode-advanced #btcLiveQuoteBar{padding:16px!important}body.mode-advanced .quick-nav{gap:6px!important;padding:8px!important}body.mode-advanced .quick-nav button{padding:9px 10px!important;font-size:10px!important}body.mode-advanced .decision-center{padding:14px!important}body.mode-advanced .decision-center-grid{grid-template-columns:repeat(2,minmax(0,1fr))!important}}
+@media(max-width:420px){body.mode-advanced .decision-center-grid{grid-template-columns:1fr!important}body.mode-advanced #btcFrontTicker #btcFrontUsd,body.mode-advanced #btcLiveQuoteBar #btcLiveUsd{font-size:29px!important}}
+@media(prefers-reduced-motion:reduce){body.mode-advanced *{animation:none!important;transition:none!important}}
+</style>
+<style id="halving-cycle-map-cockpit-20261027">
+.halving-cycle-map{margin:18px 0 20px;padding:20px;border:1px solid rgba(86,220,255,.28);border-radius:20px;background:radial-gradient(ellipse at 50% 0%,rgba(63,92,170,.2),transparent 58%),linear-gradient(145deg,#0b1424,#080d18 75%);color:#edf7ff;box-shadow:inset 0 1px 0 rgba(255,255,255,.035),0 12px 34px rgba(0,0,0,.18);overflow:hidden}
+.hcm-head{display:flex;justify-content:space-between;align-items:flex-start;gap:14px}.hcm-head>div{display:grid;gap:5px}.hcm-kicker{font:800 10px/1.3 ui-monospace,monospace;letter-spacing:.18em;color:#54e5ff}.hcm-head strong{font-size:18px;letter-spacing:.045em;color:#f3f8ff}.hcm-head small{font-size:13px;line-height:1.5;color:#b8c7dc}.hcm-live{white-space:nowrap;border:1px solid rgba(83,228,255,.22);border-radius:999px;padding:7px 10px;color:#8ceeff;font:800 10px/1.2 ui-monospace,monospace;letter-spacing:.07em}.hcm-live i{display:inline-block;width:7px;height:7px;border-radius:50%;background:#4ce6ff;box-shadow:0 0 10px #4ce6ff;margin-right:5px}
+.hcm-track-wrap{padding:24px 8px 6px}.hcm-track{height:10px;position:relative;display:flex;border-radius:99px;background:#1a2940;box-shadow:0 0 0 1px rgba(146,176,220,.14);margin:14px 8px 0}.hcm-segment{height:100%;display:block}.hcm-pre{width:50%;border-radius:99px 0 0 99px;background:linear-gradient(90deg,#32d69b,#45e6c4)}.hcm-mid{width:0}.hcm-post{width:50%;border-radius:0 99px 99px 0;background:linear-gradient(90deg,#a58aff,#ff708a)}.hcm-marker{position:absolute;top:50%;left:0;transform:translate(-50%,-50%);width:19px;height:19px;border-radius:50%;background:#f5fbff;border:4px solid #4ce5ff;box-shadow:0 0 0 4px rgba(76,229,255,.14),0 0 18px rgba(76,229,255,.8);z-index:2;transition:left .35s ease}.hcm-halving-pin{position:absolute;left:50%;top:-7px;width:2px;height:24px;background:#c5a4ff;box-shadow:0 0 10px #9b78ff}.hcm-points{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-top:22px}.hcm-point{display:grid;gap:5px;align-content:start;min-width:0}.hcm-point-center{text-align:center}.hcm-point-right{text-align:right}.hcm-point-dot{width:9px;height:9px;border-radius:50%;display:block;margin-bottom:2px}.hcm-point-center .hcm-point-dot{margin-left:auto;margin-right:auto}.hcm-point-right .hcm-point-dot{margin-left:auto}.hcm-buy{background:#43e5ac;box-shadow:0 0 12px rgba(67,229,172,.65)}.hcm-event{background:#a98bff;box-shadow:0 0 12px rgba(169,139,255,.7)}.hcm-sell{background:#ff788c;box-shadow:0 0 12px rgba(255,120,140,.6)}.hcm-point b{font:800 10px/1.45 ui-monospace,monospace;letter-spacing:.045em;color:#aebfd7}.hcm-point strong{font-size:15px;line-height:1.4;color:#f5f9ff;overflow-wrap:anywhere}.hcm-point small{font-size:11px;line-height:1.45;color:#93a5bf}.hcm-bottom{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:20px}.hcm-current,.hcm-count{padding:14px;border-radius:13px;border:1px solid rgba(132,165,211,.2);background:rgba(17,30,49,.82);display:grid;gap:6px;min-width:0}.hcm-current>span,.hcm-count>span{font:800 10px/1.4 ui-monospace,monospace;letter-spacing:.08em;color:#9aacc7}.hcm-current strong,.hcm-count strong{font-size:17px;line-height:1.3;color:#62e8c1}.hcm-current small{font-size:12px;line-height:1.5;color:#b7c5d9}.hcm-mini-track{height:5px;border-radius:99px;background:#27364b;overflow:hidden;margin-top:2px}.hcm-mini-track i{display:block;height:100%;width:0;background:linear-gradient(90deg,#3ce1a6,#52dfff,#ff7189);border-radius:99px;transition:width .35s ease}.hcm-note{font-size:11px;line-height:1.6;color:#8fa1ba;margin:14px 0 0}
+@media(max-width:560px){.halving-cycle-map{padding:15px;border-radius:16px}.hcm-head{display:grid}.hcm-head strong{font-size:16px}.hcm-live{justify-self:start}.hcm-track-wrap{padding:18px 0 2px}.hcm-points{gap:7px;margin-top:18px}.hcm-point b{font-size:9px}.hcm-point strong{font-size:12px}.hcm-point small{font-size:10px}.hcm-bottom{grid-template-columns:1fr}.hcm-current strong,.hcm-count strong{font-size:16px}}
+@media(prefers-reduced-motion:reduce){.hcm-marker,.hcm-mini-track i{transition:none}}
+</style><style id="halving-advanced-deduplicate-navigation-20261027">
+/* Advanced mode: the new BTC Cycle Navigation replaces the legacy summary cards. */
+body.mode-advanced #halvingCycleV1 > .halving-head,
+body.mode-advanced #halvingCycleV1 > .halving-status,
+body.mode-advanced #halvingCycleV1 > .halving-grid,
+body.mode-advanced #halvingCycleV1 > .halving-progress-wrap{display:none!important}
+body.mode-advanced #halvingCycleV1{background:transparent!important;border:0!important;box-shadow:none!important;padding:0!important;margin-top:18px!important}
+body.mode-advanced #halvingCycleMap500{display:block!important;margin:0 0 18px!important;border:1px solid rgba(77,231,255,.30)!important;border-radius:20px!important;background:linear-gradient(145deg,rgba(11,27,44,.98),rgba(15,18,39,.98))!important;box-shadow:0 0 0 1px rgba(139,123,255,.08),0 12px 34px rgba(0,0,0,.20),inset 0 1px rgba(255,255,255,.035)!important;color:#eaf4ff!important}
+body.mode-advanced #halvingCycleMap500 .hcm-head{border-bottom:1px solid rgba(77,231,255,.15);padding-bottom:14px}
+body.mode-advanced #halvingCycleMap500 .hcm-kicker{color:#4de7ff!important;letter-spacing:.18em}
+body.mode-advanced #halvingCycleMap500 .hcm-head strong{color:#f1f7ff!important;letter-spacing:.09em}
+body.mode-advanced #halvingCycleMap500 .hcm-head small,body.mode-advanced #halvingCycleMap500 .hcm-point small,body.mode-advanced #halvingCycleMap500 .hcm-current small,body.mode-advanced #halvingCycleMap500 .hcm-note{color:#9eafc8!important}
+body.mode-advanced #halvingCycleMap500 .hcm-point b,body.mode-advanced #halvingCycleMap500 .hcm-current>span,body.mode-advanced #halvingCycleMap500 .hcm-count>span{color:#9fb6d3!important}
+body.mode-advanced #halvingCycleMap500 .hcm-point strong,body.mode-advanced #halvingCycleMap500 .hcm-current>strong,body.mode-advanced #halvingCycleMap500 .hcm-count>strong{color:#f2f7ff!important}
+body.mode-advanced #halvingCycleV1 .halving-history,body.mode-advanced #halvingCycleV1 .halving-backtest,body.mode-advanced #halvingCycleV1 .halving-compare{margin-top:14px}
+@media(max-width:640px){body.mode-advanced #halvingCycleV1{margin-top:12px!important}body.mode-advanced #halvingCycleMap500{border-radius:15px!important;padding:14px!important}}
+</style>
+<style id="responsive-accessibility-guardrails-20261027">
+html{max-width:100%;overflow-x:clip}
+body{max-width:100%;overflow-x:clip}
+body .wrap,body main,body section,body .grid,body .card,body .chartbox,body .chart-container,body .chart-wrap{min-width:0}
+body canvas{max-width:100%}
+body img,body svg,body video{max-width:100%}
+body input,body select,body textarea,body button{max-width:100%}
+body :is(table,.table-wrap,.history-table-wrap,.backtest-table-wrap){max-width:100%}
+body :is(.table-wrap,.history-table-wrap,.backtest-table-wrap){overflow-x:auto;-webkit-overflow-scrolling:touch}
+body :is(button,a,input,select,textarea,[tabindex]):focus-visible{outline:2px solid #4de7ff;outline-offset:3px}
+@media(max-width:760px){body .wrap{width:calc(100% - 20px)!important;max-width:100%!important}body .grid,body .grid.main{grid-template-columns:minmax(0,1fr)!important}body .card,body section.card{min-width:0;overflow-wrap:anywhere}body .chartbox{width:100%;max-width:100%;overflow:hidden}body .chart-toolbar,body .chart-ranges{max-width:100%;flex-wrap:wrap}body :is(input,select,textarea){min-width:0}}
+@media(max-width:420px){body .wrap{width:calc(100% - 14px)!important}body .card{padding:12px!important}body .cardhead{gap:8px;flex-wrap:wrap}body .chart-ranges button{flex:0 1 auto}}
+@media(prefers-reduced-motion:reduce){body *,body *::before,body *::after{scroll-behavior:auto!important;animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}}
+</style>
+<style id="essential-text-contrast-final-20261027">
+/* Essential mode: readable neutral text on light cards; preserve signal colors and dark quote cards. */
+body.mode-essential .card:not(.btc-live-price-card):not(#btcLiveQuoteBar):not(#btcFrontTicker),body.mode-essential .card:not(.btc-live-price-card):not(#btcLiveQuoteBar):not(#btcFrontTicker) :is(span,div,em,i,output,summary,figcaption,code){color:#334155!important;opacity:1!important;text-shadow:none!important}
+body.mode-essential .card:not(.btc-live-price-card):not(#btcLiveQuoteBar):not(#btcFrontTicker) :is(h1,h2,h3,h4,strong,b,.value,.metric-value,.score,.fg-score,.dc-value){color:#172033!important;opacity:1!important}
+body.mode-essential .card:not(.btc-live-price-card):not(#btcLiveQuoteBar):not(#btcFrontTicker) :is(.muted,.sub,.description,.help,.note,.hint,.caption,.delta,.label,.signal-desc,.chart-timeframe-label){color:#475569!important;opacity:1!important}
+body.mode-essential .card :is(.green,.buy,.positive,.decision-buy,[class*="buy"],[data-signal="BUY"]){color:#087f5b!important;opacity:1!important}
+body.mode-essential .card :is(.red,.sell,.negative,.decision-sell,[class*="sell"],[data-signal="SELL"]){color:#c62842!important;opacity:1!important}
+body.mode-essential .card :is(.yellow,.wait,[data-signal="WAIT"]){color:#8a5a00!important;opacity:1!important}
+body.mode-essential #btcLiveQuoteBar,body.mode-essential #btcLiveQuoteBar *,body.mode-essential #btcFrontTicker,body.mode-essential #btcFrontTicker *{opacity:1!important}
+body.mode-essential #portfolioSummary,body.mode-essential #chartPortfolioHistory,body.mode-essential #walletEvolutionWrap,body.mode-essential #walletCombinedHistoryWrap{background:#fff!important;color:#334155!important}
+body.mode-essential #portfolioSummary :is(span,div,small,label,p,td,th){color:#334155!important;opacity:1!important}
+body.mode-essential #portfolioSummary :is(h2,h3,h4,strong,b,th){color:#172033!important}
+body.mode-essential #portfolioSummary :is(.green,.buy,.positive,[class*="buy"]){color:#087f5b!important}
+body.mode-essential #portfolioSummary :is(.red,.sell,.negative,[class*="sell"]){color:#c62842!important}
+</style>
+<style id="essential-decision-and-quote-contrast-20261027">
+/* Screenshot-driven fix: light decision card needs dark text; dark BTC quote needs white text. */
+body.mode-essential #decisionCenterV1,body.mode-essential #decisionCenterV1 .decisi
