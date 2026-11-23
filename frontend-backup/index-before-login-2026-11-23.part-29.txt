@@ -1,0 +1,433 @@
+ #btc-market-overview-v1{padding:14px!important;border-radius:20px!important}
+ #btc-market-overview-v1 .btc-overview-head{margin-bottom:13px!important}
+ #btc-market-overview-v1 .btc-overview-price.btc-overview-mood-stage{display:grid!important;grid-template-columns:minmax(0,1fr)!important;justify-items:center!important;gap:14px!important;padding:17px 12px 20px!important}
+ #btc-market-overview-v1 .btc-market-mood-copy{text-align:center!important;justify-items:center!important}
+ #btc-market-overview-v1 .btc-market-mood-copy small{max-width:300px!important}
+ #btc-market-overview-v1 #bitcoin-pulse-character{width:min(100%,390px)!important;min-height:300px!important;flex-basis:auto!important;border-radius:22px!important}
+ #btc-market-overview-v1 #bitcoin-pulse-character .btc-pulse-coin{width:clamp(96px,28vw,126px)!important}
+ #btc-market-overview-v1 .btc-overview-grid{grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:9px!important}
+ #btc-market-overview-v1 .btc-overview-card{min-height:128px!important;padding:14px 12px 13px!important;border-radius:15px!important}
+ #btc-market-overview-v1 .btc-overview-card strong{font-size:clamp(17px,4.7vw,21px)!important}
+ #btc-market-overview-v1 .btc-overview-card small{font-size:11px!important}
+ #btc-market-overview-v1 .btc-overview-footer{flex-direction:column!important;align-items:stretch!important}
+ #btc-market-overview-v1 .btc-overview-footer>div{display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr))!important;width:100%!important}
+ #btc-market-overview-v1 .btc-overview-footer button{min-width:0!important;min-height:44px!important;padding:10px 8px!important;font-size:10px!important}
+ #btc-market-overview-v1 .btc-overview-footer button:first-child{grid-column:1/-1!important}
+ #btc-market-overview-v1 #btcPulseSoundToggle{grid-column:1/-1!important}
+}
+@media(max-width:380px){#btc-market-overview-v1 .btc-overview-card{min-height:116px!important;padding:12px 10px!important}#btc-market-overview-v1 .btc-overview-card strong{font-size:17px!important}}
+@media(hover:hover) and (pointer:fine){#btc-market-overview-v1 .btc-overview-card:hover{transform:translateY(-2px);border-color:rgba(102,209,230,.46)!important}}
+@media(prefers-reduced-motion:reduce){#btc-market-overview-v1 .btc-overview-card,#btc-market-overview-v1 .btc-overview-footer button{transition:none!important}}
+</style>
+<style id="btc-global-module-polish-v1">
+/* Shared visual language for technical intelligence modules */
+#priceChartCard,#fearGreedPanel,#tbrLivePanel,#btcCycleHistory,#chartPortfolioHistory{
+ position:relative!important;overflow:hidden!important;border:1px solid rgba(103,163,202,.25)!important;border-radius:22px!important;
+ background:radial-gradient(ellipse at 100% 0,rgba(50,124,164,.10),transparent 42%),linear-gradient(155deg,rgba(17,35,55,.98),rgba(8,19,34,.99))!important;
+ box-shadow:0 16px 38px rgba(0,0,0,.18),inset 0 1px rgba(255,255,255,.05)!important;
+}
+#priceChartCard:before,#fearGreedPanel:before,#tbrLivePanel:before,#btcCycleHistory:before,#chartPortfolioHistory:before{
+ content:"";position:absolute;left:0;right:0;top:0;height:2px;pointer-events:none;
+ background:linear-gradient(90deg,transparent,rgba(91,211,229,.8),rgba(119,145,239,.7),transparent);
+}
+#priceChartCard .cardhead,#fearGreedPanel .cardhead,#chartPortfolioHistory .cardhead{
+ display:flex!important;align-items:center!important;justify-content:space-between!important;gap:12px!important;margin-bottom:16px!important;
+}
+#priceChartCard .cardhead h2,#fearGreedPanel .cardhead h2,#chartPortfolioHistory .cardhead h2{
+ color:#edf6ff!important;font-weight:900!important;letter-spacing:-.025em!important;line-height:1.18!important;
+}
+#priceChartCard .pill,#fearGreedPanel .pill,#chartPortfolioHistory .pill{
+ border:1px solid rgba(104,190,217,.28)!important;border-radius:999px!important;background:rgba(33,94,119,.18)!important;
+ color:#a9ddeb!important;font-size:9px!important;font-weight:850!important;letter-spacing:.09em!important;padding:7px 10px!important;
+}
+#btcLiveQuoteBar{
+ display:grid!important;grid-template-columns:1.25fr 1fr!important;gap:10px!important;padding:15px!important;margin:12px 0 16px!important;
+ border:1px solid rgba(93,190,218,.28)!important;border-radius:17px!important;
+ background:linear-gradient(115deg,rgba(15,54,72,.72),rgba(14,32,54,.82))!important;
+ box-shadow:inset 0 1px rgba(255,255,255,.045)!important;
+}
+#btcLiveQuoteBar .btc-live-quote-main strong,#btcLiveQuoteBar .btc-live-quote-brl strong{
+ color:#f1f7ff!important;font-variant-numeric:tabular-nums!important;letter-spacing:-.035em!important;
+}
+#btcLiveQuoteBar .btc-live-quote-label,#btcLiveQuoteBar .btc-live-quote-brl>span{
+ color:#9bbbd0!important;font-size:9px!important;font-weight:900!important;letter-spacing:.13em!important;
+}
+#btcLiveQuoteBar .btc-live-quote-status{grid-column:1/-1!important;display:flex!important;justify-content:space-between!important;gap:8px!important;padding-top:9px!important;border-top:1px solid rgba(130,171,202,.15)!important;color:#91a9bf!important;font-size:10px!important}
+#priceChartCard .chart-toolbar{
+ display:flex!important;align-items:center!important;justify-content:space-between!important;flex-wrap:wrap!important;gap:12px!important;
+ padding:12px 14px!important;margin:10px 0 14px!important;border:1px solid rgba(104,160,198,.2)!important;border-radius:14px!important;
+ background:rgba(9,24,41,.62)!important;
+}
+#priceChartCard .chart-toolbar>span,#priceChartCard .chart-timeframe-label,#priceChartCard .analysis-asset-picker{
+ color:#91abc2!important;font-size:9px!important;font-weight:900!important;letter-spacing:.12em!important;
+}
+#priceChartCard select,#chartPortfolioHistory select{
+ min-height:39px!important;padding:8px 32px 8px 11px!important;border:1px solid rgba(108,173,207,.32)!important;border-radius:10px!important;
+ background-color:#142b43!important;color:#e7f3ff!important;font-size:12px!important;font-weight:750!important;
+}
+#tbrLivePanel{
+ padding:16px!important;margin:14px 0!important;border-color:rgba(84,190,211,.27)!important;
+ background:radial-gradient(ellipse at 50% 0,rgba(38,126,150,.14),transparent 55%),linear-gradient(150deg,#122b42,#0a192b)!important;
+}
+#tbrLivePanel .tbr-live-head{display:flex!important;align-items:center!important;justify-content:space-between!important;gap:10px!important;flex-wrap:wrap!important;margin-bottom:13px!important}
+#tbrLivePanel .tbr-live-head>span{color:#8dd8e5!important;font-size:9px!important;font-weight:900!important;letter-spacing:.14em!important}
+#tbrLivePanel .tbr-live-head b{font-size:9px!important;letter-spacing:.1em!important;color:#a9bfd2!important}
+#tbrLivePanel .tbr-live-grid{gap:9px!important}
+#tbrLivePanel .tbr-live-grid>div{border:1px solid rgba(115,164,198,.22)!important;border-radius:15px!important;background:linear-gradient(145deg,rgba(27,51,75,.86),rgba(10,25,43,.96))!important;padding:13px!important;box-shadow:inset 0 1px rgba(255,255,255,.045)!important}
+#tbrLivePanel .tbr-live-grid small{color:#9bb4ca!important;font-size:9px!important;font-weight:850!important;letter-spacing:.1em!important}
+#tbrLivePanel .tbr-live-grid strong{font-variant-numeric:tabular-nums!important;letter-spacing:-.03em!important}
+#tbrLivePanel #tbrLiveDisclaimer{margin:12px 0 0!important;padding:10px 12px!important;border-left:2px solid rgba(105,194,219,.55)!important;border-radius:0 10px 10px 0!important;background:rgba(12,35,53,.55)!important;color:#a5b9cb!important;font-size:11px!important;line-height:1.55!important}
+#btcCycleHistory{padding:clamp(15px,2.2vw,23px)!important}
+#btcCycleHistory .bch-head h2{color:#f0f7ff!important;letter-spacing:-.03em!important}
+#btcCycleHistory .bch-head p{color:#a7bbcf!important;line-height:1.6!important}
+#btcCycleHistory .bch-head-badge{border:1px solid rgba(90,200,177,.26)!important;border-radius:999px!important;background:rgba(25,113,89,.13)!important;color:#80dfbd!important;padding:8px 11px!important;font-size:9px!important;font-weight:900!important}
+#btcCycleHistory .bch-summary{gap:9px!important;margin:16px 0!important}
+#btcCycleHistory .bch-summary>div{padding:12px!important;border:1px solid rgba(110,164,198,.2)!important;border-radius:13px!important;background:rgba(11,28,47,.72)!important}
+#btcCycleHistory .bch-summary span{color:#8faac1!important;font-size:9px!important;letter-spacing:.1em!important}
+#btcCycleHistory .bch-summary strong{color:#e9f4ff!important;font-variant-numeric:tabular-nums!important}
+#btcCycleHistory .bch-cycle{border:1px solid rgba(112,164,199,.2)!important;border-radius:17px!important;background:linear-gradient(145deg,rgba(21,43,65,.88),rgba(9,23,39,.94))!important;box-shadow:inset 0 1px rgba(255,255,255,.045)!important}
+#btcCycleHistory .bch-stats>div{border-radius:11px!important;background:rgba(6,19,34,.45)!important}
+#btcCycleHistory .bch-stats small{color:#91a9c0!important}
+#btcCycleHistory .bch-stats strong{color:#f0f6ff!important;font-variant-numeric:tabular-nums!important}
+#fearGreedPanel .fg-score-block,#fearGreedPanel .fg-detail{border-radius:16px!important}
+#fearGreedPanel .fg-interpretation,#fearGreedPanel #fgInterpretation{padding:13px 14px!important;border:1px solid rgba(105,166,199,.18)!important;border-radius:13px!important;background:rgba(10,29,47,.62)!important;color:#b7c9da!important;line-height:1.6!important}
+#chartPortfolioHistory .chart-portfolio-toolbar{display:flex!important;align-items:center!important;gap:10px!important;flex-wrap:wrap!important;margin:12px 0!important}
+#chartPortfolioHistory .chart-portfolio-table-wrap{border:1px solid rgba(112,165,199,.18)!important;border-radius:13px!important;overflow:auto!important}
+#chartPortfolioHistory table th{color:#8eb6cd!important;font-size:9px!important;letter-spacing:.1em!important}
+#chartPortfolioHistory table td{color:#d5e3f0!important;font-size:11px!important}
+@media(max-width:760px){
+ #priceChartCard,#fearGreedPanel,#tbrLivePanel,#btcCycleHistory,#chartPortfolioHistory{border-radius:18px!important}
+ #btcLiveQuoteBar{grid-template-columns:1fr 1fr!important;padding:12px!important;gap:8px!important}
+ #btcLiveQuoteBar .btc-live-quote-main strong,#btcLiveQuoteBar .btc-live-quote-brl strong{font-size:clamp(18px,5vw,24px)!important}
+ #btcLiveQuoteBar .btc-live-quote-status{flex-direction:column!important;gap:4px!important}
+ #priceChartCard .chart-toolbar{align-items:stretch!important;padding:11px!important}
+ #priceChartCard .chart-controls{display:flex!important;flex-wrap:wrap!important;gap:8px!important;width:100%!important}
+ #priceChartCard .chart-controls select{flex:1 1 125px!important;min-width:0!important}
+ #tbrLivePanel .tbr-live-grid{grid-template-columns:repeat(2,minmax(0,1fr))!important}
+ #tbrLivePanel .tbr-live-price{grid-column:1/-1!important}
+ #btcCycleHistory .bch-summary{grid-template-columns:repeat(2,minmax(0,1fr))!important}
+ #btcCycleHistory .bch-summary>div:last-child{grid-column:1/-1!important}
+ #priceChartCard .cardhead,#fearGreedPanel .cardhead,#chartPortfolioHistory .cardhead{align-items:flex-start!important}
+}
+@media(max-width:390px){
+ #btcLiveQuoteBar{grid-template-columns:1fr!important}
+ #btcLiveQuoteBar .btc-live-quote-status{grid-column:auto!important}
+ #tbrLivePanel .tbr-live-grid{grid-template-columns:1fr!important}
+ #tbrLivePanel .tbr-live-price{grid-column:auto!important}
+ #btcCycleHistory .bch-summary{grid-template-columns:1fr!important}
+ #btcCycleHistory .bch-summary>div:last-child{grid-column:auto!important}
+}
+@media(prefers-reduced-motion:reduce){
+ #priceChartCard *,#fearGreedPanel *,#tbrLivePanel *,#btcCycleHistory *,#chartPortfolioHistory *{scroll-behavior:auto!important;transition:none!important}
+}
+</style>
+<style id="btc-live-price-no-wrap-v1">
+/* Prices stay intact as monetary values; no data or formatting changes */
+#btcLiveQuoteBar{grid-template-columns:minmax(0,1fr) minmax(0,1fr)!important;align-items:stretch!important}
+#btcLiveQuoteBar .btc-live-quote-main,#btcLiveQuoteBar .btc-live-quote-brl{min-width:0!important;width:100%!important}
+#btcLiveQuoteBar #btcLiveUsd,#btcLiveQuoteBar #btcLiveBrl{
+ display:block!important;width:100%!important;max-width:100%!important;
+ white-space:nowrap!important;overflow-wrap:normal!important;word-break:normal!important;
+ hyphens:none!important;text-overflow:clip!important;
+ font-size:clamp(18px,3vw,30px)!important;line-height:1.15!important;letter-spacing:-.045em!important;
+ font-variant-numeric:tabular-nums!important;
+}
+#btcLiveQuoteBar .btc-live-quote-brl{border-left:1px solid var(--line,#293647)!important;padding-left:15px!important}
+@media(max-width:760px){
+ #btcLiveQuoteBar{grid-template-columns:minmax(0,1fr)!important;gap:12px!important;padding:15px 14px!important}
+ #btcLiveQuoteBar .btc-live-quote-main,#btcLiveQuoteBar .btc-live-quote-brl{grid-column:1!important}
+ #btcLiveQuoteBar .btc-live-quote-brl{border-left:0!important;border-top:1px solid rgba(119,165,197,.22)!important;padding:12px 0 0!important;margin-top:1px!important}
+ #btcLiveQuoteBar #btcLiveUsd,#btcLiveQuoteBar #btcLiveBrl{font-size:clamp(19px,6.2vw,27px)!important;letter-spacing:-.04em!important}
+ #btcLiveQuoteBar .btc-live-quote-status{grid-column:1!important}
+}
+@media(max-width:360px){
+ #btcLiveQuoteBar{padding:13px 11px!important}
+ #btcLiveQuoteBar #btcLiveUsd,#btcLiveQuoteBar #btcLiveBrl{font-size:clamp(17px,5.8vw,21px)!important;letter-spacing:-.035em!important}
+}
+</style><style id="btc-hide-decision-center-v1">#decisionCenterV1{display:none!important}</style>
+<style id="btc-chart-controls-ux-v2">
+/* Chart controls: clear hierarchy, contrast and touch-friendly states */
+#priceChartCard .chart-toolbar{display:grid!important;grid-template-columns:minmax(0,1fr)!important;gap:13px!important;padding:15px!important;margin:12px 0!important;border:1px solid rgba(105,166,203,.24)!important;border-radius:17px!important;background:linear-gradient(145deg,rgba(13,31,49,.96),rgba(8,20,35,.98))!important}
+#priceChartCard .chart-toolbar>span{font-size:10px!important;letter-spacing:.16em!important;color:#86d5e8!important}
+#priceChartCard .chart-controls{display:grid!important;grid-template-columns:minmax(0,1fr)!important;gap:12px!important;width:100%!important;justify-content:stretch!important}
+#priceChartCard .chart-timeframe-label,#priceChartCard .analysis-asset-picker{display:grid!important;grid-template-columns:90px minmax(0,1fr)!important;align-items:center!important;gap:10px!important;min-width:0!important;color:#a9bfd3!important;font-size:10px!important;font-weight:900!important;letter-spacing:.12em!important}
+#priceChartCard .chart-timeframe-select,#priceChartCard #analysisAsset{width:100%!important;max-width:none!important;min-width:0!important;min-height:46px!important;padding:10px 38px 10px 13px!important;border:1px solid rgba(110,177,214,.38)!important;border-radius:12px!important;background:#142b43!important;color:#f0f7ff!important;font-size:13px!important;font-weight:800!important;box-shadow:inset 0 1px rgba(255,255,255,.05)!important;color-scheme:dark}
+#priceChartCard .chart-timeframe-select option,#priceChartCard #analysisAsset option{background:#142b43!important;color:#f0f7ff!important}
+#priceChartCard .chart-ranges{display:grid!important;grid-template-columns:repeat(4,minmax(0,1fr))!important;gap:8px!important;width:100%!important}
+#priceChartCard .chart-ranges button{display:flex!important;align-items:center!important;justify-content:center!important;min-width:0!important;width:100%!important;min-height:44px!important;padding:8px 5px!important;border:1px solid rgba(112,158,192,.32)!important;border-radius:11px!important;background:linear-gradient(145deg,#152b41,#102236)!important;color:#d7e6f5!important;font-size:12px!important;font-weight:800!important;letter-spacing:.015em!important;opacity:1!important;box-shadow:inset 0 1px rgba(255,255,255,.045)!important;transition:background .18s ease,border-color .18s ease,transform .18s ease!important}
+#priceChartCard .chart-ranges button.range-active,#priceChartCard .chart-ranges button[aria-pressed="true"]{border-color:#55d5e8!important;background:linear-gradient(110deg,rgba(31,151,178,.42),rgba(76,90,177,.52))!important;color:#fff!important;box-shadow:0 0 0 1px rgba(81,205,226,.18),0 0 18px rgba(63,174,207,.15),inset 0 1px rgba(255,255,255,.12)!important}
+#priceChartCard .chart-indicators{display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:9px!important;width:100%!important}
+#priceChartCard .chart-indicators button{min-width:0!important;min-height:43px!important;border:1px solid rgba(113,166,207,.34)!important;border-radius:11px!important;background:#13273d!important;color:#dbeafa!important;font-size:11px!important;font-weight:850!important;letter-spacing:.06em!important;opacity:1!important}
+#priceChartCard .chart-indicators button[aria-pressed="true"]{background:linear-gradient(120deg,rgba(48,114,162,.34),rgba(56,76,131,.36))!important;border-color:#6fa9e5!important;color:#fff!important;box-shadow:inset 0 0 0 1px rgba(111,169,229,.14)!important}
+#priceChartCard .chart-indicators button[aria-pressed="false"]{background:rgba(8,20,33,.8)!important;color:#8ea5bc!important;border-style:dashed!important;box-shadow:none!important}
+#btcChartNavigation{display:grid!important;grid-template-columns:minmax(0,1fr)!important;gap:11px!important;margin:12px 0 14px!important;padding:13px!important;border:1px solid rgba(105,166,203,.24)!important;border-radius:17px!important;background:linear-gradient(145deg,rgba(13,29,46,.98),rgba(8,18,31,.98))!important}
+#btcChartNavigation .btc-nav-group{display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:8px!important;width:100%!important}
+#btcChartNavigation button{display:flex!important;align-items:center!important;justify-content:center!important;min-width:0!important;min-height:48px!important;padding:10px 8px!important;border:1px solid rgba(115,165,200,.35)!important;border-radius:12px!important;background:linear-gradient(145deg,#193149,#11263b)!important;color:#e7f2ff!important;font-size:12px!important;font-weight:800!important;letter-spacing:.01em!important;white-space:normal!important;line-height:1.25!important}
+#btcChartNavigation .btc-nav-primary{grid-column:1/-1!important;border-color:#54cfe0!important;background:linear-gradient(105deg,rgba(35,137,166,.55),rgba(64,81,153,.58))!important;color:#fff!important}
+#btcChartNavigation #btcChartFullscreen{grid-column:1/-1!important;background:linear-gradient(105deg,rgba(43,88,150,.55),rgba(76,79,155,.58))!important;border-color:rgba(125,151,231,.65)!important}
+#btcChartNavigation .btc-nav-hint{width:100%!important;color:#9db4ca!important;font-size:11px!important;line-height:1.55!important;padding:2px 2px 0!important}
+#priceChartCard .chartbox{border:1px solid rgba(92,161,197,.35)!important;border-radius:18px!important;background:radial-gradient(ellipse at 50% 0,rgba(30,86,117,.11),transparent 55%),#091421!important;box-shadow:inset 0 1px rgba(255,255,255,.035),0 12px 28px rgba(0,0,0,.15)!important}
+#priceChartCard #chartFearGreedBadge{border:1px solid rgba(120,158,190,.3)!important;border-radius:14px!important;background:rgba(7,17,29,.94)!important;box-shadow:0 8px 22px rgba(0,0,0,.24)!important;backdrop-filter:blur(12px)!important}
+#priceChartCard #chartSignalLegend{display:flex!important;flex-wrap:wrap!important;gap:9px 14px!important;padding:12px 2px 2px!important;color:#a9bfd3!important;font-size:11px!important;line-height:1.5!important}
+@media(max-width:760px){
+ #priceChartCard .chart-toolbar{padding:13px!important;gap:12px!important}
+ #priceChartCard .chart-timeframe-label,#priceChartCard .analysis-asset-picker{grid-template-columns:66px minmax(0,1fr)!important}
+ #priceChartCard .chart-timeframe-select,#priceChartCard #analysisAsset{min-height:47px!important;font-size:12px!important}
+ #priceChartCard .chart-ranges{grid-template-columns:repeat(4,minmax(0,1fr))!important;gap:7px!important}
+ #priceChartCard .chart-ranges button{min-height:45px!important;font-size:11px!important}
+ #priceChartCard .chartbox{height:clamp(390px,112vw,490px)!important;min-height:390px!important}
+ #btcChartNavigation{padding:12px!important}
+ #btcChartNavigation .btc-nav-group{grid-template-columns:repeat(2,minmax(0,1fr))!important}
+}
+@media(max-width:370px){
+ #priceChartCard .chart-ranges{gap:5px!important}
+ #priceChartCard .chart-ranges button{font-size:10px!important;padding:7px 2px!important}
+ #btcChartNavigation button{font-size:11px!important}
+}
+@media(hover:hover) and (pointer:fine){
+ #priceChartCard .chart-ranges button:hover,#priceChartCard .chart-indicators button:hover,#btcChartNavigation button:hover{transform:translateY(-1px)!important;border-color:#72cde4!important;filter:brightness(1.12)!important}
+}
+@media(prefers-reduced-motion:reduce){
+ #priceChartCard .chart-ranges button,#btcChartNavigation button{transition:none!important}
+}
+</style>
+<style id="btc-chart-controls-ux-v3">
+/* BTC Chart controls — compact, grouped and legible */
+#priceChartCard .chart-toolbar{
+ display:grid!important;grid-template-columns:minmax(0,1fr)!important;gap:12px!important;
+ padding:15px!important;margin:12px 0 13px!important;border:1px solid rgba(102,174,210,.25)!important;
+ border-radius:17px!important;background:linear-gradient(145deg,rgba(13,31,49,.98),rgba(8,20,35,.98))!important;
+ box-shadow:inset 0 1px rgba(255,255,255,.045),0 10px 24px rgba(0,0,0,.13)!important
+}
+#priceChartCard .chart-toolbar>span{display:block!important;color:#8bd9e9!important;font-size:10px!important;letter-spacing:.18em!important;font-weight:950!important}
+#priceChartCard .chart-controls{
+ display:grid!important;grid-template-columns:86px minmax(0,1fr)!important;align-items:center!important;
+ gap:10px 12px!important;width:100%!important;min-width:0!important
+}
+#priceChartCard .chart-timeframe-label{
+ display:flex!important;align-items:center!important;min-height:44px!important;color:#a9bfd2!important;
+ font-size:10px!important;font-weight:900!important;letter-spacing:.11em!important;white-space:nowrap!important
+}
+#priceChartCard .chart-timeframe-select{
+ display:block!important;width:100%!important;max-width:none!important;min-width:0!important;min-height:46px!important;
+ padding:10px 38px 10px 13px!important;border:1px solid rgba(110,177,214,.38)!important;border-radius:12px!important;
+ background:#162d45!important;color:#f0f7ff!important;font-size:13px!important;font-weight:850!important;
+ box-shadow:inset 0 1px rgba(255,255,255,.055)!important;color-scheme:dark!important
+}
+#priceChartCard #analysisAssetPicker{
+ display:grid!important;grid-column:1/-1!important;grid-template-columns:86px minmax(0,1fr)!important;
+ align-items:center!important;gap:10px 12px!important;width:100%!important;min-width:0!important;
+ color:#a9bfd2!important;font-size:10px!important;font-weight:900!important;letter-spacing:.11em!important
+}
+#priceChartCard #analysisAssetPicker select{
+ display:block!important;width:100%!important;max-width:none!important;min-width:0!important;min-height:46px!important;
+ padding:10px 38px 10px 13px!important;border:1px solid rgba(110,177,214,.38)!important;border-radius:12px!important;
+ background:#162d45!important;color:#f0f7ff!important;font-size:13px!important;font-weight:850!important;
+ box-shadow:inset 0 1px rgba(255,255,255,.055)!important;color-scheme:dark!important
+}
+#priceChartCard .chart-timeframe-select option,#priceChartCard #analysisAssetPicker select option{background:#162d45!important;color:#f0f7ff!important}
+#priceChartCard .chart-ranges{
+ display:grid!important;grid-column:1/-1!important;grid-template-columns:repeat(4,minmax(0,1fr))!important;
+ gap:8px!important;width:100%!important;min-width:0!important
+}
+#priceChartCard .chart-ranges button{
+ display:flex!important;align-items:center!important;justify-content:center!important;min-width:0!important;width:100%!important;
+ min-height:43px!important;padding:8px 4px!important;border:1px solid rgba(112,163,198,.33)!important;
+ border-radius:11px!important;background:linear-gradient(150deg,#193149,#11253a)!important;
+ color:#dceafa!important;font-size:12px!important;font-weight:850!important;letter-spacing:0!important;
+ line-height:1.1!important;white-space:nowrap!important;opacity:1!important;
+ box-shadow:inset 0 1px rgba(255,255,255,.045)!important
+}
+#priceChartCard .chart-ranges button.range-active,#priceChartCard .chart-ranges button[aria-pressed="true"]{
+ border-color:#5bd6e8!important;background:linear-gradient(110deg,#17647c,#3f4c91)!important;
+ color:#fff!important;box-shadow:0 0 0 1px rgba(91,214,232,.18),0 0 18px rgba(69,190,218,.18),inset 0 1px rgba(255,255,255,.17)!important
+}
+#priceChartCard .chart-indicators{
+ display:grid!important;grid-column:1/-1!important;grid-template-columns:repeat(2,minmax(0,1fr))!important;
+ gap:9px!important;width:100%!important;margin-top:1px!important
+}
+#priceChartCard .chart-indicators button{
+ display:flex!important;align-items:center!important;justify-content:center!important;min-width:0!important;min-height:44px!important;
+ padding:9px!important;border:1px solid rgba(112,163,198,.34)!important;border-radius:11px!important;
+ background:#142a41!important;color:#c7d9eb!important;font-size:11px!important;font-weight:900!important;
+ letter-spacing:.06em!important;opacity:1!important
+}
+#priceChartCard .chart-indicators button[aria-pressed="true"]{
+ color:#effaff!important;border-color:#5ecfe2!important;background:linear-gradient(120deg,rgba(28,101,133,.5),rgba(49,64,115,.55))!important;
+ box-shadow:inset 0 0 0 1px rgba(94,207,226,.14),0 0 13px rgba(94,207,226,.09)!important
+}
+#priceChartCard .chart-indicators button[aria-pressed="false"]{
+ color:#8da5bc!important;background:#0e1d2d!important;border-style:dashed!important;box-shadow:none!important
+}
+#btcChartNavigation{
+ display:grid!important;grid-template-columns:minmax(0,1fr)!important;gap:11px!important;
+ margin:12px 0 14px!important;padding:13px!important;border:1px solid rgba(102,174,210,.24)!important;
+ border-radius:17px!important;background:linear-gradient(145deg,rgba(13,30,47,.98),rgba(8,19,32,.98))!important
+}
+#btcChartNavigation .btc-nav-group{
+ display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:8px!important;width:100%!important
+}
+#btcChartNavigation button{
+ display:flex!important;align-items:center!important;justify-content:center!important;min-width:0!important;width:100%!important;
+ min-height:47px!important;padding:10px 8px!important;border:1px solid rgba(112,163,198,.35)!important;
+ border-radius:12px!important;background:linear-gradient(145deg,#19334b,#11253a)!important;
+ color:#e7f2ff!important;font-size:12px!important;font-weight:850!important;line-height:1.2!important;
+ white-space:normal!important;opacity:1!important;box-shadow:inset 0 1px rgba(255,255,255,.05)!important
+}
+#btcChartNavigation button[data-btc-zoom="latest"],#btcChartNavigation button[data-btc-zoom="reset"]{
+ grid-column:auto!important;border-color:rgba(111,176,207,.42)!important;background:linear-gradient(145deg,#1a3851,#12283e)!important
+}
+#btcChartNavigation #btcChartFullscreen{
+ grid-column:1/-1!important;min-height:48px!important;border-color:rgba(124,151,232,.65)!important;
+ background:linear-gradient(105deg,#24466f,#3c427f)!important;color:#f6f8ff!important
+}
+#btcChartNavigation .btc-nav-hint{
+ width:100%!important;padding:1px 2px 0!important;color:#9eb4c9!important;font-size:10px!important;line-height:1.55!important
+}
+@media(min-width:761px){
+ #priceChartCard .chart-ranges{grid-template-columns:repeat(8,minmax(0,1fr))!important}
+ #btcChartNavigation .btc-nav-group{grid-template-columns:repeat(5,minmax(0,1fr))!important}
+ #btcChartNavigation button[data-btc-zoom="latest"],#btcChartNavigation button[data-btc-zoom="reset"],#btcChartNavigation #btcChartFullscreen{grid-column:auto!important}
+}
+@media(max-width:760px){
+ #priceChartCard .chart-toolbar{padding:13px!important;gap:10px!important}
+ #priceChartCard .chart-controls{grid-template-columns:72px minmax(0,1fr)!important;gap:9px 10px!important}
+ #priceChartCard #analysisAssetPicker{grid-template-columns:72px minmax(0,1fr)!important}
+ #priceChartCard .chart-timeframe-select,#priceChartCard #analysisAssetPicker select{min-height:45px!important;font-size:12px!important}
+ #priceChartCard .chart-ranges{grid-template-columns:repeat(4,minmax(0,1fr))!important;gap:7px!important}
+ #priceChartCard .chart-ranges button{min-height:42px!important;font-size:11px!important}
+ #btcChartNavigation{padding:12px!important}
+ #btcChartNavigation .btc-nav-group{grid-template-columns:repeat(2,minmax(0,1fr))!important}
+ #btcChartNavigation button{min-height:46px!important;font-size:11px!important}
+}
+@media(max-width:370px){
+ #priceChartCard .chart-controls{grid-template-columns:58px minmax(0,1fr)!important}
+ #priceChartCard #analysisAssetPicker{grid-template-columns:58px minmax(0,1fr)!important}
+ #priceChartCard .chart-timeframe-select,#priceChartCard #analysisAssetPicker select{padding-left:10px!important;font-size:11px!important}
+ #priceChartCard .chart-ranges{gap:5px!important}
+ #priceChartCard .chart-ranges button{font-size:10px!important}
+ #btcChartNavigation button{font-size:10px!important}
+}
+@media(hover:hover) and (pointer:fine){
+ #priceChartCard .chart-ranges button:hover,#priceChartCard .chart-indicators button:hover,#btcChartNavigation button:hover{filter:brightness(1.13)!important;border-color:#76d7e8!important;transform:translateY(-1px)}
+}
+@media(prefers-reduced-motion:reduce){
+ #priceChartCard .chart-ranges button,#priceChartCard .chart-indicators button,#btcChartNavigation button{transition:none!important}
+}
+</style>
+<style id="btc-pulse-cinematic-motion-v1">
+/* CINEMATIC BTC PULSE — purely visual; market data and signal engine untouched */
+#btc-market-overview-v1 .btc-market-mood-copy{position:relative;isolation:isolate}
+#btc-market-overview-v1 .btc-market-mood-copy:after{content:"";position:absolute;z-index:-1;left:50%;top:50%;width:min(88vw,620px);height:190px;transform:translate(-50%,-50%);background:radial-gradient(ellipse,rgba(46,173,207,.12),rgba(32,90,143,.045) 45%,transparent 72%);filter:blur(15px);pointer-events:none;animation:btcPulseHeaderGlow 6s ease-in-out infinite}
+#bitcoin-pulse-character{isolation:isolate!important;overflow:hidden!important;box-shadow:inset 0 1px rgba(255,255,255,.055),0 18px 48px rgba(0,0,0,.24)!important;background:radial-gradient(ellipse at 50% 18%,rgba(38,135,166,.18),transparent 42%),linear-gradient(145deg,rgba(17,38,57,.98),rgba(7,17,30,.99))!important;animation:btcPulseSceneEntrance .85s cubic-bezier(.2,.8,.2,1) both}
+#bitcoin-pulse-character:before{content:"";position:absolute;z-index:1;inset:-30% -65%;pointer-events:none;background:linear-gradient(112deg,transparent 38%,rgba(111,226,244,.055) 47%,rgba(255,255,255,.12) 50%,rgba(111,226,244,.045) 53%,transparent 62%);transform:translateX(-70%) rotate(8deg);animation:btcPulseSceneSweep 9s ease-in-out infinite}
+#bitcoin-pulse-character:after{z-index:9!important;opacity:.75!important;bottom:8px!important;text-shadow:0 0 10px rgba(89,207,231,.35)}
+#bitcoin-pulse-character .btc-pulse-aura{opacity:.72!important;filter:blur(23px)!important;animation:btcPulseAuraBreath 5.2s ease-in-out infinite!important}
+#bitcoin-pulse-character .btc-pulse-orbit{border-color:rgba(101,207,228,.24)!important;box-shadow:0 0 18px rgba(68,178,209,.08),inset 0 0 18px rgba(68,178,209,.035)!important;will-change:transform,opacity}
+#bitcoin-pulse-character .btc-pulse-orbit-a{animation:btcPulseOrbitCinematicA 13s linear infinite!important}
+#bitcoin-pulse-character .btc-pulse-orbit-b{animation:btcPulseOrbitCinematicB 17s linear infinite!important}
+#bitcoin-pulse-character .btc-pulse-coin{transform-style:preserve-3d!important;will-change:transform,filter;animation:btcPulseCoinCinematic 8s ease-in-out infinite!important}
+#bitcoin-pulse-character .btc-pulse-coin span{animation:btcPulseCoinGlimmer 4.8s ease-in-out infinite!important}
+#bitcoin-pulse-character .btc-pulse-coin span:after{content:"";position:absolute;inset:8%;border-radius:50%;pointer-events:none;background:linear-gradient(118deg,transparent 27%,rgba(255,255,229,.58) 48%,transparent 65%);transform:translateX(-125%) rotate(18deg);animation:btcPulseCoinSweep 6.5s ease-in-out infinite}
+#bitcoin-pulse-character .btc-market-mascot-side{perspective:700px!important}
+#bitcoin-pulse-character .btc-market-mascot-side:before{content:"";position:absolute;inset:4%;border:1px solid rgba(116,203,224,.25);border-radius:50%;box-shadow:0 0 22px rgba(71,174,209,.12),inset 0 0 18px rgba(71,174,209,.08);animation:btcPulseMascotHalo 5s ease-in-out infinite}
+#bitcoin-pulse-character .btc-market-mascot-side i{position:relative;z-index:1;transform-origin:50% 82%;will-change:transform,filter;animation:btcPulseMascotFloat 3.7s ease-in-out infinite!important}
+#bitcoin-pulse-character .btc-market-mascot-side i:after{content:"";position:absolute;left:25%;right:25%;bottom:-7px;height:10px;border-radius:50%;background:rgba(0,0,0,.32);filter:blur(6px);animation:btcPulseMascotShadow 3.7s ease-in-out infinite}
+#bitcoin-pulse-character .btc-pulse-caption{animation:btcPulseCaptionGlow 4.5s ease-in-out infinite!important}
+#bitcoin-pulse-character .btc-pulse-burst{pointer-events:none}
+#bitcoin-pulse-character[data-pulse-state="buy"] .btc-pulse-orbit{border-color:rgba(91,255,188,.65)!important;box-shadow:0 0 20px rgba(65,255,174,.18)!important}
+#bitcoin-pulse-character[data-pulse-state="buy"] .btc-market-mascot-side:before{border-color:rgba(91,255,188,.5);box-shadow:0 0 28px rgba(65,255,174,.22),inset 0 0 20px rgba(65,255,174,.1)}
+#bitcoin-pulse-character[data-pulse-state="sell"] .btc-pulse-orbit{border-color:rgba(255,115,133,.62)!important;box-shadow:0 0 20px rgba(255,75,101,.16)!important}
+#bitcoin-pulse-character[data-pulse-state="sell"] .btc-market-mascot-side:before{border-color:rgba(255,115,133,.5);box-shadow:0 0 28px rgba(255,75,101,.18),inset 0 0 20px rgba(255,75,101,.08)}
+#bitcoin-pulse-character[data-pulse-state="wait"] .btc-pulse-orbit{border-color:rgba(239,199,116,.4)!important}
+#btc-market-overview-v1 .btc-overview-card{animation:btcPulseCardEntrance .65s cubic-bezier(.2,.8,.2,1) both;transition:transform .28s ease,border-color .28s ease,box-shadow .28s ease!important}
+#btc-market-overview-v1 .btc-overview-card:nth-child(2){animation-delay:.09s}
+#btc-market-overview-v1 .btc-overview-card:nth-child(3){animation-delay:.18s}
+#btc-market-overview-v1 .btc-overview-card:nth-child(4){animation-delay:.27s}
+#btc-market-overview-v1 .btc-overview-card:before{content:"";position:absolute;inset:0;pointer-events:none;background:linear-gradient(115deg,transparent 25%,rgba(108,220,238,.075) 50%,transparent 75%);transform:translateX(-120%);animation:btcPulseCardSheen 8s ease-in-out infinite}
+#btc-market-overview-v1 .btc-overview-card:nth-child(2):before{animation-delay:1.1s}
+#btc-market-overview-v1 .btc-overview-card:nth-child(3):before{animation-delay:2.2s}
+#btc-market-overview-v1 .btc-overview-card:nth-child(4):before{animation-delay:3.3s}
+#btc-market-overview-v1 .btc-overview-signal{box-shadow:inset 3px 0 rgba(93,215,234,.8),inset 0 1px rgba(255,255,255,.06),0 0 24px rgba(65,171,204,.08)!important}
+@keyframes btcPulseSceneEntrance{from{opacity:0;transform:translateY(18px) scale(.985);filter:blur(5px)}to{opacity:1;transform:translateY(0) scale(1);filter:blur(0)}}
+@keyframes btcPulseSceneSweep{0%,12%{transform:translateX(-70%) rotate(8deg);opacity:0}32%{opacity:1}58%{transform:translateX(70%) rotate(8deg);opacity:0}100%{transform:translateX(70%) rotate(8deg);opacity:0}}
+@keyframes btcPulseHeaderGlow{0%,100%{opacity:.45;transform:translate(-50%,-50%) scale(.88)}50%{opacity:1;transform:translate(-50%,-50%) scale(1.08)}}
+@keyframes btcPulseAuraBreath{0%,100%{opacity:.48;transform:translateZ(-14px) scale(.9)}50%{opacity:.9;transform:translateZ(-14px) scale(1.13)}}
+@keyframes btcPulseOrbitCinematicA{0%{transform:rotate(0deg) scale(1)}50%{transform:rotate(180deg) scale(1.025)}100%{transform:rotate(360deg) scale(1)}}
+@keyframes btcPulseOrbitCinematicB{0%{transform:rotateX(62deg) rotateZ(0deg) scale(.96)}50%{transform:rotateX(62deg) rotateZ(180deg) scale(1.04)}100%{transform:rotateX(62deg) rotateZ(360deg) scale(.96)}}
+@keyframes btcPulseCoinCinematic{0%,100%{transform:translateY(0) rotateY(-8deg) rotateX(4deg) scale(1);filter:brightness(1) drop-shadow(0 8px 14px rgba(0,0,0,.28))}25%{transform:translateY(-5px) rotateY(7deg) rotateX(1deg) scale(1.025);filter:brightness(1.12) drop-shadow(0 12px 19px rgba(255,190,75,.2))}50%{transform:translateY(-2px) rotateY(0deg) rotateX(-3deg) scale(1.01);filter:brightness(1.05) drop-shadow(0 10px 17px rgba(255,190,75,.13))}75%{transform:translateY(-6px) rotateY(-5deg) rotateX(2deg) scale(1.03);filter:brightness(1.14) drop-shadow(0 12px 20px rgba(255,190,75,.22))}}
+@keyframes btcPulseCoinGlimmer{0%,100%{filter:brightness(1)}50%{filter:brightness(1.16)}}
+@keyframes btcPulseCoinSweep{0%,15%{transform:translateX(-125%) rotate(18deg);opacity:0}28%{opacity:.8}45%{transform:translateX(125%) rotate(18deg);opacity:0}100%{transform:translateX(125%) rotate(18deg);opacity:0}}
+@keyframes btcPulseMascotFloat{0%,100%{transform:translateY(0) rotate(-1deg) scale(1);filter:drop-shadow(0 12px 10px rgba(0,0,0,.38)) drop-shadow(0 0 14px rgba(105,185,255,.18))}35%{transform:translateY(-8px) rotate(1.5deg) scale(1.025);filter:drop-shadow(0 17px 12px rgba(0,0,0,.3)) drop-shadow(0 0 22px rgba(105,185,255,.32))}68%{transform:translateY(-3px) rotate(-.5deg) scale(1.01)}}
+@keyframes btcPulseMascotShadow{0%,100%{transform:scale(1);opacity:.7}35%{transform:scale(.78);opacity:.42}68%{transform:scale(.94);opacity:.58}}
+@keyframes btcPulseMascotHalo{0%,100%{transform:scale(.96);opacity:.55}50%{transform:scale(1.06);opacity:1}}
+@keyframes btcPulseCaptionGlow{0%,100%{box-shadow:0 5px 20px rgba(0,0,0,.25),0 0 12px var(--pulse-glow)!important}50%{box-shadow:0 7px 24px rgba(0,0,0,.3),0 0 24px var(--pulse-glow)!important}}
+@keyframes btcPulseCardEntrance{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
+@keyframes btcPulseCardSheen{0%,68%{transform:translateX(-120%);opacity:0}76%{opacity:1}92%,100%{transform:translateX(120%);opacity:0}}
+@media(max-width:560px){
+ #bitcoin-pulse-character{min-height:320px!important}
+ #bitcoin-pulse-character .btc-pulse-coin{animation:btcPulseCoinCinematic 8s ease-in-out infinite!important}
+ #bitcoin-pulse-character .btc-market-mascot-side i{font-size:clamp(76px,22vw,104px)!important}
+ #btc-market-overview-v1 .btc-overview-card{animation-duration:.55s}
+}
+@media(hover:hover) and (pointer:fine){
+ #bitcoin-pulse-character:hover{border-color:rgba(102,218,237,.48)!important;box-shadow:inset 0 1px rgba(255,255,255,.08),0 22px 58px rgba(0,0,0,.3),0 0 28px rgba(64,184,214,.1)!important}
+ #btc-market-overview-v1 .btc-overview-card:hover{transform:translateY(-4px)!important;border-color:rgba(99,211,230,.46)!important;box-shadow:0 14px 30px rgba(0,0,0,.2),0 0 18px rgba(70,183,212,.1)!important}
+}
+@media(prefers-reduced-motion:reduce){
+ #bitcoin-pulse-character,#bitcoin-pulse-character:before,#bitcoin-pulse-character:after,
+ #bitcoin-pulse-character .btc-pulse-aura,#bitcoin-pulse-character .btc-pulse-orbit,
+ #bitcoin-pulse-character .btc-pulse-coin,#bitcoin-pulse-character .btc-pulse-coin span,
+ #bitcoin-pulse-character .btc-pulse-coin span:after,#bitcoin-pulse-character .btc-market-mascot-side:before,
+ #bitcoin-pulse-character .btc-market-mascot-side i,#bitcoin-pulse-character .btc-market-mascot-side i:after,
+ #bitcoin-pulse-character .btc-pulse-caption,#btc-market-overview-v1 .btc-overview-card,
+ #btc-market-overview-v1 .btc-overview-card:before,#btc-market-overview-v1 .btc-market-mood-copy:after{animation:none!important;transition:none!important}
+}
+</style><style id="btc-pulse-mobile-ux-v2-20261119">
+/* Bitcoin Pulse — mobile-first layout refinement; visual only */
+#btc-pulse-insight-dialog-v1{padding:clamp(10px,2.5vw,22px)!important;overscroll-behavior:contain!important}
+#btc-pulse-insight-dialog-v1 .btc-pulse-dialog-card{width:min(100%,560px)!important;max-height:min(88dvh,820px)!important;max-height:min(88vh,820px)!important;max-height:min(88dvh,820px)!important;overflow-x:hidden!important;overscroll-behavior:contain!important;scrollbar-width:thin!important;scrollbar-color:rgba(99,207,226,.45) transparent!important}
+#btc-pulse-insight-dialog-v1 .btc-pulse-dialog-top{position:sticky!important;top:-1px!important;z-index:5!important;padding:2px 0 12px!important;margin:-2px 0 14px!important;background:linear-gradient(180deg,#142840 82%,rgba(20,40,64,0))!important}
+#btc-pulse-insight-dialog-v1 .btc-pulse-dialog-kicker{line-height:1.5!important;max-width:calc(100% - 52px)!important}
+#btc-pulse-insight-dialog-v1 .btc-pulse-dialog-close{width:44px!important;height:44px!important;flex-basis:44px!important;border-radius:13px!important;background:rgba(255,255,255,.075)!important;transition:background .18s ease,transform .18s ease!important}
+#btc-pulse-insight-dialog-v1 .btc-pulse-dialog-status{align-items:flex-start!important;gap:14px!important;padding:16px!important;border-color:rgba(100,182,205,.32)!important;box-shadow:inset 3px 0 rgba(243,201,111,.85)!important}
+#btc-pulse-insight-dialog-v1 .btc-pulse-dialog-status strong{font-size:clamp(16px,4vw,19px)!important;line-height:1.25!important;overflow-wrap:anywhere!important}
+#btc-pulse-insight-dialog-v1 .btc-pulse-dialog-status small{font-size:13px!important;line-height:1.55!important}
+#btc-pulse-insight-dialog-v1 .btc-pulse-dialog-orb{width:52px!important;height:52px!important;flex-basis:52px!important;border-radius:16px!important;font-size:29px!important}
+#btc-pulse-insight-dialog-v1 .btc-pulse-dialog-metrics{gap:10px!important;margin:14px 0!important}
+#btc-pulse-insight-dialog-v1 .btc-pulse-dialog-metric{padding:14px!important;border-radius:16px!important;background:linear-gradient(145deg,rgba(23,45,68,.96),rgba(12,28,46,.96))!important;min-height:98px!important;display:flex!important;flex-direction:column!important;justify-content:space-between!important}
+#btc-pulse-insight-dialog-v1 .btc-pulse-dialog-metric span{font-size:10px!important;letter-spacing:.14em!important;line-height:1.4!important}
+#btc-pulse-insight-dialog-v1 .btc-pulse-dialog-metric strong{font-size:clamp(15px,3.8vw,18px)!important;line-height:1.35!important;font-variant-numeric:tabular-nums!important}
+#btc-pulse-insight-dialog-v1 .btc-pulse-dialog-explain{padding:16px!important;font-size:13px!important;line-height:1.65!important;border-radius:0 15px 15px 0!important}
+#btc-pulse-insight-dialog-v1 .btc-pulse-dialog-actions{gap:10px!important;margin-top:18px!important}
+#btc-pulse-insight-dialog-v1 .btc-pulse-dialog-actions button{min-height:48px!important;font-size:12px!important;letter-spacing:.02em!important}
+#btc-pulse-insight-dialog-v1 .btc-pulse-dialog-disclaimer{padding-bottom:4px!important;line-height:1.6!important}
+body:has(#btc-pulse-insight-dialog-v1[aria-hidden="false"]) .wallet-floating-access{opacity:0!important;visibility:hidden!important;pointer-events:none!important;transform:translateY(12px)!important}
+@media(max-width:560px){
+ #btc-pulse-insight-dialog-v1{align-items:center!important;padding:calc(10px + env(safe-area-inset-top,0px)) 10px calc(10px + env(safe-area-inset-bottom,0px))!important}
+ #btc-pulse-insight-dialog-v1 .btc-pulse-dialog-card{width:100%!important;max-height:calc(100dvh - env(safe-area-inset-top,0px) - env(safe-area-inset-bottom,0px) - 20px)!important;max-height:calc(100vh - 32px)!important;max-height:calc(100dvh - 32px - env(safe-area-inset-top,0px) - env(safe-area-inset-bottom,0px))!important;padding:16px 14px calc(18px + env(safe-area-inset-bottom,0px))!important;border-radius:22px!important}
+ #btc-pulse-insight-dialog-v1 .btc-pulse-dialog-top{margin-bottom:12px!important}
+ #btc-pulse-insight-dialog-v1 .btc-pulse-dialog-intro{font-size:13px!important;line-height:1.6!important;margin-bottom:15px!important}
+ #btc-pulse-insight-dialog-v1 .btc-pulse-dialog-status{padding:13px!important;gap:11px!important}
+ #btc-pulse-insight-dialog-v1 .btc-pulse-dialog-orb{width:46px!important;height:46px!important;flex-basis:46px!important;font-size:26px!important}
+ #btc-pulse-insight-dialog-v1 .btc-pulse-dialog-metrics{gap:8px!important}
+ #btc-pulse-insight-dialog-v1 .btc-pulse-dialog-metric{min-height:92px!important;padding:12px!important;border-radius:14px!important}
+ #btc-pulse-insight-dialog-v1 .btc-pulse-dialog-metric span{font-size:9px!important}
+ #btc-pulse-insight-dialog-v1 .btc-pulse-dialog-metric strong{font-size:clamp(14px,4vw,17px)!important}
+ #btc-pulse-insight-dialog-v1 .btc-pulse-dialog-actions{grid-template-columns:1fr 1fr!important}
+ #btc-pulse-insight-dialog-v1 .btc-pulse-dialog-actions button{min-height:46px!important;padding:10px 8px!important;font-size:11px!important}
+}
+@media(max-width:360px){#btc-pulse-insight-dialog-v1 .btc-pulse-dialog-metrics{grid-template-columns:1fr!important}#btc-pulse-insight-dialog-v1 .btc-pulse-dialog-metric{min-height:76px!important}#btc-pulse-insight-dialog-v1 .btc-pulse-dialog-actions{grid-template-columns:1fr!important}}
+@media(min-width:561px){#btc-pulse-insight-dialog-v1 .btc-pulse-dialog-card{padding:26px!important}#btc-pulse-insight-dialog-v1 .btc-pulse-dialog-metric{min-height:110px!important}}
+@media(prefers-reduced-motion:reduce){#btc-pulse-insight-dialog-v1 *{scroll-behavior:auto!important;transition:none!important}}
+</style><style id="btc-pulse-visual-polish-v3-20261119">
+/* Bitcoin Pulse — premium visual polish v3 */
+#btc-pulse-insight-dialog-v1 .btc-pulse-dialog-card{position:relative!important;border:1px solid rgba(101,207,229,.42)!important;background:radial-gradient(ellipse at 8% 0%,rgba(54,155,184,.17),transparent 38%),radial-gradient(ellipse at 100% 75%,rgba(37,91,137,.12),transparent 42%),linear-gradient(155deg,#142b43 0%,#0c1d31 54%,#091626 100%)!important;box-shadow:0 30px 90px rgba(0,0,0,.58),0 0 36px rgba(67,185,211,.09),inset 0 1px rgba(255,255,255,.09)!important}
+#btc-pulse-insight-dialog-v1 .btc-pulse-dialog-card:before{content:"";position:absolute;z-index:0;top:0;left:7%;right:7%;height:2px;border-radius:0 0 4px 4px;background:linear-gradient(90deg,transparent,#68ddec 24%,#d7b46e 72%,transparent);opacity:.9;pointer-events:none}
+#btc-pulse-insight-dialog-v1 .btc-pulse-dialog-top{position:relative!important;top:auto!important;z-index:1!important;display:flex!important;align-items:center!important;min-height:54px!important;padding:4px 0 15px!important;margin:0 0 18px!important;border-bottom:1px solid rgba(137,181,211,.16)!important;background:transparent!important}
+#btc-pulse-insight-dialog-v1 .btc-pulse-dialog-kicker{font-size:10px!important;letter-spacing:.19em!important;color:#8de2ed!important;text-shadow:0 0 16px rgba(92,217,234,.18)!important}
+#btc-pulse-insight-dialog-v1 .btc-pulse-dialog-intro{position:relative!important;display:block!important;margin:0 0 18px!important;padding:0!important;border:0!important;text-decoration:none!important;color:#aebfd2!important;line-height:1.65!important;overflow:visible!important}
+#btc-pulse-insight-dialog-v1 .btc-pulse-dialog-status{position:relative!important;overflow:hidden!important;border:1px solid rgba(111,193,216,.32)!important;border-radius:19px!important;background:linear-gradient(115deg,rgba(17,48,70,.96),rgba(10,29,48,.94))!important;box-shadow:0 12px 28px rgba(0,0,0,.15),inset 0 1px rgba(255,255,255,.05)!important}
+#btc-pulse-insight-dialog-v1 .btc-pulse-dialog-status:after{content:"";position:absolute;right:-42px;top:-58px;width:150px;height:150px;border-radius:50%;background:radial-gradient(circle,rgba(82,205,225,.12),transparent 70%);pointer-events:none}
+#btc-pulse-insight-dialog-v1 .btc-pulse-dialog-orb{position:relative!important;z-index:1!important;border:1px solid rgba(142,224,235,.35)!important;background:linear-gradient(145deg,#22516a,#123448)!important;color:#8fe7ef!important;box-shadow:inset 0 1px rgba(255,255,255,.18),0 6px 18px rgba(0,0,0,.22),0 0 18px rgba(80,204,223,.13)!important}
+#btc-pu
