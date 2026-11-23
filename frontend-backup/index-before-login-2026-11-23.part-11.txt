@@ -1,0 +1,243 @@
+ .btc-live-quote-status{grid-column:1/-1!important;min-width:0!important;padding:9px 10px!important;border-top:1px solid rgba(125,165,207,.22)!important;background:rgba(25,47,70,.72)!important;border-radius:0 0 8px 8px!important;color:#d0deed!important;font-size:10px!important;line-height:1.5!important}
+ #btcLiveQuoteBar #btcLiveUpdated,#btcLiveQuoteBar #btcLiveQuoteSource{color:#d0deed!important;overflow-wrap:anywhere!important}
+ #priceChartCard .chart-toolbar{opacity:1!important;filter:none!important;background:linear-gradient(145deg,#0d1d30,#101f32)!important;border-color:#355674!important}
+ #priceChartCard .chart-toolbar>span{color:#b7d0eb!important;font-size:10px!important;letter-spacing:.13em!important}
+ #priceChartCard .chart-controls{opacity:1!important;filter:none!important}
+ #priceChartCard .chart-timeframe-label,#priceChartCard #analysisAssetPicker{color:#b7cce3!important;font-size:10px!important;letter-spacing:.1em!important;font-weight:850!important}
+ #priceChartCard .chart-timeframe-select,#priceChartCard #analysisAssetPicker select{opacity:1!important;filter:none!important;color:#edf5ff!important;background:#172b42!important;border:1px solid #52789e!important;box-shadow:inset 0 1px 0 rgba(255,255,255,.04)!important;font-size:12px!important;font-weight:750!important}
+ #priceChartCard .chart-ranges button,#priceChartCard .chart-indicators button{opacity:1!important;filter:none!important;color:#d7e6f7!important;background:linear-gradient(180deg,#1a3049,#14263a)!important;border:1px solid #456584!important;font-size:10px!important;font-weight:800!important}
+ #priceChartCard .chart-ranges button.range-active,#priceChartCard .chart-indicators button[aria-pressed="true"]{color:#fff!important;background:linear-gradient(135deg,#16547b,#283e80)!important;border:1px solid #4dd7e8!important;box-shadow:0 0 0 1px rgba(77,215,232,.13),0 0 16px rgba(56,163,218,.18)!important}
+ #priceChartCard .chart-toolbar label,#priceChartCard .chart-toolbar button{text-shadow:none!important}
+ #priceChartCard .chartbox{margin-top:10px!important}
+ #priceChartCard{padding-bottom:24px!important}
+}
+@media(max-width:390px){
+ #btcLiveQuoteBar{gap:7px!important;padding:9px!important}
+ #btcLiveQuoteBar #btcLiveUsd{font-size:clamp(17px,5vw,20px)!important}
+ #btcLiveQuoteBar #btcLiveBrl{font-size:clamp(16px,4.6vw,19px)!important}
+ #btcLiveQuoteBar .btc-live-quote-label,#btcLiveQuoteBar .btc-live-quote-brl>span{font-size:8px!important}
+}
+</style>
+
+<style id="btc-mobile-quote-fix-20261115">
+/* Mobile quote layout: stack USD and BRL to prevent collision. */
+@media(max-width:760px){
+ #btcLiveQuoteBar{display:grid!important;grid-template-columns:minmax(0,1fr)!important;align-items:stretch!important;gap:11px!important;padding:13px!important;overflow:hidden!important}
+ #btcLiveQuoteBar .btc-live-quote-main,#btcLiveQuoteBar .btc-live-quote-brl{display:flex!important;flex-direction:column!important;grid-column:1!important;width:100%!important;min-width:0!important;padding:0!important;border:0!important;gap:5px!important;overflow:hidden!important}
+ #btcLiveQuoteBar .btc-live-quote-brl{padding-top:10px!important;border-top:1px solid rgba(125,165,207,.24)!important}
+ #btcLiveQuoteBar #btcLiveUsd,#btcLiveQuoteBar #btcLiveBrl{display:block!important;width:100%!important;max-width:100%!important;min-width:0!important;margin:0!important;white-space:normal!important;overflow-wrap:anywhere!important;word-break:normal!important;line-height:1.16!important;letter-spacing:-.035em!important;font-variant-numeric:tabular-nums!important}
+ #btcLiveQuoteBar #btcLiveUsd{font-size:clamp(23px,6.2vw,29px)!important;color:#f4f8ff!important}
+ #btcLiveQuoteBar #btcLiveBrl{font-size:clamp(21px,5.7vw,27px)!important;color:#68e6b5!important}
+ #btcLiveQuoteBar .btc-live-quote-label,#btcLiveQuoteBar .btc-live-quote-brl>span{display:flex!important;align-items:center!important;font-size:9px!important;line-height:1.4!important;letter-spacing:.1em!important;color:#b7cce3!important}
+ #btcLiveQuoteBar small{font-size:10px!important;line-height:1.4!important;color:#c2d2e4!important;overflow-wrap:anywhere!important}
+ #btcLiveQuoteBar .btc-live-quote-status{display:flex!important;grid-column:1!important;flex-direction:column!important;align-items:flex-start!important;gap:5px!important;width:100%!important;min-width:0!important;padding:10px!important;border-top:1px solid rgba(125,165,207,.24)!important;background:rgba(25,47,70,.72)!important;border-radius:0 0 8px 8px!important;color:#dce8f5!important;font-size:10px!important;line-height:1.5!important;overflow-wrap:anywhere!important}
+ #btcLiveQuoteBar #btcLiveUpdated,#btcLiveQuoteBar #btcLiveQuoteSource{color:#dce8f5!important;overflow-wrap:anywhere!important}
+ #priceChartCard .chart-toolbar,#priceChartCard .chart-controls{opacity:1!important;filter:none!important}
+ #priceChartCard .chart-toolbar>span,#priceChartCard .chart-timeframe-label,#priceChartCard #analysisAssetPicker{color:#d1e2f4!important;opacity:1!important}
+ #priceChartCard .chart-timeframe-select,#priceChartCard #analysisAssetPicker select{color:#f0f6ff!important;background:#172b42!important;border-color:#6387a9!important;opacity:1!important}
+ #priceChartCard .chart-ranges button,#priceChartCard .chart-indicators button{color:#e0ebf8!important;background:#172b42!important;border-color:#52718f!important;opacity:1!important}
+ #priceChartCard .chart-ranges button.range-active,#priceChartCard .chart-indicators button[aria-pressed="true"]{color:#fff!important;background:linear-gradient(135deg,#16547b,#283e80)!important;border-color:#4dd7e8!important}
+}
+@media(max-width:390px){#btcLiveQuoteBar #btcLiveUsd{font-size:22px!important}#btcLiveQuoteBar #btcLiveBrl{font-size:20px!important}}
+</style>
+
+<style id="btc-indicator-experience-stage4-20261115">
+/* Stage 4 — premium indicator presentation. CSS only; source values and engine remain untouched. */
+#customerIndicatorStackV2 .indicator-hub{
+ position:relative!important;isolation:isolate!important;overflow:hidden!important;
+ padding:clamp(15px,2vw,22px)!important;border:1px solid rgba(94,145,195,.34)!important;border-radius:17px!important;
+ background:radial-gradient(ellipse at 0 0,rgba(48,105,158,.2),transparent 48%),linear-gradient(145deg,#14243a 0%,#0c1728 100%)!important;
+ box-shadow:0 15px 38px rgba(0,0,0,.2),inset 0 1px 0 rgba(220,238,255,.05)!important;
+}
+#customerIndicatorStackV2 .indicator-hub:before{content:"";position:absolute;inset:0 0 auto;height:2px;background:linear-gradient(90deg,transparent,#4ba5df 30%,#e2bd70 70%,transparent);opacity:.85;pointer-events:none}
+#customerIndicatorStackV2 .indicator-hub-head{position:relative;z-index:1;margin-bottom:15px!important;padding-bottom:12px!important;border-bottom:1px solid rgba(125,163,203,.18)!important}
+#customerIndicatorStackV2 .indicator-kicker{font-size:9px!important;letter-spacing:.17em!important;font-weight:900!important;color:#7fc9ed!important}
+#customerIndicatorStackV2 .indicator-hub-head h2{margin:4px 0!important;color:#f1f6ff!important;font-size:clamp(17px,2vw,20px)!important;letter-spacing:.01em!important}
+#customerIndicatorStackV2 .indicator-hub-head p{color:#a9bdd3!important;line-height:1.55!important}
+#customerIndicatorStackV2 .indicator-hub-grid{position:relative;z-index:1;gap:10px!important}
+#customerIndicatorStackV2 .indicator-tile{position:relative!important;isolation:isolate!important;overflow:hidden!important;min-width:0!important;min-height:174px!important;padding:14px!important;display:flex!important;flex-direction:column!important;align-items:flex-start!important;gap:8px!important;text-align:left!important;border:1px solid rgba(94,142,188,.34)!important;border-radius:13px!important;background:linear-gradient(155deg,rgba(25,45,68,.98),rgba(14,27,43,.98))!important;color:#edf5ff!important;box-shadow:inset 0 1px 0 rgba(220,238,255,.045),0 8px 20px rgba(0,0,0,.12)!important;transition:transform .18s ease,border-color .18s ease,box-shadow .18s ease!important}
+#customerIndicatorStackV2 .indicator-tile:after{content:"";position:absolute;inset:auto 0 0;height:2px;background:linear-gradient(90deg,transparent,rgba(82,177,220,.8),rgba(221,186,111,.7),transparent);opacity:.7;pointer-events:none}
+#customerIndicatorStackV2 .indicator-tile:hover{transform:translateY(-2px)!important;border-color:rgba(102,183,225,.7)!important;box-shadow:0 12px 25px rgba(0,0,0,.2),0 0 18px rgba(60,140,200,.09)!important}
+#customerIndicatorStackV2 .indicator-number{font-size:9px!important;letter-spacing:.12em!important;font-weight:900!important;color:#8fb8db!important}
+#customerIndicatorStackV2 .indicator-art{width:100%!important;height:52px!important;display:flex!important;align-items:center!important;justify-content:flex-start!important;opacity:.95!important}
+#customerIndicatorStackV2 .indicator-art svg{max-width:120px!important;height:52px!important;filter:drop-shadow(0 3px 8px rgba(50,150,205,.12))}
+#customerIndicatorStackV2 .indicator-tile strong{font-size:13px!important;line-height:1.35!important;color:#f1f6ff!important;font-weight:850!important}
+#customerIndicatorStackV2 .indicator-tile small{font-size:10px!important;line-height:1.5!important;color:#a9bdd3!important}
+#customerIndicatorStackV2 .indicator-action{margin-top:auto!important;padding-top:3px!important;font-size:10px!important;font-weight:850!important;color:#79d8ed!important}
+#customerIndicatorStackV2 #threeDayAnalysis{position:relative!important;overflow:hidden!important;border:1px solid rgba(91,145,194,.34)!important;border-radius:16px!important;background:linear-gradient(150deg,#13243a,#0c1728)!important;box-shadow:0 12px 30px rgba(0,0,0,.17),inset 0 1px 0 rgba(220,238,255,.045)!important;padding:clamp(14px,2vw,21px)!important}
+#customerIndicatorStackV2 #threeDayAnalysis:before{content:"";position:absolute;inset:0 0 auto;height:2px;background:linear-gradient(90deg,transparent,#4b9ed6 35%,#d7b46f 70%,transparent);pointer-events:none}
+#customerIndicatorStackV2 #threeDayAnalysis .cardhead{position:relative;align-items:center!important;gap:10px!important;padding-bottom:12px!important;margin-bottom:12px!important;border-bottom:1px solid rgba(125,163,203,.17)!important}
+#customerIndicatorStackV2 #threeDayAnalysis .cardhead h2{font-size:clamp(14px,1.7vw,17px)!important;letter-spacing:.035em!important;color:#eff6ff!important}
+#customerIndicatorStackV2 #threeDayAnalysis .pill{border:1px solid rgba(89,165,213,.38)!important;background:rgba(26,63,91,.6)!important;color:#b8dcf2!important;font-size:9px!important;font-weight:900!important;letter-spacing:.07em!important}
+#customerIndicatorStackV2 #threeDayAnalysis>.note{padding:10px 12px!important;border-left:2px solid #5ca9d7!important;border-radius:0 8px 8px 0!important;background:rgba(19,42,64,.56)!important;color:#a9bfd5!important;font-size:10px!important;line-height:1.6!important}
+#customerIndicatorStackV2 #threeDayAnalysis .metric{position:relative!important;min-width:0!important;padding:13px!important;border:1px solid rgba(91,139,184,.28)!important;border-radius:11px!important;background:linear-gradient(145deg,rgba(25,46,69,.92),rgba(15,29,46,.96))!important;box-shadow:inset 0 1px 0 rgba(220,238,255,.035)!important}
+#customerIndicatorStackV2 #threeDayAnalysis .metric span{display:block!important;margin-bottom:6px!important;color:#9db6d0!important;font-size:9px!important;line-height:1.45!important;letter-spacing:.08em!important;font-weight:850!important;text-transform:uppercase!important}
+#customerIndicatorStackV2 #threeDayAnalysis .metric strong{display:block!important;color:#f0f6ff!important;font-size:clamp(15px,2vw,19px)!important;line-height:1.3!important;font-weight:900!important;font-variant-numeric:tabular-nums!important;overflow-wrap:anywhere!important}
+#customerIndicatorStackV2 #threeDayAnalysis #threeDayTrend,#customerIndicatorStackV2 #threeDayAnalysis #threeDayCross{color:#8dd8ef!important}
+#customerIndicatorStackV2 #threeDayAnalysis #threeDayRsi{color:#d9c18b!important}
+#customerIndicatorStackV2 #threeDayAnalysis #threeDayMacd{color:#a9c8ff!important}
+#customerIndicatorStackV2 #threeDayAnalysis #threeDayScore{color:#77e0b4!important}
+#customerIndicatorStackV2 #threeDayAnalysis #threeDayCloseTime{font-size:13px!important;color:#d8e5f4!important}
+#customerIndicatorStackV2 #threeDayAnalysis #threeDayInterpretation{margin:12px 0 0!important;padding:11px 12px!important;border:1px solid rgba(91,139,184,.2)!important;border-radius:9px!important;background:rgba(8,18,31,.55)!important;color:#aebfd2!important}
+#customerIndicatorStackV2 #fearGreedPanel{position:relative!important;overflow:hidden!important;border:1px solid rgba(91,145,194,.34)!important;border-radius:16px!important;background:linear-gradient(150deg,#13243a,#0c1728)!important;box-shadow:0 12px 30px rgba(0,0,0,.17),inset 0 1px 0 rgba(220,238,255,.045)!important}
+#customerIndicatorStackV2 #fearGreedPanel:before{content:"";position:absolute;inset:0 0 auto;height:2px;background:linear-gradient(90deg,transparent,#5bcbb0 35%,#d7b46f 70%,transparent);pointer-events:none}
+#customerIndicatorStackV2 #fearGreedPanel .cardhead{padding-bottom:12px!important;border-bottom:1px solid rgba(125,163,203,.17)!important}
+#customerIndicatorStackV2 #fearGreedPanel .cardhead h2{color:#eff6ff!important;font-size:16px!important}
+#customerIndicatorStackV2 #fearGreedPanel .fg-score{font-variant-numeric:tabular-nums!important;text-shadow:0 0 22px rgba(95,200,180,.12)!important}
+#customerIndicatorStackV2 #fearGreedPanel .fg-comparison>div,#customerIndicatorStackV2 #fearGreedPanel .fg-stat,#customerIndicatorStackV2 #fearGreedPanel .fg-mini-card{border:1px solid rgba(91,139,184,.27)!important;border-radius:10px!important;background:rgba(22,42,64,.84)!important;box-shadow:inset 0 1px 0 rgba(220,238,255,.035)!important}
+#customerIndicatorStackV2 #fearGreedPanel .fg-comparison strong{font-variant-numeric:tabular-nums!important}
+@media(max-width:700px){
+ #customerIndicatorStackV2 .indicator-hub-grid{grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:8px!important}
+ #customerIndicatorStackV2 .indicator-tile{min-height:154px!important;padding:11px!important;gap:6px!important}
+ #customerIndicatorStackV2 .indicator-art{height:42px!important}
+ #customerIndicatorStackV2 .indicator-art svg{height:42px!important}
+ #customerIndicatorStackV2 #threeDayAnalysis .metric{padding:11px!important}
+ #customerIndicatorStackV2 #threeDayAnalysis .metric strong{font-size:15px!important}
+}
+@media(max-width:380px){#customerIndicatorStackV2 .indicator-hub-grid{grid-template-columns:minmax(0,1fr)!important}#customerIndicatorStackV2 .indicator-tile{min-height:0!important}#customerIndicatorStackV2 #threeDayAnalysis .metric{padding:10px!important}}
+@media(prefers-reduced-motion:reduce){#customerIndicatorStackV2 .indicator-tile{transition:none!important}}
+</style>
+<style id="btc-indicator-mobile-layout-fix-20261115">
+/* Indicator cards: reserve a dedicated icon zone and keep titles clear. */
+#customerIndicatorStackV2 .indicator-tile{position:relative!important;display:flex!important;flex-direction:column!important;align-items:flex-start!important;gap:7px!important;padding:13px!important;overflow:hidden!important;}
+#customerIndicatorStackV2 .indicator-tile .indicator-number{position:relative!important;z-index:2!important;display:block!important;width:100%!important;max-width:100%!important;min-height:25px!important;padding-right:82px!important;font-size:8px!important;line-height:1.35!important;letter-spacing:.09em!important;white-space:normal!important;overflow-wrap:anywhere!important;}
+#customerIndicatorStackV2 .indicator-tile .indicator-art{position:absolute!important;z-index:1!important;top:31px!important;right:9px!important;width:82px!important;height:46px!important;max-width:38%!important;margin:0!important;display:flex!important;align-items:center!important;justify-content:flex-end!important;pointer-events:none!important;opacity:.88!important;}
+#customerIndicatorStackV2 .indicator-tile .indicator-art svg{display:block!important;width:100%!important;max-width:82px!important;height:46px!important;overflow:visible!important;}
+#customerIndicatorStackV2 .indicator-tile>strong{position:relative!important;z-index:2!important;display:block!important;width:100%!important;margin-top:13px!important;font-size:13px!important;line-height:1.35!important;overflow-wrap:anywhere!important;}
+#customerIndicatorStackV2 .indicator-tile>small{position:relative!important;z-index:2!important;display:block!important;width:100%!important;font-size:10px!important;line-height:1.5!important;overflow-wrap:anywhere!important;}
+#customerIndicatorStackV2 .indicator-tile .indicator-action{position:relative!important;z-index:2!important;margin-top:auto!important;padding-top:5px!important;}
+@media(max-width:700px){#customerIndicatorStackV2 .indicator-tile{min-height:166px!important;padding:12px!important;}#customerIndicatorStackV2 .indicator-tile .indicator-number{min-height:27px!important;padding-right:72px!important;font-size:8px!important;}#customerIndicatorStackV2 .indicator-tile .indicator-art{top:31px!important;right:7px!important;width:70px!important;height:42px!important;}#customerIndicatorStackV2 .indicator-tile .indicator-art svg{max-width:70px!important;height:42px!important;}#customerIndicatorStackV2 .indicator-tile>strong{margin-top:13px!important;font-size:12px!important;line-height:1.38!important;}}
+@media(max-width:380px){#customerIndicatorStackV2 .indicator-hub-grid{grid-template-columns:minmax(0,1fr)!important;}#customerIndicatorStackV2 .indicator-tile{min-height:145px!important;}#customerIndicatorStackV2 .indicator-tile .indicator-art{width:82px!important;max-width:32%!important;}}
+</style>
+<style id="btc-score-chart-premium-v3-20261115">#btcTopBottomRadar .tbr-history-chart{position:relative!important}#btcTopBottomRadar #tbrScoreChart{display:block!important;width:100%!important;max-width:100%!important;border:1px solid rgba(111,155,190,.12)!important;background:linear-gradient(180deg,rgba(8,20,34,.45),rgba(7,17,29,.18))!important;box-shadow:inset 0 1px 10px rgba(0,0,0,.13)!important}#btcTopBottomRadar .tbr-history-head{letter-spacing:.13em!important}#btcTopBottomRadar .tbr-chart-legend{align-items:center!important}#btcTopBottomRadar .tbr-chart-note{border-left-color:#d9b96e!important}@media(max-width:620px){#btcTopBottomRadar #tbrScoreChart{height:235px!important;padding:2px!important}}@media(prefers-reduced-motion:reduce){#btcTopBottomRadar #tbrScoreChart{scroll-behavior:auto!important}}</style><style id="btc-score-tooltip-mobile-anchor-20261115">#tbrScoreTooltip{pointer-events:none!important;max-width:calc(100vw - 24px)!important;box-sizing:border-box!important;z-index:9999!important}@media(max-width:700px){#tbrScoreTooltip{font-size:11px!important;padding:9px 11px!important;border-radius:10px!important;}}</style><style id="btc-genesis-motion-restore-20261115">/* Re-enable GENESIS cinematic sequence; reduced-motion preferences remain unchanged elsewhere in the app. */</style>
+<style id="btc-genesis-cinematic-motion-v18-20261115">
+/* GENESIS motion pass: visible, synchronized movement across the full 6.2s intro. */
+#btcGenesisIntro .btc-genesis-content{animation:btcGenesisCamera 6.2s cubic-bezier(.18,.72,.2,1) both!important}
+#btcGenesisIntro .btc-genesis-kicker{animation:btcGenesisKicker 1s .12s both!important}
+#btcGenesisIntro .btc-genesis-coin{animation:btcGenesisCoinMotionV18 6.2s cubic-bezier(.2,.72,.18,1) both,btcGenesisCoinGlow 1.55s ease-in-out 4!important;transform-origin:50% 50%!important;will-change:transform,box-shadow!important}
+#btcGenesisIntro .btc-genesis-ring{animation:btcGenesisRingMotionV18 6.2s linear infinite!important;will-change:transform,opacity!important}
+#btcGenesisIntro .btc-genesis-ring.r2{animation:btcGenesisRingMotionV18B 5.1s linear infinite!important}
+#btcGenesisIntro .btc-genesis-orbit-track{animation:btcGenesisTrackMotionV18 6.2s linear infinite!important;will-change:transform!important}
+#btcGenesisIntro .btc-genesis-orbit-track:after{animation:btcGenesisOrbitNodeV14 6.2s linear infinite!important}
+#btcGenesisIntro .btc-genesis-aura{animation:btcGenesisAuraV18 1.55s ease-in-out 4!important}
+#btcGenesisIntro .btc-genesis-stage:before{animation:btcGenesisCoreIgnition 2.3s ease-out .12s both,btcGenesisPlanetAuraV13 1.55s ease-in-out 2!important}
+#btcGenesisIntro .btc-genesis-stage:after{animation:btcGenesisHaloSweepV14 6.2s linear infinite!important}
+#btcGenesisIntro .btc-genesis-cosmos:before{animation:btcGenesisNebula 8s linear infinite!important}
+#btcGenesisIntro .btc-genesis-cosmos:after{animation:btcGenesisDeepOrbit 10s linear infinite!important}
+#btcGenesisIntro:before{animation:btcGenesisGrid 6.2s linear infinite!important}
+#btcGenesisIntro:after{animation:btcGenesisRing 3.1s ease-in-out infinite!important}
+#btcGenesisIntro .btc-genesis-supernova{animation:btcGenesisSupernovaFlash 3.1s cubic-bezier(.16,.7,.2,1) .08s both!important}
+#btcGenesisIntro .btc-genesis-supernova:before{animation:btcGenesisShockwave 2.6s cubic-bezier(.12,.72,.18,1) .12s both!important}
+#btcGenesisIntro .btc-genesis-supernova:after{animation:btcGenesisCosmicRays 3.2s ease-out .05s both!important}
+#btcGenesisIntro .btc-genesis-particle{animation:btcGenesisParticleFly var(--d) cubic-bezier(.12,.7,.2,1) var(--delay) 1 both!important}
+#btcGenesisIntro .btc-genesis-title{animation:btcGenesisTitle 1.15s 2.05s cubic-bezier(.16,.8,.2,1) both!important}
+#btcGenesisIntro .btc-genesis-subtitle{animation:btcGenesisSubtitle 1s 2.55s both!important}
+#btcGenesisIntro .btc-genesis-status{animation:btcGenesisSubtitle .8s 3s both!important}
+#btcGenesisIntro .btc-genesis-signature{animation:btcGenesisSignatureReveal 1s 3.35s cubic-bezier(.2,.7,.2,1) both!important}
+#btcGenesisIntro .btc-genesis-status:before{animation:btcGenesisLive .7s ease-in-out infinite!important}
+@keyframes btcGenesisCoinMotionV18{0%{transform:translate(-50%,-50%) perspective(1000px) rotateX(22deg) rotateY(-95deg) rotateZ(-35deg) scale(.28);filter:brightness(2.2)}18%{transform:translate(-50%,-50%) perspective(1000px) rotateX(12deg) rotateY(12deg) rotateZ(45deg) scale(1.08);filter:brightness(1.4)}48%{transform:translate(-50%,-50%) perspective(1000px) rotateX(-5deg) rotateY(0deg) rotateZ(190deg) scale(.98);filter:brightness(1)}78%{transform:translate(-50%,-50%) perspective(1000px) rotateX(8deg) rotateY(8deg) rotateZ(310deg) scale(1.04)}100%{transform:translate(-50%,-50%) perspective(1000px) rotateX(5deg) rotateY(0deg) rotateZ(405deg) scale(1);filter:brightness(1)}}
+@keyframes btcGenesisRingMotionV18{0%{transform:rotateX(68deg) rotateZ(0deg) scale(.78);opacity:.12}35%{opacity:.85}100%{transform:rotateX(68deg) rotateZ(360deg) scale(1.08);opacity:.55}}
+@keyframes btcGenesisRingMotionV18B{0%{transform:rotateY(68deg) rotateX(12deg) rotateZ(360deg) scale(1.12);opacity:.12}45%{opacity:.8}100%{transform:rotateY(68deg) rotateX(12deg) rotateZ(0deg) scale(.88);opacity:.5}}
+@keyframes btcGenesisTrackMotionV18{0%{transform:rotate(-23deg) scaleY(.43)}100%{transform:rotate(337deg) scaleY(.43)}}
+@keyframes btcGenesisAuraV18{0%,100%{transform:scale(.72);opacity:.35}50%{transform:scale(1.24);opacity:1}}
+@media(max-width:600px){#btcGenesisIntro .btc-genesis-coin{animation-duration:6.2s,1.55s!important}#btcGenesisIntro .btc-genesis-ring{animation-duration:6.2s!important}#btcGenesisIntro .btc-genesis-ring.r2{animation-duration:5.1s!important}}
+</style>
+
+<style id="btc-cycle-history-v1-20261116">#btcCycleHistory{margin:22px 0;padding:clamp(16px,2.5vw,26px);background:radial-gradient(ellipse at 12% 0%,rgba(45,113,163,.16),transparent 44%),linear-gradient(145deg,#0d1726,#080e18 78%);border:1px solid rgba(91,166,207,.28);border-radius:20px;color:#eaf2fc;scroll-margin-top:90px}#btcCycleHistory .bch-head{display:flex;justify-content:space-between;align-items:flex-start;gap:16px;margin-bottom:18px}#btcCycleHistory .bch-kicker{font-size:9px;letter-spacing:.18em;font-weight:900;color:#67d9e9}#btcCycleHistory h2{font-size:clamp(21px,3vw,29px);margin:7px 0;color:#f5f8ff;letter-spacing:.035em}#btcCycleHistory .bch-head p{color:#9fb1c8;font-size:12px;line-height:1.6;margin:0;max-width:650px}#btcCycleHistory .bch-head-badge{white-space:nowrap;border:1px solid #31536b;border-radius:20px;padding:8px 11px;color:#a9ddeb;font-size:9px;font-weight:900;letter-spacing:.1em}#btcCycleHistory .bch-head-badge i,#btcCycleHistory .bch-status.live i{display:inline-block;width:7px;height:7px;border-radius:50%;background:#45d7aa;box-shadow:0 0 12px #45d7aa;margin-right:6px}#btcCycleHistory .bch-summary{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:9px;margin:18px 0}#btcCycleHistory .bch-summary>div{background:rgba(15,29,45,.8);border:1px solid #263b52;border-radius:12px;padding:11px 13px;min-width:0}#btcCycleHistory .bch-summary span,#btcCycleHistory .bch-compare>div>span{display:block;color:#7f9ab5;font-size:9px;font-weight:900;letter-spacing:.1em}#btcCycleHistory .bch-summary strong{display:block;color:#eaf3ff;font-size:13px;margin-top:6px;overflow-wrap:anywhere}#btcCycleHistory .bch-cycles{display:grid;grid-template-columns:1fr;gap:14px}#btcCycleHistory .bch-cycle{padding:16px;border:1px solid #263c54;border-radius:16px;background:linear-gradient(145deg,rgba(16,29,45,.96),rgba(9,17,29,.98));min-width:0}#btcCycleHistory .bch-cycle-head{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:14px}#btcCycleHistory .bch-cycle-index{font-size:9px;letter-spacing:.1em;font-weight:900;color:#7ea4c8}#btcCycleHistory .bch-cycle h3{font-size:17px;color:#f3f7ff;margin:5px 0 0}#btcCycleHistory .bch-status{font-size:9px;font-weight:900;letter-spacing:.08em;border-radius:20px;padding:7px 10px;background:#1b2b40;color:#a9bed5;white-space:nowrap}#btcCycleHistory .bch-status.live{color:#70e6bd;background:rgba(33,112,87,.18);border:1px solid rgba(69,215,170,.3)}#btcCycleHistory .bch-stats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;margin-bottom:12px}#btcCycleHistory .bch-stats>div{background:rgba(5,12,21,.52);border:1px solid rgba(66,91,117,.45);border-radius:10px;padding:9px;min-width:0}#btcCycleHistory .bch-stats small{display:block;color:#8da3bc;font-size:9px;line-height:1.35}#btcCycleHistory .bch-stats strong{display:block;color:#eaf3ff;font-size:clamp(12px,1.5vw,16px);font-variant-numeric:tabular-nums;margin-top:6px;overflow-wrap:anywhere}#btcCycleHistory .bch-chart-wrap{height:230px;position:relative;width:100%}#btcCycleHistory .bch-chart-wrap canvas,#btcCycleHistory .bch-compare-chart canvas{width:100%!important;height:100%!important}#btcCycleHistory .bch-foot{font-size:10px;color:#8da3bc;line-height:1.5;margin-top:8px}#btcCycleHistory .bch-live-strip{display:flex;align-items:center;gap:12px;flex-wrap:wrap;background:rgba(28,108,83,.12);border:1px solid rgba(69,215,170,.25);border-radius:10px;padding:9px 12px;margin-bottom:12px}#btcCycleHistory .bch-live-strip span{font-size:9px;font-weight:900;color:#83bcae;letter-spacing:.1em}#btcCycleHistory .bch-live-strip strong{font-size:17px;color:#72e5bb;font-variant-numeric:tabular-nums}#btcCycleHistory .bch-live-strip small{font-size:10px;color:#9bb6b1}#btcCycleHistory .bch-compare{margin-top:18px;padding:16px;border:1px solid rgba(91,166,207,.26);border-radius:15px;background:rgba(7,15,25,.72)}#btcCycleHistory .bch-compare>div>strong{display:block;color:#eef5ff;font-size:15px;margin:6px 0}#btcCycleHistory .bch-compare>div>small{display:block;color:#91a8c2;font-size:11px;line-height:1.55;max-width:800px}#btcCycleHistory .bch-compare-chart{height:290px;position:relative;margin-top:14px}#btcCycleHistory .bch-note{border-top:1px solid #26394e;margin:12px 0 0;padding-top:11px;color:#8095ad;font-size:10px;line-height:1.6}@media(max-width:650px){#btcCycleHistory .bch-head{display:block}#btcCycleHistory .bch-head-badge{display:inline-block;margin-top:12px}#btcCycleHistory .bch-summary{grid-template-columns:1fr 1fr}#btcCycleHistory .bch-summary>div:last-child{grid-column:1/-1}#btcCycleHistory .bch-cycle{padding:12px}#btcCycleHistory .bch-stats{grid-template-columns:repeat(2,minmax(0,1fr))}#btcCycleHistory .bch-chart-wrap{height:205px}#btcCycleHistory .bch-compare-chart{height:240px}#btcCycleHistory .bch-live-strip{gap:7px}#btcCycleHistory .bch-live-strip small{width:100%}}@media(prefers-reduced-motion:reduce){#btcCycleHistory *{scroll-behavior:auto!important;transition:none!important}}
+
+/* Cycle History · layout cronológico em card único */
+#btcCycleHistory .bch-cycles.bch-single-card{display:block;padding:4px 18px;background:linear-gradient(145deg,rgba(16,29,45,.96),rgba(8,16,27,.98));border:1px solid #2b435c;border-radius:16px;overflow:hidden}#btcCycleHistory .bch-cycles.bch-single-card .bch-cycle{padding:18px 2px 20px;margin:0;border:0;border-radius:0;background:transparent;box-shadow:none}#btcCycleHistory .bch-cycles.bch-single-card .bch-cycle+.bch-cycle{border-top:1px solid rgba(105,139,173,.24)}#btcCycleHistory .bch-cycles.bch-single-card .bch-cycle-head{margin-bottom:10px}#btcCycleHistory .bch-cycles.bch-single-card .bch-chart-wrap{height:185px}#btcCycleHistory .bch-cycles.bch-single-card .bch-stats{margin-bottom:9px}#btcCycleHistory .bch-cycles.bch-single-card .bch-foot{margin-top:5px}#btcCycleHistory .bch-cycles.bch-single-card .bch-current{background:linear-gradient(90deg,rgba(48,120,98,.07),transparent 65%)}@media(max-width:650px){#btcCycleHistory .bch-cycles.bch-single-card{padding:3px 12px}#btcCycleHistory .bch-cycles.bch-single-card .bch-cycle{padding:15px 0 17px}#btcCycleHistory .bch-cycles.bch-single-card .bch-chart-wrap{height:165px}}
+</style>
+
+<style id="btc-cycle-history-compare-polish-20261116">#btcCycleHistory .bch-compare{position:relative;overflow:hidden;background:radial-gradient(ellipse at 50% 0%,rgba(51,126,177,.15),transparent 58%),linear-gradient(145deg,rgba(9,21,35,.96),rgba(6,13,23,.98));border-color:rgba(91,166,207,.38);box-shadow:inset 0 1px 0 rgba(255,255,255,.035),0 16px 38px rgba(0,0,0,.18)}#btcCycleHistory .bch-compare>div:first-child{padding:2px 2px 12px}#btcCycleHistory .bch-compare>div>span{color:#72d8e8!important;letter-spacing:.16em!important}#btcCycleHistory .bch-compare>div>strong{font-size:clamp(16px,2vw,20px)!important;letter-spacing:-.02em}#btcCycleHistory .bch-compare>div>small{max-width:760px;font-size:12px!important;color:#a2b6cc!important}#btcCycleHistory .bch-compare-chart{height:340px;margin:8px -2px 0;padding:14px 12px 8px;border:1px solid rgba(91,137,174,.2);border-radius:14px;background:linear-gradient(180deg,rgba(20,40,61,.44),rgba(7,15,26,.18))}#btcCycleHistory .bch-note{color:#9aacc0!important;font-size:10px!important}#btcCycleHistory .bch-compare-chart canvas{cursor:crosshair;touch-action:pan-y}@media(max-width:650px){#btcCycleHistory .bch-compare-chart{height:290px;padding:10px 5px 5px;margin-top:10px}}@media(prefers-reduced-motion:no-preference){#btcCycleHistory .bch-compare{transition:border-color .2s ease,box-shadow .2s ease}#btcCycleHistory .bch-compare:hover{border-color:rgba(103,193,220,.52);box-shadow:0 18px 42px rgba(0,0,0,.24)}}
+</style>
+
+<style id="btc-cycle-history-essential-visibility-fix-20261116">
+/* Histórico comparativo: exclusivo do modo Avançado nos dois controladores de experiência. */
+body.mode-essential #btcCycleHistory,body[data-ce4-mode="essential"] #btcCycleHistory{display:none!important}
+body.mode-essential [data-jump="btcCycleHistory"],body[data-ce4-mode="essential"] [data-jump="btcCycleHistory"]{display:none!important}
+body.mode-advanced #btcCycleHistory,body[data-ce4-mode="advanced"] #btcCycleHistory{display:block}
+body.mode-advanced [data-jump="btcCycleHistory"],body[data-ce4-mode="advanced"] [data-jump="btcCycleHistory"]{display:block}
+</style>
+<style id="indicator-hub-essential-availability-v1-20261116-style">
+/* Central de Indicadores: vermelho = módulo avançado indisponível no modo Essencial. */
+body[data-ce4-mode="essential"] .indicator-hub-grid [data-jump="halvingCycleV1"],body[data-ce4-mode="essential"] .indicator-hub-grid [data-jump="traderRadarPanel"],body[data-ce4-mode="essential"] .indicator-hub-grid [data-jump="btcTopBottomRadar"],body[data-ce4-mode="essential"] .indicator-hub-grid [data-jump="btcCycleHistory"]{border-color:#a94350!important;background:linear-gradient(145deg,rgba(104,28,39,.48),rgba(43,17,27,.92))!important;color:#ffe8eb!important;cursor:not-allowed!important;opacity:.9;box-shadow:inset 0 0 0 1px rgba(255,112,126,.12)}
+body[data-ce4-mode="essential"] .indicator-hub-grid [data-jump="halvingCycleV1"] .indicator-number,body[data-ce4-mode="essential"] .indicator-hub-grid [data-jump="traderRadarPanel"] .indicator-number,body[data-ce4-mode="essential"] .indicator-hub-grid [data-jump="btcTopBottomRadar"] .indicator-number,body[data-ce4-mode="essential"] .indicator-hub-grid [data-jump="btcCycleHistory"] .indicator-number{color:#ff9aa5!important}
+body[data-ce4-mode="essential"] .indicator-hub-grid [data-jump="halvingCycleV1"] .indicator-action,body[data-ce4-mode="essential"] .indicator-hub-grid [data-jump="traderRadarPanel"] .indicator-action,body[data-ce4-mode="essential"] .indicator-hub-grid [data-jump="btcTopBottomRadar"] .indicator-action,body[data-ce4-mode="essential"] .indicator-hub-grid [data-jump="btcCycleHistory"] .indicator-action{display:none!important}
+body[data-ce4-mode="essential"] .indicator-hub-grid [data-jump="halvingCycleV1"]:after,body[data-ce4-mode="essential"] .indicator-hub-grid [data-jump="traderRadarPanel"]:after,body[data-ce4-mode="essential"] .indicator-hub-grid [data-jump="btcTopBottomRadar"]:after,body[data-ce4-mode="essential"] .indicator-hub-grid [data-jump="btcCycleHistory"]:after{content:"INDISPONÍVEL NO ESSENCIAL · DISPONÍVEL NO AVANÇADO";display:block;margin-top:auto;padding-top:8px;color:#ff9aa5;font-size:9px;font-weight:900;letter-spacing:.045em;line-height:1.4}
+body[data-ce4-mode="essential"] .indicator-hub-grid [data-jump="halvingCycleV1"]:hover,body[data-ce4-mode="essential"] .indicator-hub-grid [data-jump="traderRadarPanel"]:hover,body[data-ce4-mode="essential"] .indicator-hub-grid [data-jump="btcTopBottomRadar"]:hover,body[data-ce4-mode="essential"] .indicator-hub-grid [data-jump="btcCycleHistory"]:hover{transform:none!important;border-color:#a94350!important;background:linear-gradient(145deg,rgba(104,28,39,.48),rgba(43,17,27,.92))!important}
+</style>
+<style id="btc-cycle-history-visual-v2-20261116">
+#btcCycleHistory .bch-compare-chart{height:370px!important;padding:18px 16px 12px!important;background:radial-gradient(ellipse at 50% 0%,rgba(54,118,169,.14),transparent 62%),linear-gradient(180deg,rgba(15,31,48,.78),rgba(5,13,23,.9))!important;border-color:rgba(102,157,195,.3)!important;box-shadow:inset 0 1px 0 rgba(255,255,255,.035)}
+#btcCycleHistory .bch-compare canvas{filter:drop-shadow(0 2px 5px rgba(0,0,0,.18))}
+#btcCycleHistory .bch-compare-chart canvas{cursor:crosshair!important}
+#btcCycleHistory .bch-compare .bch-cycle-key{display:flex;flex-wrap:wrap;gap:8px;margin:12px 0 4px}
+#btcCycleHistory .bch-compare .bch-cycle-key span{display:inline-flex;align-items:center;gap:7px;padding:6px 10px;border:1px solid rgba(130,166,198,.2);border-radius:999px;background:rgba(13,28,43,.65);font-size:10px;color:#d5e2ef}
+#btcCycleHistory .bch-compare .bch-cycle-key i{width:8px;height:8px;border-radius:50%;display:inline-block}
+@media(max-width:650px){#btcCycleHistory .bch-compare-chart{height:310px!important;padding:10px 5px 5px!important}}
+body[data-ce4-mode="essential"] .indicator-hub-grid [data-jump="halvingCycleV1"],body[data-ce4-mode="essential"] .indicator-hub-grid [data-jump="traderRadarPanel"],body[data-ce4-mode="essential"] .indicator-hub-grid [data-jump="btcTopBottomRadar"],body[data-ce4-mode="essential"] .indicator-hub-grid [data-jump="btcCycleHistory"]{cursor:default!important}
+</style>
+
+<style id="indicator-hub-red-card-complete-v2-20261116">
+/* Essencial: módulos indisponíveis em vermelho integral; módulos ativos preservam azul original. */
+body[data-ce4-mode="essential"] .indicator-hub-grid [data-jump="halvingCycleV1"],
+body[data-ce4-mode="essential"] .indicator-hub-grid [data-jump="traderRadarPanel"],
+body[data-ce4-mode="essential"] .indicator-hub-grid [data-jump="btcTopBottomRadar"],
+body[data-ce4-mode="essential"] .indicator-hub-grid [data-jump="btcCycleHistory"]{
+  background:linear-gradient(145deg,rgba(105,25,39,.94),rgba(42,13,23,.98))!important;
+  border:1px solid rgba(255,104,122,.72)!important;
+  box-shadow:inset 0 0 0 1px rgba(255,132,145,.13),0 8px 24px rgba(110,18,35,.18)!important;
+  color:#fff0f2!important;cursor:default!important;opacity:1!important
+}
+body[data-ce4-mode="essential"] .indicator-hub-grid [data-jump="halvingCycleV1"] strong,
+body[data-ce4-mode="essential"] .indicator-hub-grid [data-jump="traderRadarPanel"] strong,
+body[data-ce4-mode="essential"] .indicator-hub-grid [data-jump="btcTopBottomRadar"] strong,
+body[data-ce4-mode="essential"] .indicator-hub-grid [data-jump="btcCycleHistory"] strong{color:#fff4f5!important}
+body[data-ce4-mode="essential"] .indicator-hub-grid [data-jump="halvingCycleV1"] small,
+body[data-ce4-mode="essential"] .indicator-hub-grid [data-jump="traderRadarPanel"] small,
+body[data-ce4-mode="essential"] .indicator-hub-grid [data-jump="btcTopBottomRadar"] small,
+body[data-ce4-mode="essential"] .indicator-hub-grid [data-jump="btcCycleHistory"] small{color:#f0cbd0!important}
+body[data-ce4-mode="essential"] .indicator-hub-grid [data-jump="halvingCycleV1"] .indicator-number,
+body[data-ce4-mode="essential"] .indicator-hub-grid [data-jump="traderRadarPanel"] .indicator-number,
+body[data-ce4-mode="essential"] .indicator-hub-grid [data-jump="btcTopBottomRadar"] .indicator-number,
+body[data-ce4-mode="essential"] .indicator-hub-grid [data-jump="btcCycleHistory"] .indicator-number{color:#ff9ba7!important}
+body[data-ce4-mode="essential"] .indicator-hub-grid [data-jump="halvingCycleV1"] .indicator-art,
+body[data-ce4-mode="essential"] .indicator-hub-grid [data-jump="traderRadarPanel"] .indicator-art,
+body[data-ce4-mode="essential"] .indicator-hub-grid [data-jump="btcTopBottomRadar"] .indicator-art,
+body[data-ce4-mode="essential"] .indicator-hub-grid [data-jump="btcCycleHistory"] .indicator-art{background:rgba(255,91,111,.12)!important;border-color:rgba(255,120,136,.28)!important}
+body[data-ce4-mode="essential"] .indicator-hub-grid [data-jump="halvingCycleV1"] .indicator-action,
+body[data-ce4-mode="essential"] .indicator-hub-grid [data-jump="traderRadarPanel"] .indicator-action,
+body[data-ce4-mode="essential"] .indicator-hub-grid [data-jump="btcTopBottomRadar"] .indicator-action,
+body[data-ce4-mode="essential"] .indicator-hub-grid [data-jump="btcCycleHistory"] .indicator-action{display:none!important}
+body[data-ce4-mode="essential"] .indicator-hub-grid [data-jump="halvingCycleV1"]:after,
+body[data-ce4-mode="essential"] .indicator-hub-grid [data-jump="traderRadarPanel"]:after,
+body[data-ce4-mode="essential"] .indicator-hub-grid [data-jump="btcTopBottomRadar"]:after,
+body[data-ce4-mode="essential"] .indicator-hub-grid [data-jump="btcCycleHistory"]:after{content:"INDISPONÍVEL NO ESSENCIAL · DISPONÍVEL NO AVANÇADO";display:block;margin-top:auto;padding-top:9px;color:#ff9eaa;font-size:9px;font-weight:900;letter-spacing:.045em;line-height:1.4}
+body[data-ce4-mode="essential"] .indicator-hub-grid [data-jump="halvingCycleV1"]:hover,
+body[data-ce4-mode="essential"] .indicator-hub-grid [data-jump="traderRadarPanel"]:hover,
+body[data-ce4-mode="essential"] .indicator-hub-grid [data-jump="btcTopBottomRadar"]:hover,
+body[data-ce4-mode="essential"] .indicator-hub-grid [data-jump="btcCycleHistory"]:hover{transform:none!important;background:linear-gradient(145deg,rgba(105,25,39,.94),rgba(42,13,23,.98))!important;border-color:rgba(255,104,122,.72)!important}
+</style>
+<style id="btc-cycle-history-series-status-style-v1-20261116">.bch-series-status{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;margin:12px 2px 2px}.bch-series-status span{display:block;padding:9px 10px;border:1px solid rgba(120,155,190,.22);border-radius:9px;background:rgba(8,18,32,.72);color:#a9bfd6;font-size:10px;line-height:1.45;overflow-wrap:anywhere}.bch-series-status span[data-state="ok"]{border-color:rgba(62,190,145,.4);background:rgba(20,100,75,.13);color:#8ce0bd}.bch-series-status span[data-state="error"]{border-color:rgba(245,100,115,.45);background:rgba(110,25,40,.18);color:#ffadb7}@media(max-width:700px){.bch-series-status{grid-template-columns:repeat(2,minmax(0,1fr))}}</style><style id="btc-cycle-history-client-ux-v3-20261116">
+/* Comparativo: hierarquia visual, leitura guiada e status fora da área do canvas. */
+#btcCycleHistory .bch-compare{padding:clamp(16px,2.1vw,25px)!important;border-radius:18px!important;background:radial-gradient(ellipse at 50% -12%,rgba(54,142,205,.19),transparent 58%),linear-gradient(145deg,#0c1c2d 0%,#071321 58%,#091827 100%)!important;border:1px solid rgba(106,174,215,.36)!important;box-shadow:inset 0 1px 0 rgba(255,255,255,.045),0 18px 44px rgba(0,0,0,.22)!important}
+#btcCycleHistory .bch-compare>div:first-child{display:grid;gap:8px;padding:0 2px 16px!important}
+#btcCycleHistory .bch-compare>div:first-child>span{display:inline-flex;align-items:center;gap:7px;color:#65d7e8!important;font-size:10px!important;font-weight:900!important;letter-spacing:.18em!important}
+#btcCycleHistory .bch-compare>div:first-child>span:before{content:"";width:7px;height:7px;border-radius:50%;background:#62d6e6;box-shadow:0 0 12px rgba(98,214,230,.8)}
+#btcCycleHistory .bch-compare>div:first-child>strong{font-size:clamp(18px,2.3vw,24px)!important;line-height:1.2!important;color:#f0f6fc!important;letter-spacing:-.035em!important}
+#btcCycleHistory .bch-compare>div:first-child>small{font-size:12px!important;line-height:1.65!important;color:#a9bdd1!important;max-width:820px}
+#btcCycleHistory .bch-compare-chart{height:430px!important;position:relative!important;overflow:hidden!important;margin:0!important;padding:18px 18px 14px!important;border:1px solid rgba(117,169,207,.28)!important;border-radius:15px!important;background:radial-gradient(ellipse at 48% 0%,rgba(30,95,151,.20),transparent 65%),linear-gradient(180deg,rgba(13,29,47,.94),rgba(5,13,23,.96))!important;box-shadow:inset 0 1px 0 rgba(255,255,255,.035),0 10px 28px rgba(0,0,0,.15)!important}
+#btcCycleHistory .bch-compare-chart canvas{cursor:crosshair!important;filter:drop-shadow(0 2px 5px rgba(0,0,0,.2))}
+#btcCycleHistory .bch-series-status{display:grid!important;grid-template-columns:repeat(4,minmax(0,1fr))!important;gap:9px!important;margin:13px 0 0!important}
+#btcCycleHistory .bch-series-status span{position:relative;min-height:54px;padding:11px 12px 10px 30px!important;border:1px solid rgba(117,157,190,.23)!important;border-radius:11px!important;background:linear-gradient(145deg,rgba(16,36,56,.92),rgba(8,20,33,.94))!important;color:#b9cce0!important;font-size:10px!important;line-height:1.5!important;font-weight:650!important;box-shadow:inset 0 1px 0 rgba(255,255,255,.025)!important}
+#btcCycleHistory .bch-series-status span:before{content:"";position:absolute;left:12px;top:15px;width:8px;height:8px;border-radius:50%;background:#8ca3ba;box-shadow:0 0 0 3px rgba(140,163,186,.1)}
+#btcCycleHistory .bch-series-status span[data-state="ok"]{border-color:rgba(59,190,148,.34)!important;background:linear-gradient(145deg,rgba(15,55,49,.65),rgba(8,28,31,.92))!important;color:#a8e8d0!important}
+#btcCycleHistory .bch-series-status span[data-state="ok"]:before{background:#4dd6a3;box-shadow:0 0 12px rgba(77,214,163,.55),0 0 0 3px rgba(77,214,163,.12)}
+#btcCycleHistory .bch-series-status span[data-state="error"]{border-color:rgba(245,100,115,.4)!important;background:linear-gradient(145deg,rgba(75,26,39,.65),rgba(35,14,25,.92))!important;color:#ffc0c7!important}
+#btcCycleHistory .bch-series-status span[data-state="error"]:before{background:#ff7888;box-shadow:0 0 0 3px rgba(255,120,136,.12)}
+#btcCycleHistory .bch-note{margin-top:13px!important;padding:12px 14px!important;border:1px solid rgba(117,157,190,.16)!important;border-radius:10px!important;background:rgba(5,14,24,.52)!important;color:#91a8bf!important;font-size:10px!important;line-height:1.65!important}
+#btcCycleHistory .bch-note:before{content:"FONTE E METODOLOGIA";display:block;margin-bottom:4px;color:#72cddd;font-size:9px;font-weight:900;letter-spacing:.13em}
+@media(max-width:850px){#btcCycleHistory .bch-compare-chart{height:380px!important;padding:14px 10px 10px!important}#btcCycleHistory .bch-series-status{grid-template-columns:repeat(2,minmax(0,1fr))!important}}
+@media(max-width:560px){#btcCycleHistory .bch-compare{padding:14px!important}#btcCycleHistory .bch-compare-chart{height:330px!important;padding:9px 4px 6px!important}#btcCycleHistory .bch-series-status{gap:7px!important}#btcCycleHistory .bch-series-status span{min-height:49px;padding:9px 8px 8px 25px!important;font-size:9px!important}#btcCycleHistory .bch-series-status span:before{left:9px;top:13px;width:7px;height:7px}#btcCycleHistory .bch-note{font-size:9px!important;padding:10px!important}}
+@media(prefers-reduced-motion:no-preference){#btcCycleHistory .bch-series-status span{transition:transform .18s ease,border-color .18s ease}#btcCycleHistory .bch-series-status span:hover{transform:translateY(-2px);border-color:rgba(111,193,218,.42)!important}}
+</style><style id="btc-cycle-history-scale-toggle-v1-20261116">#btcCycleHistory .bch-scale-control{display:flex;align-items:center;gap:7px;flex-wrap:wrap;margin-top:8px}#btcCycleHistory .bch-scale-control>span{margin-right:3px;color:#83a4bd;font-size:9px;font-weight:900;letter-spacing:.13em}#btcCycleHistory .bch-scale-control button{appearance:none;border:1px solid rgba(117,169,207,.34);border-radius:999px;padding:7px 14px;background:rgba(9,22,36,.82);color:#b6c9dc;font:700 11px sans-serif;cursor:pointer;transition:background .18s,border-color .18s,color .18s,transform .18s}#btcCycleHistory .bch-scale-control button:hover{border-color:rgba(101,211,231,.7);transform:translateY(-1px)}#btcCycleHistory .bch-scale-control button.active,#btcCycleHistory .bch-scale-control button[aria-pressed="true"]{background:linear-gradient(135deg,rgba(39,119,157,.42),rgba(19,69,105,.55));border-color:rgba(92,207,229,.75);color:#e7faff;box-shadow:0 0 14px rgba(52,166,202,.12)}@media(max-width:560px){#btcCycleHistory .bch-scale-control{gap:6px}#btcCycleHistory .bch-scale-control button{padding:7px 11px;font-size:10px}}</style><style id="btc-cycle-history-scale-toolbar-v2-20261116">#btcCycleHistory .bch-scale-toolbar{display:flex!important;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap;margin:14px 0 10px;padding:12px 14px;border:1px solid rgba(105,181,215,.34);border-radius:13px;background:linear-gradient(110deg,rgba(15,43,65,.94),rgba(8,22,37,.96));box-shadow:inset 0 1px 0 rgba(255,255,255,.04),0 8px 22px rgba(0,0,0,.16)}#btcCycleHistory .bch-scale-label{display:flex;align-items:center;gap:8px;color:#a9c4d9;font-size:10px;font-weight:900;letter-spacing:.13em}#btcCycleHistory .bch-scale-dot{width:7px;height:7px;border-radius:50%;background:#63d5e5;box-shadow:0 0 10px rgba(99,213,229,.7)}#btcCycleHistory .bch-scale-toolbar .bch-scale-control{display:flex!important;align-items:center;gap:8px;margin:0!important}#btcCycleHistory .bch-scale-toolbar .bch-scale-control>span{display:none!important}#btcCycleHistory .bch-scale-toolbar .bch-scale-control button{display:inline-flex!important;align-items:center;justify-content:center;min-height:36px;min-width:94px;padding:8px 15px!important;border:1px solid rgba(117,169,207,.42)!important;border-radius:9px!important;background:rgba(7,19,32,.92)!important;color:#b8cde0!important;font:700 12px/1.2 system-ui,sans-serif!important;cursor:pointer!important;visibility:visible!important;opacity:1!important}#btcCycleHistory .bch-scale-toolbar .bch-scale-control button.active,#btcCycleHistory .bch-scale-toolbar .bch-scale-control button[aria-pressed="true"]{background:linear-gradient(135deg,#15516c,#12
