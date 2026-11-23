@@ -1,0 +1,259 @@
+;title.textContent='Regra única do sinal diário';badge.textContent=signal;
+ if(!d||d.ready===false||!c||!c.ready){body.textContent='Dados insuficientes. Nenhum gatilho deve ser utilizado.';list.innerHTML='<li>Aguardando pelo menos 205 candles diários fechados.</li>';return;}
+ body.textContent=c.reason||'A decisão é calculada com candles diários fechados.';
+ const price=Number(c.close),e50=Number(c.ema50),e200=Number(c.ema200);
+ const items=[
+ 'Fechamento do candle diário: '+fmtUSD(price)+'.',
+ 'EMA 50: '+fmtUSD(e50)+' · EMA 200: '+fmtUSD(e200)+'.',
+ 'COMPRA: cruzamento ascendente do MACD diário e fechamento abaixo da EMA 50. A compra é classificada como forte quando também está abaixo da EMA 200.',
+ 'VENDA: cruzamento descendente do MACD diário, fechamento acima da EMA 50 e filtro de ciclo/ATH liberado.',
+ 'MVRV não participa do motor atual. O score é uma pontuação de estado, não uma probabilidade de lucro.'
+ ];
+ list.innerHTML=items.map(x=>'<li>'+x+'</li>').join('');
+}
+function updateDecisionCenter(signal,data){
+ const q=id=>document.getElementById(id),set=(id,v)=>{const e=q(id);if(e)e.textContent=v==null?"—":String(v)},tone=(id,v)=>{const e=q(id);if(e)e.dataset.tone=v};
+ const engine=data&&data.cycleSignals&&data.cycleSignals.current&&data.cycleSignals.current.ready?data.cycleSignals.current:(data&&data.engineDaily&&data.engineDaily.ready?data.engineDaily:null);
+ const pulse=window.__btcPulseTbr&&Number.isFinite(Number(window.__btcPulseTbr.bottom))&&Number.isFinite(Number(window.__btcPulseTbr.top))?window.__btcPulseTbr:null;
+ const pulseState=pulse?String(pulse.state||"wait").toLowerCase():"";
+ if(selectedAnalysisSymbol==='BTCUSDT'){if(lastBitcoinPulseAlertState!==null&&pulse&&(pulseState==='buy'||pulseState==='sell')&&pulseState!==lastBitcoinPulseAlertState){const pulseLabel=pulseState==='buy'?'COMPRA':'VENDA';notify('BITCOIN PULSE · ALERTA DE '+pulseLabel,'O Bitcoin Pulse mudou para '+pulseLabel+'. '+(pulse.detail||'Confira o painel antes de decidir.'));}if(pulse)lastBitcoinPulseAlertState=pulseState;}
+ const s=String(pulse?(pulse.title|| (pulseState==="buy"?"CANDIDATO A COMPRA · PENDENTE":pulseState==="sell"?"CANDIDATO A VENDA · PENDENTE":"AGUARDAR")):(engine&&engine.signal||signal||"AGUARDAR")).toUpperCase(),buy=pulse?pulseState==="buy":s.indexOf("COMPRA")===0,sell=pulse?pulseState==="sell":(s.indexOf("VENDA")===0||s.indexOf("REDUZIR")===0);
+ const rawScore=pulse?Math.max(Number(pulse.bottom),Number(pulse.top)):(engine&&Number.isFinite(Number(engine.score))?Number(engine.score):Number(data&&data.score)),valid=Number.isFinite(rawScore),score=valid?Math.max(0,Math.min(100,rawScore)):NaN;
+ const tfEl=q("timeframe"),tf=tfEl?tfEl.value:"1d",tfLabel=({"4h":"4 horas","1d":"diário","3d":"3 dias","1w":"semanal","1M":"mensal"})[tf]||tf;
+ set("dcSignal",s);tone("dcSignal",buy?"buy":sell?"sell":"wait");
+ const confirmed=pulse?(pulseState==="buy"||pulseState==="sell"):!!(engine&&(engine.buy||engine.sell)),detail=pulse?(pulse.detail|| (pulseState==="buy"?"Bitcoin Pulse 3D: candidato a compra · candle em formação/fechado conforme leitura.":pulseState==="sell"?"Bitcoin Pulse 3D: candidato a venda · candle em formação/fechado conforme leitura.":"Bitcoin Pulse 3D sem candidato ativo.")):(confirmed?"Gatilho confirmado pelo motor oficial · ponto correspondente no gráfico · visualização "+tfLabel:"Sem novo gatilho no último candle diário fechado · visualização "+tfLabel);
+ set("dcSignalDetail",detail);
+ set("dcScore",valid?Math.round(score)+"/100":"—/100");tone("dcScore",buy?"buy":sell?"sell":"neutral");
+ set("dcEngineStateText",data&&data.ready===false?"DADOS INSUFICIENTES":confirmed?s+" · MARCADO NO GRÁFICO":"MOTOR ALINHADO · AGUARDANDO GATILHO");tone("dcEngineStateText",buy?"buy":sell?"sell":"wait");
+ const p=Number(lastSpotPrice);set("dcPrice",Number.isFinite(p)&&p>0?fmtUSD(p):"Indisponível");
+ const pt=q("btcLiveUpdated");set("dcPriceDetail",pt&&pt.textContent&&pt.textContent!=="—"?"Última atualização: "+pt.textContent:"Cotação spot; candles técnicos são independentes");
+ const rr=Number(data&&data.rr),target=Number(data&&data.target),stop=Number(data&&data.invalidation),plan=buy&&Number.isFinite(target)&&target>0&&Number.isFinite(stop)&&stop>0&&Number.isFinite(rr)&&rr>=1.5;
+ set("dcRisk",plan?"PLANO DISPONÍVEL":"AGUARDAR PLANO");tone("dcRisk",plan?"buy":"wait");
+ set("dcRiskDetail",plan?"Alvo, invalidação e R:R "+rr.toFixed(2)+":1 calculados pelo motor":"Exigir entrada, stop/invalidação e risco-retorno válidos");
+ set("dcNextTitle",buy?"PRÓXIMO PASSO":sell?"GESTÃO DE EXPOSIÇÃO":"PRÓXIMO PASSO");
+ let n=buy?(plan?"Gatilho comprador confirmado pelo motor do gráfico. Revise tamanho da posição, invalidação e custos antes de decidir.":"Gatilho comprador confirmado, mas o plano de risco ainda não está completo. Aguarde níveis válidos."):sell?"Gatilho vendedor confirmado pelo motor do gráfico. Revise exposição e proteção; não é uma ordem automática de venda a descoberto.":"Sem novo gatilho de compra/venda no último candle diário fechado. Aguarde a confirmação do mesmo motor; pontos históricos continuam no gráfico.";
+ if(data&&data.reason)n+=" Contexto: "+data.reason;set("dcNextText",n);
+}
+function updateDecisionCenterPrice(){const p=Number(lastSpotPrice),el=document.getElementById('dcPrice');if(el)el.textContent=Number.isFinite(p)&&p>0?fmtUSD(p):'Indisponível';const label=document.querySelector('#decisionCenterV1 .dc-tile:nth-child(3) .dc-label');if(label)label.textContent='Preço spot '+selectedAnalysisSymbol.replace('USDT','');const stamp=document.getElementById('btcLiveUpdated'),detail=document.getElementById('dcPriceDetail');if(detail)detail.textContent=stamp&&stamp.textContent&&stamp.textContent!=='—'?'Última atualização: '+stamp.textContent:'Cotação spot de '+analysisAssetName()+'; candles técnicos independentes';const title=document.getElementById('analysisChartTitle');if(title)title.textContent=analysisAssetName()+' · preço e tendência';const topLabel=document.querySelector('#price')?.parentElement?.querySelector('.label');if(topLabel)topLabel.textContent=selectedAnalysisSymbol.replace('USDT','')+' / USDT';const quote=document.getElementById('btcLiveQuoteBar');if(quote)quote.style.display=selectedAnalysisSymbol==='BTCUSDT'?'':'none';document.body.dataset.analysisAsset=selectedAnalysisSymbol;const fg=document.getElementById('chartFearGreedBadge');if(fg)fg.style.display=selectedAnalysisSymbol==='BTCUSDT'?'':'none';const feed=document.querySelector('#marketFreshness .freshness-item b');if(feed)feed.textContent='Preço '+selectedAnalysisSymbol.replace('USDT','');const legend=document.querySelector('#chartSignalLegend span:last-child');if(legend)legend.textContent='Motor oficial '+selectedAnalysisSymbol.replace('USDT','')+': MACD diário + EMA 50/200 · sinais em candles diários fechados';}
+function setSignal(data){
+  renderSignalHealth(data);
+  renderSignalConflict(data);
+  renderEntryConfirmation(data);
+  const s=data.signal||(data.score>=70?'COMPRA GRADUAL':data.score<=35?'REDUZIR EXPOSIÇÃO':'AGUARDAR');currentChartSignal=s;updateDecisionCenter(s,data);if(typeof updateLiveChartSignal==='function')updateLiveChartSignal(s);
+  const buy=s==='COMPRA'||s==='COMPRA GRADUAL'||s==='COMPRA FORTE',sell=s==='VENDA'||s==='REDUZIR EXPOSIÇÃO'||s==='VENDA FORTE';
+  updateMarketSnapshot(s,data);
+  recordSignal(s,data);
+  renderSignalHistory();
+  trackProspectiveSignal(s,data);
+  $('signalWord').textContent=s;$('signalPill').textContent=s;$('signalPill').className='pill '+(buy?'buy':sell?'sell':'wait');
+  $('signalIcon').textContent=buy?'↗':sell?'↘':'Ⅱ';$('signalIcon').style.color=buy?'var(--green)':sell?'var(--red)':'var(--yellow)';
+  $('score').textContent=data.score;$('scoreBar').style.width=data.score+'%';const numericScore=Math.max(0,Math.min(100,Number(data.score)||50));const primary3dScore=$('primary3dScore');if(primary3dScore){const scoreBand=numericScore>=80?'VIÉS COMPRADOR FORTE · risco técnico relativamente menor':numericScore>=65?'VIÉS COMPRADOR MODERADO · confirme o gatilho':numericScore>=45?'ZONA NEUTRA · risco misto':numericScore>=25?'VIÉS BAIXISTA · risco de queda elevado':'PRESSÃO BAIXISTA FORTE · risco elevado';primary3dScore.textContent='SCORE '+Math.round(numericScore)+'/100 · '+scoreBand+' · índice técnico, não probabilidade estatística';}
+  $('signalReason').textContent=data.reason||'Aguardando atualização. O motor oficial confirma gatilhos somente em candles semanais fechados.';
+  const mainDecision=$('decisionMain'), needle=$('gaugeNeedle');
+  const visualLabel=s==='COMPRA FORTE'?'COMPRA FORTE':s==='COMPRA GRADUAL'?'COMPRA':s==='COMPRA'?'COMPRA':s==='VENDA'?'VENDA':s==='VENDA FORTE'?'VENDA FORTE':s==='REDUZIR EXPOSIÇÃO'?(Number(data.score)<=30?'VENDA FORTE':'VENDA'):'AGUARDAR';
+  const gaugePosition=numericScore;
+  if(mainDecision){mainDecision.textContent=visualLabel;mainDecision.style.color=buy?'var(--green)':sell?'var(--red)':'var(--yellow)';}
+  if(needle)needle.style.transform='translateX(-50%) rotate('+(-90+gaugePosition*1.8)+'deg)';
+  const guidance=$('actionGuidance');
+  const actionText=numericScore>=80?'Score alto: MACD e posição do preço em relação às médias formam uma configuração tecnicamente mais favorável à compra, com menor risco relativo de entrada esticada. Confirme o gatilho do gráfico e defina stop e tamanho da posição.':numericScore>=65?'Score moderadamente alto: viés comprador, mas a confirmação do sinal e o risco-retorno ainda importam. Evite interpretar o score como chance garantida de alta.':numericScore>=45?'Score intermediário: cenário misto ou sem vantagem técnica clara. Considere aguardar confirmação antes de assumir risco.':numericScore>=25?'Score baixo: viés baixista ou posição do preço menos favorável; o risco de queda é maior segundo os critérios do modelo. Reavalie exposição e aguarde sinais de estabilização.':'Score muito baixo: pressão baixista técnica elevada e risco de queda relativamente maior. Se já possui BTC, revise seu plano de proteção; não é uma ordem automática para vender a descoberto.';
+  if(guidance)guidance.textContent=actionText;
+  if(visualLabel==='COMPRA FORTE'&&guidance)guidance.textContent='Compra forte: confluência técnica elevada e risco-retorno aprovado. Considere entrada escalonada, respeitando o limite de risco; não invista todo o capital de uma vez.';
+  if(visualLabel==='VENDA FORTE'&&guidance)guidance.textContent='Venda forte: pressão baixista intensa. Se já possui BTC, avalie reduzir a exposição e proteger o capital. Não é uma recomendação automática de venda a descoberto.';
+  const planIsValid=buy&&Number.isFinite(Number(data.target))&&Number(data.target)>0&&Number.isFinite(Number(data.invalidation))&&Number(data.invalidation)>0&&Number.isFinite(Number(data.rr))&&Number(data.rr)>=1.5;
+  const quickPlan=$('quickPlan');if(quickPlan)quickPlan.hidden=!planIsValid;
+  $('quickEntry').textContent=planIsValid?(data.entryZone||'Confirmar preço antes da entrada'):'—';
+  $('quickTarget').textContent=planIsValid?fmtUSD(data.target):'—';
+  $('quickInvalidation').textContent=planIsValid?fmtUSD(data.invalidation):'—';
+  $('quickRR').textContent=planIsValid?'1 : '+Number(data.rr).toFixed(2):'—';
+  renderRiskCalculator(data,lastSpotPrice);
+  $('planPill').textContent=s;$('planPill').className='pill '+(buy?'buy':sell?'sell':'wait');
+  $('entryZone').textContent=data.entryZone||'Aguardar confirmação';
+  $('trendConfirm').textContent=data.trendConfirm||'—';
+  $('riskRule').textContent=data.riskRule||'—';
+  $('weeklyRead').textContent=data.weeklyRead||'—';
+  $('supportLevel').textContent=data.support?fmtUSD(data.support):'—';$('resistanceLevel').textContent=data.resistance?fmtUSD(data.resistance):'—';$('targetLevel').textContent=data.target?fmtUSD(data.target):'—';$('invalidationLevel').textContent=data.invalidation?fmtUSD(data.invalidation):'—';$('riskReward').textContent=data.rr!=null?'1 : '+data.rr.toFixed(2):'—';
+  $('weeklyTrend').textContent=data.weeklyTrend||'—';
+  const oddsEl=$('historicalOdds');if(oddsEl){oddsEl.textContent=data.historicalOdds&&data.historicalOdds.ready?data.historicalOdds.up.toFixed(1)+'% alta · '+data.historicalOdds.n+' casos':'Amostra insuficiente (<20 casos)';oddsEl.title='Frequência histórica de retornos positivos após 90 dias em casos com tendência, score e RSI semelhantes. Não é probabilidade futura garantida; observações podem se sobrepor.';}
+  $('weeklyTrend').className=data.weeklyTrend&&data.weeklyTrend.indexOf('Alta')===0?'green':data.weeklyTrend&&data.weeklyTrend.indexOf('Baixa')===0?'red':'yellow';
+  if(lastSignal&&lastSignal!==s){const kind=s.indexOf('COMPRA')===0?'ALERTA DE COMPRA':s==='REDUZIR EXPOSIÇÃO'?'ALERTA DE REDUÇÃO DE EXPOSIÇÃO':'MUDANÇA DE SINAL';notify('BTC Cycle Desk · '+kind,'O sinal mudou de '+lastSignal+' para '+s+'. Score técnico: '+data.score+'/100. Confira o painel antes de decidir; isto não é uma ordem automática.')}
+  lastSignal=s;
+}
+let lastSpotPrice=0;const tradeKey='btcCyclePortfolioV1';const altSymbols=['ETHUSDT','BNBUSDT','XRPUSDT','SOLUSDT','DOGEUSDT','TRXUSDT','ADAUSDT','LINKUSDT','AVAXUSDT','TONUSDT'];function isValidISODate(value){if(typeof value!=='string'||!/^\d{4}-\d{2}-\d{2}$/.test(value))return false;const parts=value.split('-').map(Number);const date=new Date(Date.UTC(parts[0],parts[1]-1,parts[2]));return date.getUTCFullYear()===parts[0]&&date.getUTCMonth()===parts[1]-1&&date.getUTCDate()===parts[2]}function readTrades(){try{const v=JSON.parse(localStorage.getItem(tradeKey)||'[]');return Array.isArray(v)?v:[]}catch(e){return []}}function writeTrades(rows){localStorage.setItem(tradeKey,JSON.stringify(rows))}function fmtQty(n){return Number(n).toLocaleString('pt-BR',{maximumFractionDigits:8})}function calcPortfolio(){const rows=readTrades().slice().sort((a,b)=>String(a.date||'').localeCompare(String(b.date||''))||(Number(a.created)||0)-(Number(b.created)||0));let lots=[],realized=0,invested=0,qtyBought=0,qtySold=0,fees=0,errors=[];for(const t of rows){const q=Number(t.qty),p=Number(t.price),fee=Number(t.fee)/100;if(!(Number.isFinite(q)&&q>0&&Number.isFinite(p)&&p>0&&Number.isFinite(fee)&&fee>=0&&fee<=0.1&&['BUY','SELL'].includes(t.side)&&isValidISODate(t.date))){errors.push('Registro inválido ignorado: confira tipo, data, quantidade, preço e taxa.');continue}if(t.side==='BUY'){fees+=q*p*fee;lots.push({qty:q,cost:p*(1+fee),price:p});qtyBought+=q;invested+=q*p*(1+fee)}else{let remaining=q,proceeds=p*(1-fee);const held=lots.reduce((s,l)=>s+l.qty,0);if(q>held+1e-10){errors.push('Venda de '+fmtQty(q)+' BTC excede o saldo disponível ('+fmtQty(held)+'); revise o histórico.');continue}fees+=q*p*fee;qtySold+=q;realized+=q*p*(1-fee);while(remaining>1e-10&&lots.length){const lot=lots[0],take=Math.min(remaining,lot.qty);realized-=take*lot.cost;lot.qty-=take;remaining-=take;if(lot.qty<1e-10)lots.shift()}}}const qty=lots.reduce((s,l)=>s+l.qty,0),cost=lots.reduce((s,l)=>s+l.qty*l.cost,0);return {rows,lots,qty,cost,avg:qty?cost/qty:0,realized,qtyBought,qtySold,fees,errors}}function setWalletPerformanceState(total,hasTrades,hasPrice){const btn=document.querySelector('.wallet-floating-access');if(!btn)return;const dot=btn.querySelector('i');let state='neutral';if(hasTrades&&hasPrice&&Number.isFinite(Number(total))){const value=Number(total);state=value>0.01?'profit':value< -0.01?'loss':'neutral';}btn.classList.remove('wallet-state-profit','wallet-state-loss','wallet-state-neutral');btn.classList.add('wallet-state-'+state);btn.dataset.walletState=state;const labels={profit:'Carteira em lucro',loss:'Carteira em prejuízo',neutral:hasTrades&&!hasPrice?'Resultado aguardando cotação':'Carteira no ponto de equilíbrio'};btn.setAttribute('aria-label',labels[state]+'. Saldo: '+(btn.querySelector('[data-wallet-balance]')?.textContent||'0 BTC')+'. Abrir carteira.');btn.title=labels[state];if(dot)dot.setAttribute('aria-label',labels[state]);}
+function renderPortfolio(){const p=calcPortfolio(),price=Number((selectedAnalysisSymbol==='BTCUSDT'?lastSpotPrice:lastBtcSpotPrice)||0),market=p.qty*price,unrealized=price?p.qty*price*(1-0.001)-p.cost:0,total=p.realized+unrealized;setWalletPerformanceState(total,p.rows.length>0,price>0);const walletBalance=document.querySelector('[data-wallet-balance]');if(walletBalance)walletBalance.textContent=fmtQty(p.qty)+' BTC';const summary=$('portfolioSummary');summary.innerHTML='<div class="metric"><span>Saldo BTC</span><strong>'+fmtQty(p.qty)+' BTC</strong></div><div class="metric"><span>Custo médio por BTC (com taxa de compra)</span><strong>'+(p.qty?fmtUSD(p.avg):'—')+'</strong></div><div class="metric"><span>Valor atual estimado</span><strong>'+(price?fmtUSD(market):'Aguardando cotação')+'</strong></div><div class="metric"><span>Resultado realizado</span><strong class="'+(p.realized>=0?'green':'red')+'">'+fmtUSD(p.realized)+'</strong></div><div class="metric"><span>Resultado não realizado</span><strong class="'+(unrealized>=0?'green':'red')+'">'+(price?fmtUSD(unrealized):'—')+'</strong></div><div class="metric"><span>Resultado total estimado</span><strong class="'+(total>=0?'green':'red')+'">'+(price?fmtUSD(total):fmtUSD(p.realized))+'</strong></div><div class="metric"><span>Comprado / vendido</span><strong>'+fmtQty(p.qtyBought)+' / '+fmtQty(p.qtySold)+' BTC</strong></div>'+(p.errors.length?'<div class="note" style="color:var(--red)">'+p.errors.map(e=>e.replace(/[<>&]/g,'')).join('<br>')+'</div>':'');summary.insertAdjacentHTML('beforeend','<div class=\"portfolio-visual\" id=\"portfolioVisual\"><div class=\"portfolio-visual-head\"><strong>Visão da posição</strong><span>'+(p.qty?'Posição ativa':'Sem saldo BTC registrado')+'</span></div><div class=\"portfolio-visual-grid\"><div class=\"portfolio-visual-metric\"><span>Capital de custo atual</span><strong>'+(p.qty?fmtUSD(p.cost):'—')+'</strong></div><div class=\"portfolio-visual-metric\"><span>Valor de mercado</span><strong>'+(price?fmtUSD(market):'—')+'</strong></div><div class=\"portfolio-visual-metric\"><span>Variação não realizada</span><strong class=\"'+(unrealized>=0?'green':'red')+'\">'+(price&&p.qty?fmtUSD(unrealized):'—')+'</strong></div></div><div class=\"portfolio-visual-track\" aria-label=\"Valor de mercado em relação ao custo\"><span style=\"width:'+(p.cost>0&&price?Math.max(0,Math.min(100,market/p.cost*100)):0)+'%\"></span></div><div class=\"portfolio-visual-foot\"><span>Valor de mercado / custo de compra</span><span>'+(p.cost>0&&price?(market/p.cost*100).toLocaleString('pt-BR',{maximumFractionDigits:1})+'%':'Aguardando dados')+'</span></div></div>');$('tradeHistory').innerHTML=p.rows.length?'<table style="width:100%;border-collapse:collapse;font-size:12px"><thead><tr><th>Data</th><th>Tipo</th><th>BTC</th><th>Preço USDT</th><th>Taxa</th><th></th></tr></thead><tbody>'+p.rows.slice().reverse().map(t=>'<tr><td>'+t.date+'</td><td class="'+(t.side==='BUY'?'green':'red')+'">'+(t.side==='BUY'?'COMPRA':'VENDA')+'</td><td>'+fmtQty(t.qty)+'</td><td>'+fmtUSD(t.price)+'</td><td>'+Number(t.fee).toFixed(2)+'%</td><td><button type="button" data-trade-delete="'+t.id+'">Excluir</button></td></tr>').join('')+'</tbody></table>':'<div class="note">Nenhuma operação registrada.</div>';$('portfolioMessage').textContent='Cálculo estimado em USDT pelo método FIFO. Resultado não realizado desconta uma taxa de venda estimada de 0,10%; o realizado usa as taxas informadas em cada operação. Não inclui impostos, conversão cambial, depósitos/saques externos nem outras carteiras. Histórico local neste navegador.';document.querySelectorAll('[data-trade-delete]').forEach(b=>b.onclick=()=>{if(confirm('Excluir esta operação do histórico local?')){writeTrades(readTrades().filter(t=>t.id!==b.dataset.tradeDelete));renderPortfolio()}})}const renderPortfolioUSDT=renderPortfolio;let brlPortfolioRequest=0;renderPortfolio=function(){renderPortfolioUSDT();try{renderSelectedChart()}catch(e){}try{renderChartPortfolioHistory()}catch(e){}try{renderWalletEvolutionChart()}catch(e){}const box=$('portfolioSummary');if(!box)return;let panel=$('portfolioBRLSummary');if(!panel){panel=document.createElement('div');panel.id='portfolioBRLSummary';panel.className='portfolio-visual';panel.style.marginTop='12px';box.appendChild(panel)}panel.innerHTML='<div class="portfolio-visual-head"><strong>Visão em reais (estimativa)</strong><span>Consultando cotação…</span></div><div class="note">Estimativa informativa. O custo histórico em USDT é convertido pelo câmbio atual, não pelo câmbio de cada compra.</div>';const request=++brlPortfolioRequest;Promise.all([fetch('https://api.binance.com/api/v3/ticker/price?symbol=BTCBRL').then(r=>{if(!r.ok)throw Error('BTCBRL indisponível');return r.json()}),fetch('https://api.binance.com/api/v3/ticker/price?symbol=USDTBRL').then(r=>{if(!r.ok)throw Error('USDTBRL indisponível');return r.json()})]).then(([btc,usdt])=>{if(request!==brlPortfolioRequest)return;const p=calcPortfolio(),btcBRL=Number(btc.price),usdtBRL=Number(usdt.price);if(!(btcBRL>0&&usdtBRL>0))throw Error('Cotação inválida');const market=p.qty*btcBRL,costBRL=p.cost*usdtBRL,unrealized=market*(1-0.001)-costBRL,realized=p.realized*usdtBRL,total=realized+unrealized;const money=n=>n.toLocaleString('pt-BR',{style:'currency',currency:'BRL',maximumFractionDigits:2});panel.innerHTML='<div class="portfolio-visual-head"><strong>Visão em reais (estimativa)</strong><span>BTC/BRL '+money(btcBRL)+'</span></div><div class="portfolio-visual-grid"><div class="portfolio-visual-metric"><span>Valor atual da posição</span><strong>'+money(market)+'</strong></div><div class="portfolio-visual-metric"><span>Custo estimado da posição</span><strong>'+money(costBRL)+'</strong></div><div class="portfolio-visual-metric"><span>Resultado não realizado</span><strong class="'+(unrealized>=0?'green':'red')+'">'+money(unrealized)+'</strong></div><div class="portfolio-visual-metric"><span>Resultado realizado estimado</span><strong class="'+(realized>=0?'green':'red')+'">'+money(realized)+'</strong></div><div class="portfolio-visual-metric"><span>Resultado total estimado</span><strong class="'+(total>=0?'green':'red')+'">'+money(total)+'</strong></div><div class="portfolio-visual-metric"><span>Câmbio USDT/BRL</span><strong>'+money(usdtBRL)+'</strong></div></div><div class="note">Cotações spot da Binance. O resultado não realizado desconta taxa estimada de venda de 0,10%, igual à estimativa em USDT. Conversão aproximada, não extrato oficial; não inclui impostos nem depósitos/saques externos.</div>'}).catch(()=>{if(request!==brlPortfolioRequest)return;panel.innerHTML='<div class="portfolio-visual-head"><strong>Visão em reais (estimativa)</strong><span>Cotação indisponível</span></div><div class="note">Não foi possível obter as cotações BTC/BRL e USDT/BRL agora. Os cálculos originais em USDT continuam disponíveis acima; tente atualizar a página mais tarde.</div>'})};
+let refreshInProgress=false,refreshAfterCurrent=false;
+async function refreshFGBtcOverlay(){return;}
+async function refreshFearGreed(){
+ const scoreEl=$('fgScore'),classEl=$('fgClass'),dateEl=$('fgDate'),updatedEl=$('fgUpdated');
+ if(!scoreEl||!classEl)return;
+ try{
+  const response=await fetch('https://api.alternative.me/fng/?limit=30&format=json&cb='+Date.now(),{cache:'no-store'});
+  if(!response.ok)throw new Error('HTTP '+response.status);
+  const payload=await response.json();
+  if(payload.metadata&&payload.metadata.error)throw new Error(payload.metadata.error);
+  const data=Array.isArray(payload.data)?payload.data:[];
+  if(!data.length)throw new Error('Resposta sem leituras');
+  const freshFearGreed=data.map(x=>({timestamp:Number(x.timestamp),value:Number(x.value)})).filter(x=>Number.isFinite(x.timestamp)&&Number.isFinite(x.value)&&x.value>=0&&x.value<=100);
+  if(freshFearGreed.length){const merged=new Map((Array.isArray(fearGreedHistory)?fearGreedHistory:[]).map(x=>[Number(x.timestamp),x]));freshFearGreed.forEach(x=>merged.set(x.timestamp,x));fearGreedHistory=Array.from(merged.values()).sort((a,b)=>a.timestamp-b.timestamp);if(typeof window.__btcFgUnifiedRefresh==='function')window.__btcFgUnifiedRefresh();}
+  if(!fearGreedHistory.length&&!window.__btcFearGreedHistoryLoading){window.__btcFearGreedHistoryLoading=true;fetch('https://api.alternative.me/fng/?limit=0&format=json',{cache:'no-store'}).then(historyResponse=>{if(!historyResponse.ok)throw new Error('HTTP '+historyResponse.status);return historyResponse.json()}).then(historyPayload=>{fearGreedHistory=(Array.isArray(historyPayload.data)?historyPayload.data:[]).map(x=>({timestamp:Number(x.timestamp),value:Number(x.value)})).filter(x=>Number.isFinite(x.timestamp)&&Number.isFinite(x.value)&&x.value>=0&&x.value<=100).sort((a,b)=>a.timestamp-b.timestamp);if(typeof window.__btcFgUnifiedRefresh==='function')window.__btcFgUnifiedRefresh();if(Array.isArray(dailyCandles)&&dailyCandles.length&&typeof runDailyConfluenceBacktest==='function'){dailyBacktest=runDailyConfluenceBacktest(dailyCandles);renderDailyEnginePanel();}if(typeof historicalBacktest!=='undefined'&&historicalBacktest&&typeof renderSelectedChart==='function')renderSelectedChart();}).catch(historyError=>console.warn('Fear & Greed histórico indisponível para backtest:',historyError)).finally(()=>{window.__btcFearGreedHistoryLoading=false;});}
+  const current=data[0],value=Number(current.value),timestamp=Number(current.timestamp);
+  if(!Number.isFinite(value)||value<0||value>100||!Number.isFinite(timestamp))throw new Error('Leitura inválida');
+  const labels={'Extreme Fear':'Medo extremo','Fear':'Medo','Neutral':'Neutro','Greed':'Ganância','Extreme Greed':'Ganância extrema'};
+  const label=labels[current.value_classification]||current.value_classification||'Sentimento';
+  const prev=data[1]?Number(data[1].value):NaN,change=Number.isFinite(prev)?value-prev:NaN;
+  const color=value<=24?'#e35b62':value<=44?'#ed9850':value<=55?'#e5c85b':value<=74?'#8dc978':'#28b77c';
+  scoreEl.textContent=String(value);scoreEl.style.color=color;classEl.textContent=label;classEl.style.color=color;
+  dateEl.textContent='Leitura de '+new Date(timestamp*1000).toLocaleDateString('pt-BR',{timeZone:'UTC'});
+  updatedEl.textContent='Atualizado '+new Date().toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'});updatedEl.className='pill';
+  const marker=$('fgMeterMarker'),fill=$('fgMeterFill');if(marker)marker.style.left=value+'%';if(fill)fill.style.width=value+'%';if(marker)marker.style.borderColor=color;
+  const y=$('fgYesterday');if(y)y.textContent=Number.isFinite(prev)?String(prev)+'/100':'—';
+  const ch=$('fgChange');if(ch){ch.textContent=Number.isFinite(change)?(change>0?'+':'')+change+' pts':'—';ch.style.color=change>0?'#8dc978':change<0?'#ed858b':'inherit';}
+  const week=$('fgWeek');if(week){const v7=data.length>=7?value-Number(data[6].value):NaN;week.textContent=Number.isFinite(v7)?(v7>0?'+':'')+v7+' pts':'—';}
+  const note=$('fgInterpretation');if(note){let text='Sentimento neutro: use apenas como contexto e priorize a confirmação técnica 3D.';if(value<=24)text='Medo extremo: pode acompanhar capitulação ou oportunidade, mas também quedas persistentes. Não é compra automática.';else if(value<=44)text='Medo: apetite por risco reduzido. Aguarde a confirmação de preço, cruzamentos e volume no motor 3D.';else if(value>=75)text='Ganância extrema: atenção ao risco de euforia e reversão. Não é venda automática.';else if(value>=56)text='Ganância: apetite por risco elevado. Confirme se preço, MACD, KDJ e volume 3D continuam alinhados.';note.textContent=text;}
+  const hist=$('fgHistory');if(hist){hist.replaceChildren();const ordered=data.slice(0,30).reverse();ordered.forEach(item=>{const n=Number(item.value);if(!Number.isFinite(n))return;const bar=document.createElement('span');bar.style.height=Math.max(5,n)+'%';bar.style.setProperty('background',n<=24?'linear-gradient(180deg,#ff858b,#df3f50)':n<=44?'linear-gradient(180deg,#ffb16e,#e77a32)':n<=55?'linear-gradient(180deg,#f6df82,#c9a833)':n<=74?'linear-gradient(180deg,#c6e99b,#85b94e)':'linear-gradient(180deg,#75efbd,#159d6c)','important');bar.title=new Date(Number(item.timestamp)*1000).toLocaleDateString('pt-BR',{timeZone:'UTC'})+': '+n+'/100';const dateObj=new Date(Number(item.timestamp)*1000);const dateLabel=dateObj.toLocaleDateString('pt-BR',{day:'2-digit',month:'2-digit',timeZone:'UTC'});bar.dataset.date=dateLabel;bar.setAttribute('role','img');bar.setAttribute('aria-label',dateLabel+': '+n+' de 100');const b=document.createElement('b');b.textContent=String(n);bar.appendChild(b);const dateTag=document.createElement('i');dateTag.textContent=dateLabel;bar.appendChild(dateTag);hist.appendChild(bar);});if(document.getElementById('fgBtcLineStatus'))refreshFGBtcOverlay();}
+ }catch(e){if(updatedEl){updatedEl.textContent='Indisponível';updatedEl.className='pill warn';}scoreEl.textContent='—';classEl.textContent='Sentimento indisponível';dateEl.textContent='Não foi possível atualizar';const y=$('fgYesterday'),ch=$('fgChange'),week=$('fgWeek'),marker=$('fgMeterMarker'),fill=$('fgMeterFill'),hist=$('fgHistory');if(y)y.textContent='—';if(ch)ch.textContent='—';if(week)week.textContent='—';if(marker)marker.style.left='0%';if(fill)fill.style.width='0%';if(hist)hist.replaceChildren();const note=$('fgInterpretation');if(note)note.textContent='Não foi possível obter o Fear & Greed. A leitura foi limpa para não exibir dados antigos como atuais; o motor técnico 3D continua independente.';console.warn('Fear & Greed unavailable:',e);}
+}
+async function refresh(){
+  if(refreshInProgress)return;
+  refreshInProgress=true;
+  const refreshAsset=selectedAnalysisSymbol;
+  try{
+    $('connection').textContent='Atualizando candles 4h, diários, 3D, semanais e mensais…';$('connection').style.color='var(--yellow)';$('connection').title='Aguardando resposta das fontes de mercado';const feedback=$('refreshFeedback');if(feedback){feedback.textContent='Atualizando dados de mercado… aguarde a confirmação antes de usar qualquer sinal.';feedback.className='refresh-feedback show warn';}
+    const getKlineHistory=async(interval,pages)=>{
+      const batches=[];let endTime;
+      for(let page=0;page<pages;page++){
+        const url='https://api.binance.com/api/v3/klines?symbol='+selectedAnalysisSymbol+'&interval='+interval+'&limit=1000'+(Number.isFinite(endTime)?'&endTime='+endTime:'');
+        const batch=await getJSON(url);if(!Array.isArray(batch)||!batch.length)break;batches.push(batch);
+        const oldest=Number(batch[0][0]);if(!Number.isFinite(oldest)||batch.length<1000)break;endTime=oldest-1;
+      }
+      const seen=new Set();return batches.flat().filter(k=>{const t=Number(k[0]);if(seen.has(t))return false;seen.add(t);return true}).sort((a,b)=>Number(a[0])-Number(b[0]));
+    };
+    const getDailyHistory=async()=>{
+      const pages=[];let endTime;
+      for(let page=0;page<4;page++){
+        const url='https://api.binance.com/api/v3/klines?symbol='+selectedAnalysisSymbol+'&interval=1d&limit=1000'+(Number.isFinite(endTime)?'&endTime='+endTime:'');
+        const batch=await getJSON(url);
+        if(!Array.isArray(batch)||!batch.length)break;
+        pages.push(batch);
+        const oldest=Number(batch[0][0]);
+        if(!Number.isFinite(oldest)||batch.length<1000)break;
+        endTime=oldest-1;
+      }
+      const seen=new Set();return pages.flat().filter(k=>{const t=Number(k[0]);if(seen.has(t))return false;seen.add(t);return true}).sort((a,b)=>Number(a[0])-Number(b[0]));
+    };
+    const results=await Promise.all([
+      getDailyHistory(),
+      getKlineHistory('4h',1),
+      getJSON('https://api.binance.com/api/v3/klines?symbol='+selectedAnalysisSymbol+'&interval=3d&limit=1000'),
+      getJSON('https://api.binance.com/api/v3/klines?symbol='+selectedAnalysisSymbol+'&interval=1w&limit=500'),
+      getJSON('https://api.binance.com/api/v3/klines?symbol='+selectedAnalysisSymbol+'&interval=1M&limit=1000'),
+      getJSON('https://api.binance.com/api/v3/ticker/24hr?symbol='+selectedAnalysisSymbol)
+    ]);
+    if(refreshAsset!==selectedAnalysisSymbol)throw new Error('O ativo mudou durante a atualização; os dados anteriores foram descartados.');
+    const mapKlines=(raw,label,minCandles=205)=>{
+      if(!Array.isArray(raw)||raw.length<minCandles)throw new Error('Histórico '+label+' insuficiente.');
+      const rows=raw.map(k=>({time:Number(k[0]),open:Number(k[1]),high:Number(k[2]),low:Number(k[3]),close:Number(k[4]),volume:Number(k[5]),closeTime:Number(k[6])}));
+      let prev=-Infinity;
+      for(const c of rows){
+        if(![c.time,c.open,c.high,c.low,c.close,c.volume,c.closeTime].every(Number.isFinite)||c.time<=prev||c.closeTime<c.time||c.open<=0||c.high<=0||c.low<=0||c.close<=0||c.volume<0||c.high<Math.max(c.open,c.close,c.low)||c.low>Math.min(c.open,c.close,c.high))throw new Error('A fonte retornou candles '+label+' inválidos ou fora de ordem; análise suspensa.');
+        prev=c.time;
+      }
+      const closed=rows.filter(c=>c.closeTime<Date.now());
+      if(closed.length<minCandles)throw new Error('Candles fechados insuficientes em '+label+'.');
+      const age=Date.now()-closed[closed.length-1].closeTime,maxAge=label==='4 horas'?12*60*60*1000:label==='diário'?48*60*60*1000:label==='3 dias'?5*24*60*60*1000:label==='semanal'?9*24*60*60*1000:70*24*60*60*1000;
+      if(age>maxAge)throw new Error('Último candle fechado '+label+' está desatualizado; análise suspensa.');
+      return rows;
+    };
+    const nextDaily=mapKlines(results[0],'diário'),nextFourHour=mapKlines(results[1],'4 horas'),nextThreeDay=mapKlines(results[2],'3 dias'),nextWeekly=mapKlines(results[3],'semanal'),nextMonthly=mapKlines(results[4],'mensal',20);
+    const ticker=results[5],p=Number(ticker&&ticker.lastPrice),ch=Number(ticker&&ticker.priceChangePercent),dayHigh=Number(ticker&&ticker.highPrice),dayLow=Number(ticker&&ticker.lowPrice);
+    if(!Number.isFinite(p)||p<=0||!Number.isFinite(ch)||!Number.isFinite(dayHigh)||!Number.isFinite(dayLow)||dayHigh<p||dayLow>p||dayLow<=0||nextDaily.length<205||nextFourHour.length<205||nextThreeDay.length<205||nextWeekly.length<205||nextMonthly.length<20)throw new Error('A cotação spot ou o histórico retornou dados incompletos/incoerentes; o sinal não será atualizado.');
+    dailyCandles=nextDaily;fourHourCandles=nextFourHour;threeDayCandles=nextThreeDay;weeklyCandles=nextWeekly;monthlyCandles=nextMonthly;lastSpotPrice=p;if(selectedAnalysisSymbol==='BTCUSDT')lastBtcSpotPrice=p;updateDecisionCenterPrice();renderPortfolio();
+    $('price').textContent=selectedAnalysisSymbol==='BTCUSDT'?fmtUSD(p):fmtAltPrice(p);$('priceChange').textContent='Máx. '+(selectedAnalysisSymbol==='BTCUSDT'?fmtUSD(+ticker.highPrice):fmtAltPrice(+ticker.highPrice))+' · Mín. '+(selectedAnalysisSymbol==='BTCUSDT'?fmtUSD(+ticker.lowPrice):fmtAltPrice(+ticker.lowPrice));
+    $('change').textContent=fmtPct(ch);$('change').className='value '+(ch>=0?'green':'red');
+    const daily=dailyCandles.filter(x=>x.closeTime<Date.now()),weekly=weeklyCandles.filter(x=>x.closeTime<Date.now());
+    if(daily.length<205||weekly.length<205)throw new Error('Histórico insuficiente para confirmação de tendência.');
+    const threeDay=threeDayCandles.filter(x=>x.closeTime<Date.now()),tw=calcScore(weekly),d=calcScore(daily),w=tw;
+    if(!tw.ready||!d.ready||!w.ready)throw new Error('Indicadores semanais e diários indisponíveis.');
+    const weeklyEngine=calcWeeklyMacdTouchEngine(weekly,tw);
+    
+    const historicalOdds=calcHistoricalOdds(daily,d);
+    const dailyEngine=runDailyConfluenceBacktest(nextDaily),dailyCurrent=dailyEngine.current;
+    const weeklyMacdAnalysis=runWeeklyMacdTouchBacktest(weekly),engine=weeklyMacdAnalysis.current;
+    const weeklyBull=w.close>w.e200.at(-1)&&w.e50.at(-1)>w.e200.at(-1);
+    const weeklyBear=w.close<w.e200.at(-1)&&w.e50.at(-1)<w.e200.at(-1);
+    const dailyBull=d.close>d.e50.at(-1)&&d.e50.at(-1)>d.e200.at(-1);
+    const dailyBear=d.close<d.e50.at(-1)&&d.e50.at(-1)<d.e200.at(-1);
+    const trendAligned=weeklyBull&&dailyBull;
+    const bearAligned=weeklyBear&&dailyBear;
+    const cycleSignals=calcDailyMacdEmaSignals(nextThreeDay,'3d'),cycleBacktest=runDailyMacdEmaBacktest(nextThreeDay,'3d');primaryChartEngine=cycleSignals;updatePrimaryChartEnginePanel(cycleSignals);
+    const score=cycleSignals.current.score;
+    const signal=cycleSignals.current.signal,reason=cycleSignals.current.reason;
+    const macdBull=!!(w.macd&&w.macd.hist>0),macdBear=!!(w.macd&&w.macd.hist<0),momentumBull=w.rsi>=50,momentumBear=w.rsi<50;
+    const motorCandles=cycleSignals.candles,recent=motorCandles.slice(-90),support=Math.min(...recent.map(x=>x.low)),resistance=Math.max(...recent.map(x=>x.high));
+    const atr=(()=>{const n=14,trs=[];for(let k=Math.max(1,motorCandles.length-n);k<motorCandles.length;k++){const c=motorCandles[k],prev=motorCandles[k-1];trs.push(Math.max(c.high-c.low,Math.abs(c.high-prev.close),Math.abs(c.low-prev.close)))}return trs.reduce((a,b)=>a+b,0)/Math.max(1,trs.length)})();
+    const invalidation=Math.max(0,Math.min(cycleSignals.current.ema50,support)-1.5*atr);
+    const target=resistance>p?resistance: p+2*atr;
+    const riskPct=p>invalidation?(p-invalidation)/p*100:0,rewardPct=target>p?(target-p)/p*100:0,rr=riskPct>0?rewardPct/riskPct:0;
+    const zoneLow=Math.max(0,cycleSignals.current.ema50-0.5*atr),zoneHigh=cycleSignals.current.ema50+0.5*atr;
+    const entryZone=signal.includes('COMPRA')?'Gatilho MACD diário confirmado no fechamento; conferir risco antes de operar.':signal.includes('VENDA')?'Gatilho vendedor MACD diário confirmado no fechamento; avaliar exposição e proteção.':'Sem novo gatilho diário confirmado; aguardar o próximo fechamento válido.';
+    const trendConfirm=trendAligned?'Tendência semanal e diária alinhadas em alta':bearAligned?'Tendência semanal e diária alinhadas em baixa':'Horizontes divergentes; confirmação insuficiente';
+    const riskRule='Invalidação técnica estimada: '+fmtUSD(invalidation)+' (EMA 50/suporte diário menos 1,5 ATR diário). Recalcular antes da operação; não é stop executado pela plataforma.';
+    const weeklyRead='MACD diário · preço '+(p>cycleSignals.current.ema50?'acima':'abaixo')+' da EMA 50 · RSI diário '+d.rsi.toFixed(1)+' · score do motor '+cycleSignals.current.score+'/100';
+    
+    const data={score,signal,reason,entryZone,trendConfirm:'Motor oficial do gráfico: MACD diário + filtros EMA 50/200 e ciclo/ATH. Volume e RSI são contexto auxiliar; não alteram o gatilho.',riskRule,weeklyRead,historicalOdds,support,resistance,target,invalidation,rr,close:w.close,ema50Value:Number(w.e50[w.e50.length-1]),ema200Value:Number(w.e200[w.e200.length-1]),dist50:w.dist50,dist200:w.dist200,rsi:w.rsi,macd:w.macd,volRatio:w.volRatio,e50:w.e50,e200:w.e200,trend:w.trend,ready:cycleSignals.ready,engine3d:engine,engineDaily:cycleSignals.current,dailyConfluence:dailyEngine,cycleSignals,cycleBacktest,engineWeekly:weeklyEngine,weeklyMacdAnalysis};
+    $('rsi').textContent=w.rsi.toFixed(1);$('rsi').className='value '+(w.rsi>70||w.rsi<30?'yellow':'');
+    $('rsiDesc').textContent=w.rsi>70?'RSI semanal sobrecomprado':w.rsi<30?'RSI semanal sobrevendido':'Momentum no gráfico semanal';
+    const dist=(w.close/w.e200.at(-1)-1)*100;const emaDistEl=$('emaDist'),emaDescEl=$('emaDesc');if(emaDistEl){emaDistEl.textContent=fmtPct(dist);emaDistEl.className='value '+(dist>=0?'green':'red');}if(emaDescEl)emaDescEl.textContent=dist>=0?'Fechamento semanal acima da EMA 200':'Fechamento semanal abaixo da EMA 200';
+    $('updated').textContent=new Date().toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit',second:'2-digit'});
+    $('trend').textContent=w.trend;$('trend').className=w.trend.indexOf('Alta')===0?'green':w.trend.indexOf('Baixa')===0?'red':'yellow';
+    $('macd').textContent=macdBull?'Positivo':macdBear?'Negativo':'Neutro';$('macd').className=macdBull?'green':macdBear?'red':'yellow';
+    $('momentum').textContent=w.rsi>=50?'Comprador · RSI semanal':w.rsi<42?'Fraco · RSI semanal':'Neutro · RSI semanal';$('momentum').className=w.rsi>=50?'green':w.rsi<42?'red':'yellow';
+    $('volume').textContent=Number.isFinite(w.volRatio)?w.volRatio.toFixed(2)+'× média semanal':'Volume semanal indisponível';$('volume').className=Number.isFinite(w.volRatio)&&w.volRatio>=1.2?'green':Number.isFinite(w.volRatio)&&w.volRatio<0.7?'yellow':'muted';
+    
+    setSignal(data);
+    // Deep 4h history is hydrated in the background: it must not block spot price or official indicators.
+    if(!fourHourHistoryLoading&&fourHourHistoryAsset!==refreshAsset){
+      fourHourHistoryLoading=true;
+      getKlineHistory('4h',14).then(raw=>{
+        if(refreshAsset!==selectedAnalysisSymbol)return;
+        const fullHistory=mapKlines(raw,'4 horas');
+        fourHourCandles=fullHistory;fourHourHistoryAsset=refreshAsset;
+        if($('timeframe')&&$('timeframe').value==='4h')renderSelectedChart();
+      }).catch(historyError=>console.warn('Histórico estendido de 4h indisponível; dados principais continuam ativos:',historyError)).finally(()=>{fourHourHistoryLoading=false;});
+    }
+    candles=threeDay;
+    historicalBacktest=runWeeklyMacdTouchBacktest(nextWeekly);dailyBacktest=dailyEngine;weeklyBacktest=runWeeklyConfluenceBacktest(nextWeekly);renderCycleBacktest(cycleBacktest);renderEngineBacktest();renderDailyEnginePanel();renderWeeklyEnginePanel();
+    renderSelectedChart();
+    $('connection').textContent='Dados atualizados · Binance';if(feedback){feedback.textContent='Dados atualizados às '+new Date().toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'})+'. O sinal usa candles fechados; confirme o horário antes de operar.';feedback.className='refresh-feedback show ok';}const diag=document.getElementById('btcDiagnosticBanner');if(diag)diag.style.display='none';$('connection').style.color='var(--green)';const latestClosedDaily=nextDaily.filter(c=>c.closeTime<Date.now()).at(-1),latestClosedThreeDay=nextThreeDay.filter(c=>c.closeTime<Date.now()).at(-1);const candleAgeHours=latestClosedDaily?Math.max(0,(Date.now()-latestClosedDaily.closeTime)/3600000):null,threeDayAgeHours=latestClosedThreeDay?Math.max(0,(Date.now()-latestClosedThreeDay.closeTime)/3600000):null;$('connection').textContent='Dados atualizados · Binance · candle diário '+(candleAgeHours===null?'indisponível':'fechado há '+candleAgeHours.toFixed(1)+' h');const candleTimestamp=latestClosedDaily?new Date(latestClosedDaily.closeTime).toLocaleString('pt-BR',{dateStyle:'short',timeStyle:'short',timeZone:'UTC'})+' UTC':'indisponível',threeDayTimestamp=latestClosedThreeDay?new Date(latestClosedThreeDay.closeTime).toLocaleString('pt-BR',{dateStyle:'short',timeStyle:'short',timeZone:'UTC'})+' UTC':'indisponível';$('connection').title='Dados da Binance carregados. Último candle diário fechado: '+candleTimestamp+(candleAgeHours===null?'': ' (há '+candleAgeHours.toFixed(1)+' h)')+'. Último candle 3D fechado: '+threeDayTimestamp+(threeDayAgeHours===null?'': ' (há '+threeDayAgeHours.toFixed(1)+' h)')+'. Indicadores calculados com candles fechados; isso não garante precisão preditiva.';
+    $('alertCount').textContent=notificationEnabled?'alertas ativos':'alertas inativos';
+    const zone=d.rsi<30?'baixo':d.rsi>70?'alto':'normal';if(lastRsiZone&&zone!==lastRsiZone&&zone!=='normal')notify('BTC: RSI diário '+zone,'RSI diário em '+d.rsi.toFixed(1)+'. Sinal informativo, não ordem.');lastRsiZone=zone;
+   }catch(e){
+ const errorMessage=String(e&&e.message||e||'Erro desconhecido');
+ const safeText=(id,value)=>{const el=$(id);if(el)el.textContent=value};
+ const safeClass=(id,value)=>{const el=$(id);if(el)el.className=value};
+ const feedback=$('refreshFeedback');
+ if(feedback){feedback.textContent='Falha ao atualizar: '+errorMessage+'. Os sinais foram suspensos; tente atualizar novamente.';feedback.className='refresh-feedback show error';}
+ safeText('connection','DADOS DESATUALIZADOS · '+errorMessage.slice(0,110));safeClass('connection','connection error');const connection=$('connection');if(connection){connection.style.color='var(--red)';connection.title='A atualização falhou. Não use sinais antigos.';}
+ safeText('priceChange','Falha na atualização: '+errorMessage);safeText('signalWord','DADOS INDISPONÍVEIS');safeText('signalPill','SEM SINAL ATUAL');safeClass('signalPill','pill wait');safeText('signalIcon','!');const icon=$('signalIcon');if(icon)icon.style.color='var(--red)';
+ safeText('signalReason','Não foi possível confirmar dados atuais. O último sinal não deve ser tratado como atual.');
+ const dm=$('decisionMain');if(dm){dm.textContent='DADOS INDISPONÍVEIS';dm.style.color='var(--red)';}
+ safeText('actionGuidance','Análise suspensa: '+errorMessage+'. Não tome decisões até a atualização ser concluída.');
+ const gn=$('gaugeNeedle');if(gn)gn.style.transform='translateX(-50%) rotate(0deg)';const qp=$('quickPlan');if(qp)qp.hidden=true;const rb=$('riskCalcBtn');if(rb)rb.disabled=true;
+ safeText('riskCalcStatus','SEM DADOS');safeClass('riskCalcStatus','pill wait');safeText('riskCalcResult','Cálculo bloqueado porque os dados de mercado não foram atualizados.');
+ primaryChartEngine=null;lastSignal=null;lastDecisionData=null;lastSpotPrice=0;candles=[];dailyCandles=[];threeDayCandles=[];weeklyCandles=[];
+ ['updated','price','change','rsi','rsiDesc','emaDist','emaDesc','trend','macd','momentum','volume','threeDayInterpretation','threeDayStatus','threeDayTrend','threeDayCross','threeDayRsi','threeDayMacd','threeDayScore','threeDayCloseTime','threeDayKdj','threeDayVolume','primary3dScore'].forEach(id=>safeText(id,id==='updated'?'Falha na atualização':'DADOS INDISPONÍVEIS'));
+ ['updated','price','change','rsi','emaDist','trend','macd','momentum','volume'].forEach(id=>safeClass(id,'value muted'));
+ if(chart){try{chart.destroy()}catch(chartError){console.warn('Falha ao limpar gráfico',chartError)}chart=null;}
+ const bt=$('backtestResults');if(bt)bt.innerHTML='<div class="metric"><span>Status</span><strong class="yellow">Backtest suspenso: atualize os dados de mercado.</strong></div>';
+ 
+ try{renderPortfolio()}catch(portfolioError){console.warn('Carteira não pôde ser atualizada',portfolioError)}
+ try{renderSignalHealth({ready:false});updateMarketSnapshot('DADOS INDISPONÍVEIS',{score:null,change24h:null})}catch(panelError){console.warn('Painéis não puderam ser limpos',panelError)}
+ console.error('BTC Cycle Desk refresh failed:',errorMessage,e);
+ }finally{refreshInProgress=false;if(refreshAfterCurrent){refreshAfterCurrent=false;Promise.resolve().then(()=>refresh()).then(()=>{if(!refreshInProgress){startLivePriceStream();startLiveKlineStream();startDailyCycleLiveStream();startChartKlineStream();}});}}
+}
+let authMode='login';
+function showAuth(){ $('authModal').style.display='flex';$('authMessage').textContent='Sua senha será enviada diretamente à autenticação Wix.'; }
+function closeAuth(){ $('authModal').style.display='none'; }
+function updateMemberStatus(email){const el=$('memberStatus');if(el)el.innerHTML='<span>Status da conta</span><strong class="green">Sessão iniciada: '+email.replace(/[&<>"']/g,'')+'</strong>';const b=$('accountBtn');if(b)b.textContent='Conta: '+email.split('@')[0]}
+function b64url(bytes){return btoa(String.fromCharCode(...new Uint8Array(bytes))).replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,'')}
+async function memberOAuth(sessionToken){const verifier=b64url(crypto.getRandomValues(new Uint8Array(32)));const challenge=b64url(await crypto.subtle.digest('SHA-256',new TextEncoder().encode(verifier)));const state=b64url(crypto.getRandomValues(new Uint8Array(24)));
+const access=await fetch('https://www.wixapis.com/oauth2/token',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({clientId:'ec19a8a0-04e6-4994-a3b5-c86
