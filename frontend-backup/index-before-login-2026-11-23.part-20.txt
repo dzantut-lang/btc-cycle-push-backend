@@ -1,0 +1,279 @@
+,'threeDayScore','threeDayCloseTime','threeDayKdj','threeDayVolume'];const invalidate=msg=>{$('threeDayStatus').textContent=msg;ids.forEach(id=>{const el=$(id);if(el){el.textContent='—';el.className='muted';}});$('threeDayInterpretation').textContent='Análise 3D indisponível. Atualize os dados e não use leituras anteriores como sinal atual.';const main=$('primary3dScore');if(main)main.textContent='Score do motor 3D: indisponível';};if(!d||!d.ready||!series||!series.length||!engine||!engine.ready){invalidate('Dados indisponíveis');return;}const closed=series.filter(x=>Number.isFinite(x.closeTime)&&x.closeTime<Date.now()&&Number.isFinite(x.close));if(closed.length<201||!d.macd||!Number.isFinite(d.rsi)||!Number.isFinite(engine.score)){invalidate('Histórico insuficiente');return;}const i=closed.length-1,e50=ema(closed.map(x=>x.close),50),e200=ema(closed.map(x=>x.close),200);let cross=e50[i]>e200[i]?'EMA 50 acima da EMA 200':'EMA 50 abaixo da EMA 200';for(let j=i;j>=Math.max(1,i-10);j--){if(e50[j-1]<=e200[j-1]&&e50[j]>e200[j]){cross=i===j?'Cruzamento altista no último candle fechado':'Cruzamento altista há '+(i-j)+' candles de 3 dias';break;}if(e50[j-1]>=e200[j-1]&&e50[j]<e200[j]){cross=i===j?'Cruzamento baixista no último candle fechado':'Cruzamento baixista há '+(i-j)+' candles de 3 dias';break;}}$('threeDayStatus').textContent=d.trend;$('threeDayTrend').textContent=d.trend;$('threeDayTrend').className=d.trendUp?'green':d.trendDown?'red':'yellow';$('threeDayCross').textContent=engine.macdTouch==='bull'?'MACD ENCOSTOU · COMPRA':engine.macdTouch==='bear'?'MACD ENCOSTOU · VENDA':cross;$('threeDayCross').className=engine.macdTouch==='bull'?'green':engine.macdTouch==='bear'?'red':cross.indexOf('altista')>=0?'green':cross.indexOf('baixista')>=0?'red':cross.indexOf('acima')>=0?'green':'yellow';$('threeDayRsi').textContent=Number(d.rsi).toFixed(1)+(d.rsi>=50?' · acima de 50':' · abaixo de 50');$('threeDayRsi').className=d.rsi>=50&&d.rsi<=70?'green':d.rsi>70||d.rsi<30?'yellow':d.rsi<50?'red':'muted';$('threeDayMacd').textContent=(d.macd.hist>0?'Histograma positivo':d.macd.hist<0?'Histograma negativo':'Neutro')+' · '+(engine.macdTouch==='bull'?'TOQUE COMPRADOR':engine.macdTouch==='bear'?'TOQUE VENDEDOR':'sem toque MACD 3D');$('threeDayMacd').className=d.macd.hist>0?'green':d.macd.hist<0?'red':'yellow';const kdjEl=$('threeDayKdj');if(kdjEl){kdjEl.textContent='K '+engine.kdj.k.toFixed(1)+' / D '+engine.kdj.d.toFixed(1)+' / J '+engine.kdj.j.toFixed(1)+' · '+(engine.kdjCross==='bull'?'cruzamento altista':engine.kdjCross==='bear'?'cruzamento baixista':engine.kdj.k>engine.kdj.d?'K acima de D':'K abaixo de D');kdjEl.className=engine.kdj.k>engine.kdj.d?'green':engine.kdj.k<engine.kdj.d?'red':'yellow';}const volEl=$('threeDayVolume');if(volEl){volEl.textContent=engine.volKnown?engine.volRatio.toFixed(2)+'x média 20 · '+(engine.volumeBuy?'confirma compra':engine.volumeSell?'confirma venda':engine.volLow?'baixo':'sem confirmação'):'Indisponível';volEl.className=engine.volumeBuy?'green':engine.volumeSell?'red':engine.volLow?'yellow':'muted';}$('threeDayScore').textContent=engine.score+'/100 · '+engine.label;$('threeDayScore').className=engine.score>=65?'green':engine.score<=35?'red':'yellow';$('threeDayCloseTime').textContent=new Date(closed[i].closeTime).toLocaleDateString('pt-BR',{timeZone:'UTC'});const main=$('primary3dScore');if(main)main.textContent='Score do motor 3D: '+engine.score+'/100 · '+engine.label;$('threeDayInterpretation').textContent='Motor principal: candles 3D fechados. '+engine.reasons.join(' | ')+'. Sinal direcional do motor: toque MACD 3D com inclinação concordante; cruzamento isolado não gera entrada. Score combina o toque, histograma, RSI e tendência estrutural. ATR é referência de risco, não gatilho. acima da EMA 50. RSI esticado, volume fraco ou preço muito distante da EMA 50 bloqueiam novas compras. Em tendência de baixa, a compra exige recuperação e confirmações adicionais. Saída estrutural exige deterioração de tendência/momentum; o backtest também testa stop móvel de 2,8x ATR. Os marcadores históricos vêm das entradas e saídas do backtest do motor, não da antiga combinação exploratória de indicadores. Score é confluência técnica, não probabilidade de lucro. Distância da EMA 50: '+fmtPct(d.dist50)+'. Diário e semanal são contexto; o motor principal é 3D.';}
+function notify(title,body){if(!notificationEnabled||!('Notification'in window)||Notification.permission!=='granted')return false;try{const n=new Notification(title,{body,tag:'btc-cycle-'+String(title).toLowerCase().replace(/[^a-z0-9]+/g,'-'),renotify:true});n.onclick=()=>{window.focus();n.close()};return true}catch(e){console.warn('Notificação local indisponível:',e);return false}}
+function readSignalHistory(){try{const v=JSON.parse(localStorage.getItem(assetScopedStorageKey('btcCycleSignalHistory'))||'[]');return Array.isArray(v)?v.filter(x=>x&&typeof x==='object'&&typeof x.signal==='string'):[]}catch(e){return []}}
+function renderSignalHistory(){
+ const rows=readSignalHistory(),body=$('signalHistory');if(!body)return;
+ const safe=v=>String(v==null?'—':v).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+ if(!rows.length){body.innerHTML='<tr><td colspan="11" class="muted" style="padding:10px 5px">Nenhuma mudança de sinal registrada ainda.</td></tr>';renderSignalOutcomeSummary(rows);return}
+ const candles=Array.isArray(dailyCandles)?dailyCandles.filter(c=>c&&c.closeTime<Date.now()).sort((x,y)=>x.time-y.time):[];
+ body.innerHTML=rows.slice(0,20).map(x=>{
+  const trend=x.trend||'—',macd=x.macd||'—',vol=x.volume||'—',context=x.context||'Registro anterior sem contexto técnico.';
+  const idx=x.candleTime?candles.findIndex(c=>c.time===x.candleTime):-1;
+  const outcome=n=>{if(!Number.isFinite(Number(x.price))||idx<0)return '<span class="outcome-pill outcome-pending">Sem referência</span>';const target=candles[idx+n];if(!target)return '<span class="outcome-pill outcome-pending">Pendente</span>';const pct=(target.close/Number(x.price)-1)*100;return '<span class="outcome-pill '+(pct>0?'outcome-up':pct<0?'outcome-down':'outcome-pending')+'">'+(pct>0?'+':'')+pct.toFixed(2)+'%</span>'};
+  return '<tr style="border-top:1px solid #202b3d"><td style="padding:9px 5px;white-space:nowrap">'+safe(x.time)+'</td><td class="'+(x.signal.indexOf('COMPRA')===0?'green':x.signal.indexOf('REDUZIR')===0?'red':'yellow')+'">'+safe(x.signal)+'</td><td>'+safe(x.score)+'</td><td>'+safe(x.rsi)+'</td><td>'+safe(trend)+'</td><td>'+safe(macd)+'</td><td>'+safe(vol)+'</td><td>'+(Number.isFinite(Number(x.price))?safe(fmtUSD(Number(x.price))):'<span class="outcome-pending">Sem referência</span>')+'</td><td>'+outcome(1)+'</td><td>'+outcome(7)+'</td><td>'+outcome(30)+'</td></tr>';
+ }).join('');
+ renderSignalOutcomeSummary(rows);
+}
+function renderSignalOutcomeSummary(rows){
+ const host=$('signalOutcomeSummary');if(!host)return;
+ const candles=Array.isArray(dailyCandles)?dailyCandles.filter(c=>c&&c.closeTime<Date.now()).sort((x,y)=>x.time-y.time):[];
+ const horizons=[1,7,30].map(days=>{const vals=(rows||[]).map(x=>{if(!x.candleTime||!Number.isFinite(Number(x.price)))return null;const i=candles.findIndex(c=>c.time===x.candleTime),target=i>=0?candles[i+days]:null;if(!target)return null;return (target.close/Number(x.price)-1)*100}).filter(Number.isFinite);return {days,vals,avg:vals.length?vals.reduce((a,b)=>a+b,0)/vals.length:null}});
+ host.innerHTML=horizons.map(h=>'<div class="outcome-summary-item"><span>Variação média após '+h.days+' dia'+(h.days===1?'':'s')+'</span><strong class="'+(h.avg==null?'outcome-pending':h.avg>0?'outcome-up':h.avg<0?'outcome-down':'')+'">'+(h.avg==null?'Aguardando dados':(h.avg>0?'+':'')+h.avg.toFixed(2)+'%')+'</strong><small class="muted">'+h.vals.length+' avaliação'+(h.vals.length===1?'':'ões')+' concluída'+(h.vals.length===1?'':'s')+'</small></div>').join('');
+}
+function recordSignal(signal,data){
+ const old=readSignalHistory();if(old.length&&old[0].signal===signal)return;
+ const n=x=>Number.isFinite(Number(x))?Number(x):NaN;
+ const closed=Array.isArray(dailyCandles)?dailyCandles.filter(c=>c&&Number.isFinite(c.closeTime)&&c.closeTime<Date.now()).sort((x,y)=>x.time-y.time):[];
+ const ref=closed.length?closed[closed.length-1]:null;
+ const engine=data&&data.cycleSignals&&data.cycleSignals.current&&data.cycleSignals.current.ready?data.cycleSignals.current:(data&&data.engineDaily&&data.engineDaily.ready?data.engineDaily:null);
+ const price=n(engine&&engine.close),referencePrice=Number.isFinite(price)&&price>0?price:(ref&&Number.isFinite(ref.close)?ref.close:(n(data&&data.close)>0?n(data.close):null));
+ const e50=n(engine&&engine.ema50),e200=n(engine&&engine.ema200);
+ const hist=n(data&&data.cycleSignals&&data.cycleSignals.macd&&data.cycleSignals.macd.hist&&data.cycleSignals.macd.hist[data.cycleSignals.macd.hist.length-1]);
+ const rsi=n(data&&data.rsi),vr=n(data&&data.volRatio);
+ const trend=Number.isFinite(referencePrice)&&Number.isFinite(e50)&&Number.isFinite(e200)?(referencePrice>e200&&e50>e200&&referencePrice>e50?'Alta alinhada':referencePrice<e200&&e50<e200&&referencePrice<e50?'Baixa alinhada':'Mista'):'EMAs diárias indisponíveis';
+ const macd=Number.isFinite(hist)?(hist>0?'Positivo':hist<0?'Negativo':'Neutro'):'Indisponível';
+ const volume=Number.isFinite(vr)?(vr>=1.4?'Elevado':vr<0.65?'Baixo':'Normal'):'Indisponível';
+ const context=[macd==='Negativo'&&trend==='Alta alinhada'?'Conflito: tendência diária alta, MACD diário negativo.':null,signal==='AGUARDAR'?'Motor principal recomenda aguardar.':null].filter(Boolean).join(' ')||'Mudança de sinal registrada pelo motor oficial diário; consulte os indicadores.';
+ old.unshift({time:new Date().toLocaleString('pt-BR'),timeMs:Date.now(),candleTime:ref?ref.time:null,signal,score:Number.isFinite(n(engine&&engine.score))?n(engine.score):(Number.isFinite(n(data&&data.score))?n(data.score):'—'),rsi:Number.isFinite(rsi)?rsi.toFixed(1):'—',trend,macd,volume,context,price:referencePrice,ema50:Number.isFinite(e50)?e50:null,ema200:Number.isFinite(e200)?e200:null,macdHist:Number.isFinite(hist)?hist:null,volRatio:Number.isFinite(vr)?vr:null,enginePeriod:'1d'});
+ try{localStorage.setItem(assetScopedStorageKey('btcCycleSignalHistory'),JSON.stringify(old.slice(0,50)))}catch(e){console.warn('Histórico local de sinais indisponível; a análise de mercado continua.',e)}
+ renderSignalHistory();
+}
+function readProspectiveState(){
+ try{
+  const v=JSON.parse(localStorage.getItem(assetScopedStorageKey('btcCycleProspectiveDailyV2'))||'null');
+  if(v&&typeof v==='object')return {lastCandle:Number(v.lastCandle)||0,pending:v.pending||null,position:v.position||null,closed:Array.isArray(v.closed)?v.closed.slice(-500):[],updated:v.updated||null};
+ }catch(e){console.warn('Registro prospectivo local indisponível.',e)}
+ return {lastCandle:0,pending:null,position:null,closed:[],updated:null};
+}
+function writeProspectiveState(st){
+ try{localStorage.setItem(assetScopedStorageKey('btcCycleProspectiveDailyV2'),JSON.stringify(st));return true}catch(e){console.warn('Não foi possível persistir o registro prospectivo neste navegador.',e);return false}
+}
+function paperPct(n){return (n>=0?'+':'')+n.toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2})+'%'}
+function trackProspectiveSignal(signal,data){
+ try{
+  if(!Array.isArray(dailyCandles)||dailyCandles.length<2)return;
+  const candles=dailyCandles.filter(c=>c&&Number.isFinite(c.closeTime)&&c.closeTime<Date.now()).sort((a,b)=>a.closeTime-b.closeTime);
+  if(candles.length<2)return;
+  const c=candles[candles.length-1],st=readProspectiveState();
+  if(c.closeTime<=st.lastCandle){renderProspectiveState(st,c);return}
+  const engine=data&&data.cycleSignals&&data.cycleSignals.current&&data.cycleSignals.current.ready?data.cycleSignals.current:(data&&data.engineDaily&&data.engineDaily.ready?data.engineDaily:null);
+  const officialSignal=engine&&typeof engine.signal==='string'?engine.signal:signal;
+  const officialScore=Number.isFinite(Number(engine&&engine.score))?Number(engine.score):(Number(data&&data.score)||0);
+  const officialPrice=Number.isFinite(Number(engine&&engine.close))?Number(engine.close):c.close;
+  const isBuy=x=>typeof x==='string'&&x.indexOf('COMPRA')===0;
+  const isExit=x=>x==='VENDA'||x==='VENDA FORTE'||x==='REDUZIR EXPOSIÇÃO';
+  // O sinal do candle diário fechado só é executado na abertura do próximo candle diário.
+  if(st.pending&&c.closeTime>st.pending.closeTime&&Number.isFinite(c.open)&&c.open>0){
+   const px=c.open,stamp=new Date(c.time||c.closeTime).toLocaleDateString('pt-BR');
+   if(isBuy(st.pending.signal)&&!st.position){
+    st.position={entryPrice:px,entryTime:c.time||c.closeTime,entryDate:stamp,signal:st.pending.signal,score:st.pending.score};
+   }else if(isExit(st.pending.signal)&&st.position){
+    const net=(1-0.0015)*(px/st.position.entryPrice)*(1-0.0015)-1;
+    st.closed.push({entryDate:st.position.entryDate,exitDate:stamp,entryPrice:st.position.entryPrice,exitPrice:px,returnPct:net*100,exitSignal:st.pending.signal});
+    st.closed=st.closed.slice(-500);st.position=null;
+   }
+  }
+  st.lastCandle=c.closeTime;
+  st.pending={signal:officialSignal,score:officialScore,price:officialPrice,closeTime:c.closeTime,period:'1d'};
+  st.updated=new Date().toLocaleString('pt-BR');
+  writeProspectiveState(st);renderProspectiveState(st,c);
+ }catch(e){console.warn('Falha no registro prospectivo; sinal técnico não alterado.',e)}
+}
+function renderProspectiveState(st,candle){
+ const el=id=>document.getElementById(id);if(!el('paperClosed'))return;
+ const trades=st.closed||[],wins=trades.filter(t=>t.returnPct>0),losses=trades.filter(t=>t.returnPct<0);
+ const compound=trades.reduce((a,t)=>a*(1+t.returnPct/100),1);
+ const pos=st.position;
+ el('paperClosed').textContent=String(trades.length);
+ el('paperWinRate').textContent=trades.length?(wins.length/trades.length*100).toLocaleString('pt-BR',{maximumFractionDigits:1})+'%':'—';
+ el('paperReturn').textContent=paperPct((compound-1)*100);el('paperReturn').className=(compound>=1?'green':'red');
+ const gp=wins.reduce((a,t)=>a+t.returnPct,0),gl=Math.abs(losses.reduce((a,t)=>a+t.returnPct,0));
+ el('paperPF').textContent=losses.length?(gl>0?(gp/gl).toLocaleString('pt-BR',{maximumFractionDigits:2}):'∞'):(wins.length?'∞':'—');
+ el('paperPosition').textContent=pos?'Comprado · '+paperPct((candle&&candle.close&&pos.entryPrice?(candle.close/pos.entryPrice-1)*100:0)):'Sem posição';
+ el('paperUpdated').textContent=st.updated||'Aguardando candle fechado';
+ el('paperPending').textContent=st.pending?st.pending.signal+' · próximo candle 3D':'Aguardando primeiro sinal';
+ el('paperNotice').textContent='Persistência local neste navegador. '+(trades.length<30?'Amostra ainda pequena: são necessárias mais operações encerradas para uma leitura preliminar.':'Há 30 ou mais operações encerradas; ainda é necessário avaliar regimes de mercado e custos reais.');
+ const curve=el('paperCurve'),badge=el('paperCurveBadge');if(curve&&badge){if(!trades.length){badge.textContent='SEM AMOSTRA';curve.innerHTML='<div class="paper-curve-empty">O gráfico aparecerá quando houver operações simuladas encerradas. Nenhum retorno foi presumido.</div>'}else{let equity=1;const points=trades.map(t=>{equity*=1+t.returnPct/100;return equity});const lo=Math.min(1,...points),hi=Math.max(1,...points),span=Math.max(0.0001,hi-lo);badge.textContent=trades.length+' OPERAÇÕES';curve.setAttribute('aria-label','Evolução do capital simulado, em sequência cronológica');curve.innerHTML=points.slice(-40).map((v,i)=>{const t=trades[trades.length-Math.min(40,points.length)+i],h=Math.max(4,Math.abs(v-1)/Math.max(Math.abs(hi-1),Math.abs(lo-1),0.01)*78);return '<div class="paper-bar-wrap" title="'+t.exitDate+': '+paperPct((v-1)*100)+' acumulado"><div class="paper-bar '+(t.returnPct<0?'loss':'')+'" style="height:'+h+'px;'+(v<1?'opacity:.72':'')+'"></div></div>'}).join('');const net=(equity-1)*100;curve.insertAdjacentHTML('beforeend','<span class="muted" style="font-size:10px;white-space:nowrap;margin-left:4px">'+paperPct(net)+'</span>')}}
+ const body=el('paperTrades');
+ if(!trades.length){body.innerHTML='<tr><td colspan="3" class="muted" style="padding:10px 5px">Nenhuma operação simulada encerrada.</td></tr>';return}
+ body.innerHTML=trades.slice(-12).reverse().map(t=>'<tr style="border-top:1px solid #202b3d"><td style="padding:9px 5px">'+t.entryDate+' → '+t.exitDate+'</td><td>'+t.exitSignal+'</td><td class="'+(t.returnPct>=0?'green':'red')+'">'+paperPct(t.returnPct)+'</td></tr>').join('');
+}
+
+function runBacktest(){
+ const out=$('backtestResults'),data=threeDayCandles.filter(x=>x.closeTime<Date.now());
+ if(data.length<450){out.innerHTML='<div class="metric"><span>Status</span><strong class="yellow">Histórico insuficiente: são necessários pelo menos 450 candles de 3 dias fechados.</strong></div>';return}
+ const cost=0.0015,first=205,usable=data.length-first,split=first+Math.floor(usable*.6),testSplit=first+Math.floor(usable*.8);
+ function signalFor(hist,variant){
+  const d=calcScore(hist);if(!d.ready)return null;
+  const p=d.close,r=d.rsi,macd=d.macd.hist;
+  let buy=false,sell=false;
+  if(variant==='current'){const engine=calcWeeklyMacdTouchEngine(hist,d);buy=engine.buy||engine.buyStrong;sell=engine.sell||engine.sellStrong;if(buy){const recent=hist.slice(-90),support=Math.min(...recent.map(x=>x.low)),resistance=Math.max(...recent.map(x=>x.high));const trs=[];for(let k=Math.max(1,hist.length-14);k<hist.length;k++){const c=hist[k],prev=hist[k-1];trs.push(Math.max(c.high-c.low,Math.abs(c.high-prev.close),Math.abs(c.low-prev.close)))}const atr=trs.length?trs.reduce((a,b)=>a+b,0)/trs.length:0;const invalidation=Math.max(0,Math.min(d.e50.at(-1),support)-1.5*atr),target=resistance>p?resistance:p+2*atr;const riskPct=p>invalidation?(p-invalidation)/p*100:0,rewardPct=target>p?(target-p)/p*100:0,rr=riskPct>0?rewardPct/riskPct:0;if(!Number.isFinite(rr)||rr<1.5)buy=false;}}
+  else if(variant==='trend'){buy=d.trendUp&&p>d.e50.at(-1)&&d.score>=62&&r>=45&&r<=72;sell=d.trendDown||p<d.e200.at(-1)||d.score<42}
+  else if(variant==='moderate'){buy=d.trendUp&&p>d.e50.at(-1)&&d.score>=52&&r>=40&&r<=75;sell=d.trendDown||p<d.e50.at(-1)||d.score<38}
+  else if(variant==='multi'){
+   const cutoff=hist[hist.length-1].closeTime;
+   const wh=(weeklyCandles||[]).filter(c=>c.closeTime<=cutoff);
+   if(wh.length<55)return {buy:false,sell:false};
+   const wc=wh.map(c=>c.close),we20=ema(wc,20),we50=ema(wc,50),wi=wc.length-1;
+   if(!we20[wi]||!we50[wi])return {buy:false,sell:false};
+   const weeklyBull=wc[wi]>we50[wi]&&we20[wi]>we50[wi];
+   const weeklyBear=wc[wi]<we50[wi]&&we20[wi]<we50[wi];
+   const weeklyScore=50+(wc[wi]>we50[wi]?15:-15)+(we20[wi]>we50[wi]?15:-15);
+   const dailyBull=d.close>d.e50.at(-1)&&d.e50.at(-1)>d.e200.at(-1);
+   const dailyBear=d.close<d.e50.at(-1)&&d.e50.at(-1)<d.e200.at(-1);
+   const aligned=weeklyBull&&dailyBull,bearAligned=weeklyBear&&dailyBear;
+   const score=Math.round(d.score*.55+weeklyScore*.45);
+   const macdBull=d.macd.hist>0,macdBear=d.macd.hist<0;
+   const momentumBull=d.rsi>=50&&d.rsi<=68,momentumBear=d.rsi<42;
+   const distanceOk=d.dist50>=-2&&d.dist50<=8;
+   const recent=hist.slice(-90),support=Math.min(...recent.map(x=>x.low)),resistance=Math.max(...recent.map(x=>x.high));
+   const trs=[];for(let k=Math.max(1,hist.length-14);k<hist.length;k++){const c=hist[k],prev=hist[k-1];trs.push(Math.max(c.high-c.low,Math.abs(c.high-prev.close),Math.abs(c.low-prev.close)))}
+   const atr=trs.length?trs.reduce((x,y)=>x+y,0)/trs.length:0;
+   const stopDistance=Math.max(atr*1.5,p*0.015);
+   const invalidation=Math.max(0,p-stopDistance);
+   const target=Math.max(resistance>p?resistance:0,p+2.5*atr);
+   const riskPct=p>invalidation?(p-invalidation)/p*100:0,rewardPct=target>p?(target-p)/p*100:0,rr=riskPct>0?rewardPct/riskPct:0;
+   buy=(aligned&&macdBull&&momentumBull&&distanceOk&&score>=70)||(weeklyBull&&p>d.e50.at(-1)&&macdBull&&r>=45&&r<=72&&d.dist50>=-3&&d.dist50<=10&&score>=60);
+   if(!Number.isFinite(rr)||rr<1.5||atr<=0)buy=false;
+   sell=(bearAligned&&macdBear&&momentumBear&&score<=30)||(weeklyBear&&(dailyBear||macdBear||score<=42));
+  } else if(variant==='experimental'){
+   const cutoff=hist[hist.length-1].closeTime;
+   const wh=(weeklyCandles||[]).filter(c=>c.closeTime<=cutoff);
+   if(wh.length<55)return {buy:false,sell:false};
+   const wc=wh.map(c=>c.close),we20=ema(wc,20),we50=ema(wc,50),wi=wc.length-1;
+   if(!we20[wi]||!we50[wi])return {buy:false,sell:false};
+   const weeklyBear=wc[wi]<we50[wi]&&we20[wi]<we50[wi];
+   const weeklySupport=wc[wi]>=we50[wi]||we20[wi]>=we50[wi];
+   const dailySupport=p>d.e50.at(-1);
+   const distanceOk=d.dist50>=-3&&d.dist50<=10;
+   const momentumOk=r>=45&&r<=70;
+   const scoreOk=d.score>=58;
+   const trs=[];for(let k=Math.max(1,hist.length-14);k<hist.length;k++){const c=hist[k],prev=hist[k-1];trs.push(Math.max(c.high-c.low,Math.abs(c.high-prev.close),Math.abs(c.low-prev.close)))}
+   const atr=trs.length?trs.reduce((x,y)=>x+y,0)/trs.length:0;
+   const recent=hist.slice(-90),resistance=Math.max(...recent.map(x=>x.high));
+   const stopDistance=Math.max(atr*1.5,p*0.015),invalidation=Math.max(0,p-stopDistance),target=Math.max(resistance>p?resistance:0,p+2.5*atr);
+   const riskPct=p>invalidation?(p-invalidation)/p*100:0,rewardPct=target>p?(target-p)/p*100:0,rr=riskPct>0?rewardPct/riskPct:0;
+   buy=weeklySupport&&!weeklyBear&&dailySupport&&macd>0&&momentumOk&&distanceOk&&scoreOk&&atr>0&&Number.isFinite(rr)&&rr>=1.5;
+   sell=(weeklyBear&&(d.trendDown||p<d.e50.at(-1)||macd<0))||(d.trendDown&&macd<0&&r<45);
+  } else {buy=d.trendUp&&p>d.e200.at(-1)&&d.dist50>=-2&&d.dist50<=4&&r>=42&&r<=60&&macd>0;sell=d.trendDown||(p<d.e50.at(-1)&&macd<0)}
+  return {buy,sell};
+ }
+ function simulate(begin,end,variant){
+  let equity=1,peak=1,maxDD=0,position=false,entries=0,closed=0,wins=0,lossCount=0,netWins=0,netLosses=0,winSum=0,lossSum=0,sumTradeNet=0,entryEquity=1,entryPrice=0,entryCapital=1,stopPrice=0,targetPrice=0;
+  const riskManaged=variant==='multi'||variant==='experimental';
+  const firstOpen=data[Math.min(begin+1,end-1)].open||data[Math.min(begin+1,end-1)].close,lastClose=data[end-1].close;
+  const benchmark=(1-cost)*(lastClose/firstOpen)*(1-cost);
+  function closeAt(price){
+   const net=(1-cost)*(price/entryPrice)*(1-cost)-1;
+   closed++;sumTradeNet+=net;
+   if(net>0){wins++;winSum+=net;netWins+=entryCapital*net}
+   else if(net<0){lossCount++;lossSum+=Math.abs(net);netLosses+=entryCapital*Math.abs(net)}
+   equity=entryEquity*(price/entryPrice)*(1-cost);
+   position=false;stopPrice=0;targetPrice=0;
+  }
+  function entryAtr(hist){
+   const trs=[];
+   for(let k=Math.max(1,hist.length-14);k<hist.length;k++){
+    const c=hist[k],prev=hist[k-1];
+    trs.push(Math.max(c.high-c.low,Math.abs(c.high-prev.close),Math.abs(c.low-prev.close)));
+   }
+   return trs.length?trs.reduce((sum,v)=>sum+v,0)/trs.length:0;
+  }
+  for(let i=begin+1;i<end-1;i++){
+   let exitedThisBar=false;
+   const hist=data.slice(0,i),signal=signalFor(hist,variant),bar=data[i],exec=bar.open||bar.close;
+   if(position&&signal&&signal.sell){
+    closeAt(exec);exitedThisBar=true;
+   }
+   if(!position&&!exitedThisBar&&signal&&signal.buy){
+    position=true;entries++;entryPrice=exec;entryCapital=equity;entryEquity=equity*(1-cost);
+    if(riskManaged){
+     const atr=entryAtr(hist),dist=Math.max(atr*1.5,entryPrice*.015);
+     stopPrice=entryPrice-dist;
+     targetPrice=entryPrice+Math.max(atr*2.5,dist*1.5);
+    }
+   }
+   if(position&&riskManaged){
+    const lo=Number.isFinite(bar.low)?bar.low:bar.close,hi=Number.isFinite(bar.high)?bar.high:bar.close;
+    // Conservador: se stop e alvo forem atingidos no mesmo candle, assume stop primeiro.
+    if(lo<=stopPrice){
+     closeAt(Number.isFinite(bar.open)&&bar.open<stopPrice?bar.open:stopPrice);
+    }else if(hi>=targetPrice){
+     closeAt(targetPrice);
+    }
+   }
+   const mark=position?entryEquity*(bar.close/entryPrice)*(1-cost):equity;
+   peak=Math.max(peak,mark);maxDD=Math.max(maxDD,(peak-mark)/peak);
+  }
+  if(position){
+   // Avalia stop/alvo também na última vela do intervalo; antes ela era encerrada sempre pelo fechamento.
+   const finalBar=data[end-1];
+   if(riskManaged){
+    const lo=Number.isFinite(finalBar.low)?finalBar.low:finalBar.close,hi=Number.isFinite(finalBar.high)?finalBar.high:finalBar.close;
+    if(lo<=stopPrice){
+     closeAt(Number.isFinite(finalBar.open)&&finalBar.open<stopPrice?finalBar.open:stopPrice);
+    }else if(hi>=targetPrice){
+     closeAt(targetPrice);
+    }
+   }
+   if(position)closeAt(lastClose);
+   peak=Math.max(peak,equity);maxDD=Math.max(maxDD,(peak-equity)/peak)
+  }
+  const years=Math.max((end-begin)/365.25,.1);
+  return {ret:(equity-1)*100,benchmark:(benchmark-1)*100,dd:maxDD*100,entries,closed,win:closed?wins/closed*100:0,avgWin:wins?winSum/wins*100:0,avgLoss:lossCount?lossSum/lossCount*100:0,pf:netLosses?netWins/netLosses:(netWins>0?Infinity:null),expect:closed?sumTradeNet/closed*100:0,cagr:(Math.pow(Math.max(equity,.000001),1/years)-1)*100};
+ }
+ const variants=[['Atual (3D)','current'],['Tendência','trend'],['Tendência moderada (exploratória)','moderate'],['Correção','pullback'],['3D + contexto semanal + risco-retorno','multi'],['Experimental: 3D + contexto semanal + RR','experimental']];
+ const results=variants.map(v=>({name:v[0],variant:v[1],full:simulate(first,split,v[1]),oos:simulate(Math.max(first,split),Math.max(split+2,testSplit),v[1]),holdout:simulate(Math.max(testSplit,split+2),data.length,v[1]),segments:[{name:'Desenvolvimento · início',begin:first,end:Math.floor(first+(split-first)/3)},{name:'Desenvolvimento · meio',begin:Math.floor(first+(split-first)/3),end:Math.floor(first+2*(split-first)/3)},{name:'Desenvolvimento · fim',begin:Math.floor(first+2*(split-first)/3),end:split}].map(s=>({name:s.name,stats:simulate(s.begin,Math.max(s.begin+2,s.end),v[1])}))}));
+ for(const r of results){r.folds=[];for(let f=0;f<5;f++){const span=split-first,begin=Math.floor(first+span*f/5),end=Math.floor(first+span*(f+1)/5);if(end>begin+2)r.folds.push({name:'Bloco '+(f+1),stats:simulate(begin,end,r.variant)});}r.foldReturn=r.folds.reduce((a,x)=>a*(1+x.stats.ret/100),1);r.foldBenchmark=r.folds.reduce((a,x)=>a*(1+x.stats.benchmark/100),1);r.foldClosed=r.folds.reduce((a,x)=>a+x.stats.closed,0);r.foldPositive=r.folds.filter(x=>x.stats.ret>x.stats.benchmark).length;r.foldWorstDD=r.folds.reduce((a,x)=>Math.max(a,x.stats.dd),0);}
+ const color=n=>n>=0?'green':'red',fmt=n=>(n>=0?'+':'')+n.toFixed(2)+'%';
+ let multiDiag={buySignals:0,sellSignals:0,oosBuySignals:0,oosSellSignals:0,weeklyReadyBars:0,oosBars:0,weeklyBull:0,weeklyBear:0,dailyBull:0,macdBull:0,momentumBull:0,distanceOk:0,score70:0,baseBuy:0,rrPass:0,rrFail:0,atrMissing:0};
+ for(let i=first+1;i<data.length-1;i++){
+  const hist=data.slice(0,i),sig=signalFor(hist,'multi');
+  if((weeklyCandles||[]).some(c=>c.closeTime<=hist[hist.length-1].closeTime)&&weeklyCandles.filter(c=>c.closeTime<=hist[hist.length-1].closeTime).length>=55)multiDiag.weeklyReadyBars++;
+  if(sig&&sig.buy){multiDiag.buySignals++;if(i>=split&&i<testSplit)multiDiag.oosBuySignals++}
+  if(sig&&sig.sell){multiDiag.sellSignals++;if(i>=split&&i<testSplit)multiDiag.oosSellSignals++}
+  if(i>=split&&i<testSplit){multiDiag.oosBars++;const d0=calcScore(hist),wh0=(weeklyCandles||[]).filter(c=>c.closeTime<=hist[hist.length-1].closeTime);if(d0.ready&&wh0.length>=55){const wc0=wh0.map(c=>c.close),e20=ema(wc0,20),e50=ema(wc0,50),k=wc0.length-1,wb=wc0[k]>e50[k]&&e20[k]>e50[k],wr=wc0[k]<e50[k]&&e20[k]<e50[k],db=d0.close>d0.e50.at(-1)&&d0.e50.at(-1)>d0.e200.at(-1),mb=d0.macd.hist>0,mo=d0.rsi>=50&&d0.rsi<=68,di=d0.dist50>=-2&&d0.dist50<=8,ws=50+(wc0[k]>e50[k]?15:-15)+(e20[k]>e50[k]?15:-15),sc=Math.round(d0.score*.55+ws*.45);if(wb)multiDiag.weeklyBull++;if(wr)multiDiag.weeklyBear++;if(db)multiDiag.dailyBull++;if(mb)multiDiag.macdBull++;if(mo)multiDiag.momentumBull++;if(di)multiDiag.distanceOk++;if(sc>=70)multiDiag.score70++;if((wb&&db&&mb&&mo&&di&&sc>=70)||(wb&&d0.close>d0.e50.at(-1)&&mb&&d0.rsi>=45&&d0.rsi<=72&&d0.dist50>=-3&&d0.dist50<=10&&sc>=60))multiDiag.baseBuy++;const tr0=[];for(let z=Math.max(1,hist.length-14);z<hist.length;z++){const cc=hist[z],pp=hist[z-1];tr0.push(Math.max(cc.high-cc.low,Math.abs(cc.high-pp.close),Math.abs(cc.low-pp.close)))}const at=tr0.length?tr0.reduce((x,y)=>x+y,0)/tr0.length:0;const re=hist.slice(-90).reduce((m,x)=>Math.max(m,x.high),-Infinity),sd=Math.max(at*1.5,d0.close*.015),inv=Math.max(0,d0.close-sd),tar=Math.max(re>d0.close?re:0,d0.close+2.5*at),rp=d0.close>inv?(d0.close-inv)/d0.close*100:0,rew=tar>d0.close?(tar-d0.close)/d0.close*100:0,rr=rp>0?rew/rp:0;if(at<=0)multiDiag.atrMissing++;else if(Number.isFinite(rr)&&rr>=1.5)multiDiag.rrPass++;else multiDiag.rrFail++;}}
+
+ }
+ const qualified=results.filter(r=>r.full.closed>=30&&r.oos.closed>=20&&r.oos.ret>r.oos.benchmark&&r.oos.expect>0&&r.oos.pf!==null&&r.oos.pf>1&&r.oos.dd<60&&r.holdout.closed>=20&&r.holdout.ret>r.holdout.benchmark&&r.holdout.expect>0&&r.holdout.pf!==null&&r.holdout.pf>1&&r.holdout.dd<60&&r.foldPositive>=3&&r.foldReturn>1);
+ const preliminary=results.filter(r=>r.oos.closed>0).slice().sort((a,b)=>((b.oos.ret-b.oos.benchmark)-(a.oos.ret-a.oos.benchmark))||((b.full.ret-b.full.dd*.5)-(a.full.ret-a.full.dd*.5)));
+ const rankingHtml='<div class="note" style="border:1px solid #385277;padding:12px;margin:12px 0"><h3 style="margin-top:0">Veredito de robustez</h3>'+ (qualified.length ? '<strong class="yellow">CANDIDATA PASSOU NOS FILTROS INTERNOS — AINDA NÃO VALIDADA: '+qualified.slice().sort((a,b)=>(b.oos.ret-b.oos.benchmark)-(a.oos.ret-a.oos.benchmark))[0].name+'</strong><p>O resultado cumpre critérios exploratórios do próprio backtest, mas não comprova vantagem estatística nem desempenho futuro. Antes de usar dinheiro real, exige validação walk-forward independente e teste em dados não usados para ajustar as regras.</p>' : '<strong class="yellow">SEM VENCEDORA VALIDADA</strong><p>Nenhuma estratégia atingiu todos os filtros mínimos: pelo menos 30 operações encerradas no histórico completo, 20 fora da amostra, retorno OOS superior à referência, expectativa positiva, profit factor acima de 1, drawdown abaixo de 60% e retorno superior à referência em pelo menos 3 dos 5 blocos temporais.</p>') + (preliminary.length ? '<p><strong>Melhor resultado observado, ainda exploratório:</strong> '+preliminary[0].name+'. Diferença OOS vs referência: '+fmt(preliminary[0].oos.ret-preliminary[0].oos.benchmark)+', com '+preliminary[0].oos.closed+' operação(ões) OOS. '+(preliminary[0].oos.closed<20?'Amostra insuficiente para escolher vencedora.':'Confira também risco e consistência por período.')+'</p>' : '<p>Nenhuma operação OOS foi encerrada; ainda não há base para ranking.</p>') + '<p style="margin-bottom:0">A classificação usa dados do próprio backtest e não substitui validação walk-forward independente.</p></div>';
+ let html='<div class="note" style="border:1px solid #385277;padding:12px;margin:12px 0"><strong>Como interpretar este backtest</strong><p>O modelo aplica custo estimado de 0,15% por lado (entrada e saída). Não inclui slippage, spread variável, impostos, funding ou diferenças de execução entre corretoras; o resultado real pode ser pior.</p><p>Os sinais são calculados com candles 3D já fechados e executados, em regra, na abertura do próximo candle de 3 dias. Nas estratégias com stop e alvo, se ambos forem tocados no mesmo candle, o teste assume conservadoramente que o stop ocorreu primeiro.</p><p style="margin-bottom:0">O período de holdout é uma checagem interna, não uma validação independente. Resultados passados não garantem desempenho futuro.</p></div><div class="note"><strong>Diagnóstico da estratégia 3D + contexto semanal</strong><br>Sinais de compra detectados: '+multiDiag.buySignals+'; sinais de venda: '+multiDiag.sellSignals+'. Na parte de validação: '+multiDiag.oosBuySignals+' sinais de compra e '+multiDiag.oosSellSignals+' de venda. Barras com histórico semanal mínimo disponível: '+multiDiag.weeklyReadyBars+'. Sinais repetidos em candles consecutivos não equivalem a operações executadas; esta contagem serve para localizar gargalos, não mede rentabilidade.<br>Filtros na validação: '+multiDiag.oosBars+' candles; semanal altista '+multiDiag.weeklyBull+'; semanal baixista '+multiDiag.weeklyBear+'; 3D altista '+multiDiag.dailyBull+'; MACD positivo '+multiDiag.macdBull+'; momentum favorável '+multiDiag.momentumBull+'; distância EMA50 aceitável '+multiDiag.distanceOk+'; score >=70 '+multiDiag.score70+'; base de compra antes do RR '+multiDiag.baseBuy+'; RR aprovado '+multiDiag.rrPass+'; RR reprovado '+multiDiag.rrFail+'; ATR ausente '+multiDiag.atrMissing+'.</div><div class="note">Backtest com candles 3D e execução na abertura seguinte: cada sinal usa apenas candles de 3 dias já fechados. A estratégia 3D + contexto semanal usa EMA 50/200 no gráfico 3D e EMA 20/50 no semanal. Nas variantes com stop e alvo, se ambos forem tocados no mesmo candle 3D, assume stop primeiro. As outras estratégias encerram por sinal de venda. Continua sendo uma aproximação: custos são estimados. A divisão temporal é exploratória, não uma validação independente definitiva.</div>';
+ html+=rankingHtml;
+ const comparisonSorted=results.slice().sort((a,b)=>(b.oos.ret-b.oos.benchmark)-(a.oos.ret-a.oos.benchmark));
+ const retScale=Math.max(1,...results.map(x=>Math.abs(x.oos.ret)),...results.map(x=>Math.abs(x.oos.benchmark)));
+ html+='<section class="strategy-overview"><div class="cardhead"><h3 style="margin:0;font-size:15px">Comparação rápida · período de validação</h3><span class="pill">RESULTADOS CALCULADOS</span></div><p class="note" style="margin-top:0">Ordenado pela diferença entre retorno líquido da estratégia e comprar e manter no período de validação (60–80% do histórico). O teste final (últimos 20%) é mostrado separadamente e não participa do ranking. Retorno maior não significa automaticamente melhor estratégia: confira drawdown e quantidade de operações.</p>';
+ for(const x of comparisonSorted){const diff=x.oos.ret-x.oos.benchmark;const caution=x.oos.closed<20?'AMOSTRA PEQUENA':x.oos.dd>=40?'DRAWDOWN ELEVADO':diff<0?'ABAIXO DO BTC':x.oos.pf!==null&&x.oos.pf<1?'PROFIT FACTOR < 1':'REVISAR ROBUSTEZ';const width=Math.min(100,Math.abs(x.oos.ret)/retScale*100);html+='<div class="strategy-row"><div class="strategy-row-top"><strong>'+x.name+'</strong><span class="pill" style="margin-left:7px">'+caution+'</span><span class="'+color(diff)+'">Diferença vs referência: '+fmt(diff)+'</span></div><div class="strategy-bars"><div class="strategy-bar-label">Estratégia <b class="'+color(x.oos.ret)+'">'+fmt(x.oos.ret)+'</b></div><div class="strategy-track"><span class="'+(x.oos.ret>=0?'pos':'neg')+'" style="width:'+Math.max(2,width)+'%"></span></div><div class="strategy-bar-label">Comprar e manter <b>'+fmt(x.oos.benchmark)+'</b></div><div class="strategy-track"><span class="benchmark" style="width:'+Math.max(2,Math.min(100,Math.abs(x.oos.benchmark)/retScale*100))+'%"></span></div></div><div class="strategy-meta"><span>Drawdown OOS: <strong>'+x.oos.dd.toFixed(2)+'%</strong></span><span>Operações encerradas: <strong>'+x.oos.closed+'</strong></span><span>Profit factor: <strong>'+(x.oos.pf==null?'—':x.oos.pf===Infinity?'∞':x.oos.pf.toFixed(2))+'</strong></span></div></div>'}
+ html+='</section>';
+ for(const r of results){
+  html+='<div style="margin-top:14px;padding-top:10px;border-top:1px solid #263449"><h3>'+r.name+'</h3><div class="metric"><span>Retorno líquido</span><strong class="'+color(r.full.ret)+'">'+fmt(r.full.ret)+'</strong></div><div class="metric"><span>Comprar e manter (referência)</span><strong>'+fmt(r.full.benchmark)+'</strong></div><div class="metric"><span>CAGR / drawdown máximo</span><strong>'+fmt(r.full.cagr)+' / '+r.full.dd.toFixed(2)+'%</strong></div><div class="metric"><span>Entradas / operações encerradas</span><strong>'+r.full.entries+' / '+r.full.closed+'</strong></div><div class="metric"><span>Taxa de acerto</span><strong>'+r.full.win.toFixed(1)+'%</strong></div><div class="metric"><span>Ganho médio / perda média líquida</span><strong>'+fmt(r.full.avgWin)+' / -'+r.full.avgLoss.toFixed(2)+'%</strong></div><div class="metric"><span>Profit factor líquido / expectativa por operação</span><strong>'+(r.full.pf==null?'—':r.full.pf===Infinity?'∞':r.full.pf.toFixed(2))+' / '+fmt(r.full.expect)+'</strong></div><div class="metric"><span>Validação · estratégia vs referência</span><strong class="'+color(r.oos.ret-r.oos.benchmark)+'">'+fmt(r.oos.ret)+' vs '+fmt(r.oos.benchmark)+'</strong></div><div class="metric"><span>Operações na validação</span><strong>'+r.oos.entries+' entradas / '+r.oos.closed+' encerradas</strong></div>'+(r.oos.closed<30?'<div class="note"><strong>Amostra de validação pequena:</strong> '+r.oos.closed+' operações encerradas. Resultados não sustentam conclusão robusta de desempenho.</div>':'')+'</div>';
+ html+='<div style="margin-top:12px"><h4>Consistência por período</h4><div class="note">O histórico é dividido em três blocos cronológicos para mostrar se os resultados dependem de uma única fase do mercado. Os períodos não são independentes e não garantem robustez futura.</div>'+r.segments.map(s=>'<div class="metric"><span>'+s.name+' · retorno / referência</span><strong class="'+color(s.stats.ret-s.stats.benchmark)+'">'+fmt(s.stats.ret)+' / '+fmt(s.stats.benchmark)+'</strong></div><div class="metric"><span>'+s.name+' · drawdown / operações</span><strong>'+s.stats.dd.toFixed(2)+'% / '+s.stats.closed+'</strong></div>').join('')+'</div>';
+  html+='<div class="metric"><span>TESTE FINAL RESERVADO · retorno líquido / referência</span><strong class="'+color(r.holdout.ret-r.holdout.benchmark)+'">'+fmt(r.holdout.ret)+' / '+fmt(r.holdout.benchmark)+'</strong></div><div class="metric"><span>Teste final · drawdown / operações encerradas</span><strong>'+r.holdout.dd.toFixed(2)+'% / '+r.holdout.closed+'</strong></div><div class="note">Teste final cronológico (últimos 20% dos candles): não use este resultado para escolher ou ajustar a estratégia. Como o dashboard mostra várias estratégias, a comparação visual ainda pode induzir seleção retrospectiva; para uma decisão independente, congele uma regra antes de consultar este bloco.</div>';
+  html+='<div class="note"><strong>Validação em cinco blocos temporais</strong><br>Retorno composto dos blocos: <strong class="'+color((r.foldReturn-1)*100)+'">'+fmt((r.foldReturn-1)*100)+'</strong>; referência composta: <strong>'+fmt((r.foldBenchmark-1)*100)+'</strong>; blocos que superaram a referência: <strong>'+r.foldPositive+'/5</strong>; operações encerradas nos blocos: <strong>'+r.foldClosed+'</strong>; pior drawdown entre blocos: <strong>'+r.foldWorstDD.toFixed(2)+'%</strong>.<br>É uma análise de consistência temporal, não cinco testes independentes nem substituto do teste OOS final.</div>';
+ }
+ html+='<div class="note">Custos estimados: taxa de 0,10% + slippage de 0,05% por lado. A simulação não modela spread variável, liquidez, impostos, ordens parciais ou execução intrabar. Drawdown é estimado com marcação diária; posições são compradas integralmente, sem alavancagem. Não use isoladamente para decisões financeiras.</div>';
+ out.innerHTML=html;
+}
+let lastDecisionData=null;
+function updateRiskCalc(){const el=id=>document.getElementById(id);const result=el('riskCalcResult'),btn=el('riskCalcBtn');if(!result||!btn)return;const d=lastDecisionData||{},buy=typeof d.signal==='string'&&d.signal.indexOf('COMPRA')===0&&Number(d.rr)>=1.5;btn.disabled=!buy;if(!buy){result.textContent='Não abrir nova compra agora: aguarde um sinal de compra aprovado e níveis válidos.';return}const capital=Number(el('riskCapital').value),pct=Number(el('riskPercent').value),entry=Number(el('riskEntry').value),stop=Number(el('riskStop').value),target=Number(el('riskTarget').value);if(!(capital>0&&pct>=0.1&&pct<=2&&entry>stop&&stop>0&&target>entry)){result.textContent='Preencha o capital, use risco entre 0,1% e 2% e confirme: stop abaixo da entrada e alvo acima dela.';return}const rr=(target-entry)/(entry-stop);if(rr<1.5){result.textContent='Risco-retorno abaixo de 1:1,5 neste preço. Não usar esta entrada; aguarde um preço melhor ou novo sinal.';return}const riskCash=capital*pct/100,qty=Math.floor(Math.min(capital/entry,riskCash/(entry-stop))*1e8)/1e8;if(!(qty>0)){result.textContent='Quantidade calculada abaixo do mínimo de 0,00000001 BTC.';return}const exposure=qty*entry,loss=qty*(entry-stop),gain=qty*(target-entry);result.innerHTML='<strong>Quantidade máxima estimada:</strong> '+qty.toLocaleString('pt-BR',{maximumFractionDigits:8})+' BTC<br><strong>Valor da posição:</strong> '+fmtUSD(exposure)+' ('+(exposure/capital*100).toLocaleString('pt-BR',{maximumFractionDigits:1})+'% do capital)<br><strong>Perda teórica até o stop:</strong> '+fmtUSD(loss)+' (limite definido: '+fmtUSD(riskCash)+')<br><strong>Ganho teórico até o alvo:</strong> '+fmtUSD(gain)+'<br><strong>Risco-retorno pelo preço informado:</strong> 1 : '+rr.toLocaleString('pt-BR',{maximumFractionDigits:2})+'<br><span class="muted">Estimativa antes de taxas, slippage e gaps; não é ordem nem garantia de execução.</span>'}
+function renderRiskCalculator(data,spot){lastDecisionData=data||null;const ids=[['riskEntry',spot],['riskStop',data&&data.invalidation],['riskTarget',data&&data.target]];for(const [id,value] of ids){const el=document.getElementById(id);if(el&&!el.dataset.touched&&Number.isFinite(Number(value))&&Number(value)>0)el.value=Number(value).toFixed(2)}const buy=data&&typeof data.signal==='string'&&data.signal.indexOf('COMPRA')===0&&Number(data.rr)>=1.5;const status=document.getElementById('riskCalcStatus');if(status){status.textContent=buy?'COMPRA APROVADA':'AGUARDAR';status.className='pill '+(buy?'buy':'wait')}updateRiskCalc()}
+
+function updateMarketSnapshot(signal,data){const changeEl=$("snapshotChange"),changeNote=$("snapshotChangeNote"),signalEl=$("snapshotSignal"),signalNote=$("snapshotSignalNote"),nextEl=$("snapshotNext"),nextNote=$("snapshotNextNote");if(changeEl){const ch=Number(data&&data.change24h);if(Number.isFinite(ch)){changeEl.textContent=(ch>0?"+":"")+ch.toFixed(2)+"%";changeEl.className=ch>0?"positive":ch<0?"negative":"";if(changeNote)changeNote.textContent=ch>0?"Alta nas últimas 24 horas":ch<0?"Queda nas últimas 24 horas":"Sem variação relevante";}else{changeEl.textContent=$("change")?$("change").textContent:"Aguardando cotação";}}if(signalEl){const shown=$("decisionMain")?$("decisionMain").textContent:signal||"Analisando";signalEl.textContent=shown;signalEl.className=String(shown).includes("COMPRA")?"positive":String(shown).includes("VENDA")?"negative":"caution";if(signalNote)signalNote.textContent="Score técnico: "+(data&&Number.isFinite(Number(data.score))?Number(data.score)+"/100":"aguardando dados")+" · não é probabilidade de lucro";}if(nextEl){const v=String($("decisionMain")?$("decisionMain").textContent:signal||"").toUpperCase();let title="Conferir atualização",desc="Verifique os dados e o horário antes de agir.";if(v.includes("COMPRA")){title="Revisar o risco";desc="Confira entrada, invalidação e risco-retorno."}else if(v.includes("VENDA")){title="Reavaliar exposição";desc="Considere seu plano de proteção; não é ordem automática."}else if(v.includes("AGUARDAR")){title="Esperar confirmação";desc="Evite forçar uma entrada sem confluência."}nextEl.textContent=title;if(nextNote)nextNote.textContent=desc;}}
+
+function signalHealthRow(x){return '<div class="signal-health-item" data-state="'+x.state+'"><span class="signal-health-dot" aria-hidden="true"></span><div><span class="signal-health-label">'+x.label+'</span><span class="signal-health-detail">'+x.detail+'</span></div></div>';}
+function renderSignalHealth(d){
+ const grid=$('signalHealthGrid'),summary=$('signalHealthSummary');if(!grid||!summary)return;const c=d&&d.engineDaily,rows=[],add=(label,detail,state)=>rows.push({label,detail,state});
+ if(!d||d.ready===false||!c||!c.ready){add('Dados diários','Histórico insuficiente; sinais suspensos.','neutral');grid.innerHTML=rows.map(signalHealthRow).join('');summary.textContent='Dados insuficientes';return;}
+ const buy=!!c.buy,sell=!!c.sell,price=Number(c.close),e50=Number(c.ema50),e200=Number(c.ema200),macd=Number(c.macd),sig=Number(c.macdSignal);
+ add('Candle diário','Último candle utilizado já está fechado.','good');add('Filtro EMA 50 / 200',buy?'Compra confirmada: fechamento abaixo da EMA 50.'+(price<e200?' Também abaixo da EMA 200 (compra forte).':' Acima/na EMA 200 (compra normal).'):sell?'Venda confirmada acima da EMA 50; filtro de ciclo liberado.':price<e50?(price<e200?'Preço abaixo das duas EMAs, sem cruzamento MACD confirmado.':'Preço abaixo da EMA 50, mas acima/na EMA 200; sem cruzamento MACD confirmado.'):price>e50?(price>e200?'Preço acima das duas EMAs, sem cruzamento MACD confirmado.':'Preço acima da EMA 50, mas abaixo/na EMA 200; filtro de ciclo/gatilho não confirmado.'):'Preço próximo/entre as médias; filtro não atendido.',buy?'good':sell?'bad':'neutral');add('MACD diário',buy?'Cruzamento ascendente confirmado.':sell?'Cruzamento descendente confirmado.':Number.isFinite(macd)&&Number.isFinite(sig)?'MACD '+macd.toFixed(2)+' · linha de sinal '+sig.toFixed(2)+'; sem cruzamento válido.':'MACD indisponível.',buy?'good':sell?'bad':'neutral');add('MVRV Z-Score','Filtro desativado temporariamente; não participa da decisão atual.','neutral');
+ grid.innerHTML=rows.map(signalHealthRow).join('');summary.textContent=buy?'COMPRA CONFIRMADA':sell?'VENDA CONFIRMADA':'AGUARDAR';
+}
+function renderEntryConfirmation(d){
+ const panel=$('entryConfirmationLight'),label=$('entryConfirmationLabel'),body=$('entryConfirmationBody');if(!panel||!label||!body)return;const c=d&&d.engineDaily,sig=String(d&&d.signal||'AGUARDAR').toUpperCase();
+ if(!d||d.ready===false||!c||!c.ready){label.textContent='DADOS INSUFICIENTES';body.textContent='Não utilizar sinais até o histórico diário estar completo.';panel.dataset.level='low';return;}
+ if(c.buy&&sig.indexOf('COMPRA')===0){const strong=Number.isFinite(Number(c.close))&&Number.isFinite(Number(c.ema200))&&Number(c.close)<Number(c.ema200);label.textContent=(strong?'COMPRA FORTE':'COMPRA')+' CONFIRMADA · CANDLE DIÁRIO FECHADO';body.textContent='Gatilho do motor: cruzamento ascendente do MACD diário com fechamento abaixo da EMA 50.'+(strong?' O fechamento também está abaixo da EMA 200, condição usada para classificar a compra como forte.':' A EMA 200 não é exigida para a compra base. O preço não está abaixo dela neste fechamento.')+' O filtro MVRV não está ativo. Confirme risco, tamanho da posição e plano de invalidação antes de executar.';panel.dataset.level='confirmed';}
+ else if(c.sell&&sig.indexOf('VENDA')===0){label.textContent='VENDA CONFIRMADA · CANDLE DIÁRIO FECHADO';body.textContent='Gatilho do motor: cruzamento descendente do MACD diário, fechamento acima da EMA 50 e filtro de ciclo/ATH liberado. O filtro MVRV não está ativo. O painel não envia ordens; avalie exposição, custos e plano de saída.';panel.dataset.level='confirmed';}
+ else{label.textContent='AGUARDAR · SEM NOVO GATILHO';body.textContent='O último candle diário fechado não cumpriu todas as condições do motor. A EMA 200 classifica a força da compra, mas não substitui o gatilho MACD; o filtro MVRV está desativado.';panel.dataset.level='low';}
+}
+function renderSignalConflict(d){
+ const title=$('signalConflictTitle'),badge=$('signalConflictBadge'),body=$('signalConflictBody'),list=$('signalConflictList');if(!title||!badge||!body||!list)return;const c=d&&d.engineDaily,signal=String(d&&d.signal||'AGUARDAR').toUpperCase()
